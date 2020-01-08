@@ -14,6 +14,22 @@ const routes: Routes = [
   {
     path: 'list',
     loadChildren: () => import('./list/list.module').then(m => m.ListPageModule)
+  },
+  {
+    path: 'products',
+    loadChildren: () => import('./pages/products/products.module').then( m => m.ProductsPageModule)
+  },
+  {
+    path: 'products/create',
+    loadChildren: () => import('./pages/product-create/product-create.module').then( m => m.ProductCreatePageModule)
+  },
+  {
+    path: 'products/:productId',
+    loadChildren: () => import('./pages/product-detail/product-detail.module').then( m => m.ProductDetailPageModule)
+  },
+  {
+    path: 'products/:productId/edit',
+    loadChildren: () => import('./pages/product-detail-edit/product-detail-edit.module').then( m => m.ProductDetailEditPageModule)
   }
 ];
 
