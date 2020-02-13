@@ -1,9 +1,76 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Products</ion-title>
-  </ion-toolbar>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Products</ion-title>
+    </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="">
+    <ion-item-group class="ion-margin">
+        <ion-button routerLink="/products/create">
+            Create New Product
+        </ion-button>
+    </ion-item-group>
 
+    <ngx-datatable
+            [rows]="products | async"
+            [rowHeight]="'auto'"
+            [headerHeight]="50"
+            [ngClass]="tableStyle"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            class="ion-text-wrap"
+    >
+        <ngx-datatable-column name="Image" [sortable]="false">
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-img [src]="row.imageUrl"></ion-img>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="ProductName">
+            <ng-template let-column="column" ngx-datatable-header-template>
+                Ten San Pham
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Product Type">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Cut Or Engraved">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column
+                name="Edit"
+                [sortable]="false"
+                *ngIf="isDesktop"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        color="warning"
+                        [routerLink]="['/products', row.id, 'edit', row]"
+                >
+                    Edit
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column
+                name="Delete"
+                [sortable]="false"
+                *ngIf="isDesktop"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        (click)="deleteProduct(row)"
+                        color="danger"
+                >
+                    Delete
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+    </ngx-datatable>
 </ion-content>

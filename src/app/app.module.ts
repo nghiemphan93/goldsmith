@@ -12,6 +12,7 @@ import {AngularFireModule} from '@angular/fire';
 import {environment} from '../environments/environment';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AngularFireStorageModule} from '@angular/fire/storage';
+import {ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
     declarations: [AppComponent],
@@ -22,7 +23,8 @@ import {AngularFireStorageModule} from '@angular/fire/storage';
         AppRoutingModule,
         AngularFireModule.initializeApp(environment.firebase),
         AngularFirestoreModule,
-        AngularFireStorageModule
+        AngularFireStorageModule,
+        ReactiveFormsModule
     ],
     providers: [
         StatusBar,
