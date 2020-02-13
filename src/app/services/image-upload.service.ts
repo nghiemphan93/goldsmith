@@ -47,4 +47,12 @@ export class ImageUploadService {
             console.log(error);
         }
     }
+
+    async deleteProductImage(imageUrl: string) {
+        try {
+            return await this.angularFireStorage.storage.refFromURL(imageUrl).delete();
+        } catch (e) {
+            console.log(e);
+        }
+    }
 }
