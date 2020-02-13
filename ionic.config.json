@@ -1,5 +1,7 @@
 {
   "name": "goldsmith",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }
