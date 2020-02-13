@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {Product} from '../../models/product';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ProductService} from '../../services/product.service';
@@ -12,62 +12,63 @@ import {ImageUploadService} from '../../services/image-upload.service';
 })
 export class ProductDetailEditPage implements OnInit {
 
-    oldProduct: Product;
-    updatedProduct: Product = new Product();
+    toUpdateProduct: Product;
+    oldImageUrl: string;
     validationForm: FormGroup;
+
 
     constructor(private productService: ProductService,
                 private formBuilder: FormBuilder,
                 private imageUploadService: ImageUploadService,
-                private activatedRoute: ActivatedRoute) {
+                private activatedRoute: ActivatedRoute,
+                private router: Router) {
     }
 
-    ngOnInit() {
-        // @ts-ignore
-        this.oldProduct = this.activatedRoute.snapshot.params;
-        this.updatedProduct = this.copyProduct(this.oldProduct);
-        console.log(this.oldProduct);
+    async ngOnInit() {
+        const productId = this.activatedRoute.snapshot.params.productId;
+        console.log(productId);
+        try {
+            this.productService.getProduct(productId).subscribe(productFromServer => {
+                this.toUpdateProduct = productFromServer;
+                console.log(this.toUpdateProduct);
 
-        this.prepareFormValidation();
-    }
+                this.oldImageUrl = this.toUpdateProduct.imageUrl;
+                this.prepareFormValidation();
+            });
 
-    copyProduct(toCopyProduct: Product): Product {
-        const copiedProduct = new Product();
-        copiedProduct.id = toCopyProduct.id;
-        copiedProduct.productType = toCopyProduct.productType;
-        copiedProduct.productName = toCopyProduct.productName;
-        copiedProduct.createdAt = toCopyProduct.createdAt;
-        copiedProduct.cutOrEngraved = toCopyProduct.cutOrEngraved;
-        copiedProduct.imageUrl = toCopyProduct.imageUrl;
-        return copiedProduct;
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     prepareFormValidation() {
         this.validationForm = this.formBuilder.group({
-            productName: new FormControl('', Validators.required),
-            productType: new FormControl('Dây', Validators.required),
-            cutOrEngraved: new FormControl('Cut', Validators.required),
-            // imageUrl: new FormControl(Validators.required)
+            productName: new FormControl(this.toUpdateProduct.productName, Validators.required),
+            productType: new FormControl(this.toUpdateProduct.productType, Validators.required),
+            cutOrEngraved: new FormControl(this.toUpdateProduct.cutOrEngraved, Validators.required)
         });
     }
 
     async uploadProductImage(event: FileList) {
-        this.updatedProduct.imageUrl = await this.imageUploadService.uploadProductImage(event);
+        this.toUpdateProduct.imageUrl = await this.imageUploadService.uploadProductImage(event);
     }
 
     async submitHandler() {
-        this.oldProduct.productName = this.validationForm.value.productName;
-        this.oldProduct.productType = this.validationForm.value.productType;
-        this.oldProduct.cutOrEngraved = this.validationForm.value.cutOrEngraved;
-        this.oldProduct.createdAt = new Date();
+        this.toUpdateProduct.productName = this.validationForm.value.productName;
+        this.toUpdateProduct.productType = this.validationForm.value.productType;
+        this.toUpdateProduct.cutOrEngraved = this.validationForm.value.cutOrEngraved;
+        this.toUpdateProduct.createdAt = new Date();
 
         try {
-            const documentRef = await this.productService.createProduct(this.oldProduct);
+            const clgt = await this.imageUploadService.deleteProductImage(this.oldImageUrl);
+            console.log(clgt);
+            const documentRef = await this.productService.updateProduct(this.toUpdateProduct);
             console.log(documentRef);
         } catch (error) {
             console.log(error);
         }
 
+        await this.router.navigate(['/products']);
     }
 
 }

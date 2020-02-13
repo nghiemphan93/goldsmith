@@ -20,7 +20,7 @@
                     To Products
                 </ion-button>
 
-                <form [formGroup]="validationForm">
+                <form [formGroup]="validationForm" *ngIf="toUpdateProduct">
                     <ion-item-divider>
                         <ion-label>Please fill in information for the product</ion-label>
                     </ion-item-divider>
@@ -71,7 +71,7 @@
 
                     <!--    Image Upload    -->
                     <ion-item-group>
-                        <ion-img [src]="updatedProduct.imageUrl"></ion-img>
+                        <ion-img [src]="toUpdateProduct.imageUrl"></ion-img>
                     </ion-item-group>
 
                     <ion-item-group>
