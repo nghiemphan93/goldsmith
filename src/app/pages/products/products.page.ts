@@ -1,23 +1,26 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../services/product.service';
 import {AngularFireUploadTask} from '@angular/fire/storage';
 import {Observable} from 'rxjs';
 import {AngularFirestoreCollection} from '@angular/fire/firestore';
 import {Product} from '../../models/product';
 import {Config, Platform} from '@ionic/angular';
+import {ImageUploadService} from '../../services/image-upload.service';
 
 @Component({
     selector: 'app-products',
     templateUrl: './products.page.html',
     styleUrls: ['./products.page.scss'],
 })
-export class ProductsPage implements OnInit {
+export class ProductsPage implements OnInit, OnDestroy {
+
     products: Observable<Product[]>;
     tableStyle = 'material';
     isDesktop: boolean;
     isMobile: boolean;
 
     constructor(private productService: ProductService,
+                private imageUploadService: ImageUploadService,
                 private config: Config,
                 private platform: Platform
     ) {
@@ -30,6 +33,9 @@ export class ProductsPage implements OnInit {
         this.products = this.productService.getProducts();
     }
 
+    ngOnDestroy(): void {
+    }
+
 
     open(row) {
         console.log(row);
@@ -37,6 +43,9 @@ export class ProductsPage implements OnInit {
 
     deleteProduct(toDeleteProduct: Product) {
         console.log(toDeleteProduct);
+        if (toDeleteProduct.imageUrl) {
+            this.imageUploadService.deleteProductImage(toDeleteProduct.imageUrl);
+        }
         this.productService.deleteProduct(toDeleteProduct);
     }
 }

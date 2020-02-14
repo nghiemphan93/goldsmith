@@ -15,7 +15,7 @@ export class ProductService {
 
     constructor(private afs: AngularFirestore) {
         this.productCollection = this.afs.collection('products', ref =>
-            ref.orderBy('productType', 'asc'));
+            ref.orderBy('createdAt', 'desc'));
     }
 
     getProducts(): Observable<Product[]> {

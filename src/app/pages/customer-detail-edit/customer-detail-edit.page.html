@@ -1,0 +1,166 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Edit Customer</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+    <ion-grid fixed>
+        <ion-row>
+            <ion-col
+                    sizeXl="6"
+                    offsetXl="3"
+                    sizeLg="6"
+                    offsetLg="3"
+                    sizeMd="8"
+                    offsetMd="2"
+            >
+                <ion-button routerLink="/customers">
+                    To Customers
+                </ion-button>
+
+                <form [formGroup]="validationForm" *ngIf="topUpdateCustomer">
+                    <ion-item-divider>
+                        <ion-label>Please fill in information for the Customer</ion-label>
+                    </ion-item-divider>
+
+                    <!--    First Name    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>First Name</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="Veronica"
+                                    formControlName="firstName"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Last Name    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Last Name</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="Flores"
+                                    formControlName="lastName"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Nick    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Nick (optional)</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="Veronica Flores"
+                                    formControlName="nick"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+
+                    <!--    Street    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Street</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="McConnell Ave"
+                                    formControlName="street"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Number    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Number</ion-label>
+                            <ion-input
+                                    type="number"
+                                    placeholder="8318"
+                                    formControlName="number"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Extra Information    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Extra Information (optional)</ion-label>
+                            <ion-input
+                                    type="string"
+                                    placeholder="apartment 520"
+                                    formControlName="extraInfor"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    City    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>City</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="SAN FRANCISCO"
+                                    formControlName="city"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    State    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>State</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="CA"
+                                    formControlName="state"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Postal Code    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Postal Code</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="90045"
+                                    formControlName="postal"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Country    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Country</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="United States"
+                                    formControlName="country"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+
+                    <ion-button
+                            [disabled]="!validationForm.valid"
+                            class="ion-margin-top"
+                            (click)="submitHandler()"
+                            type="submit"
+                            expand="block"
+                    >
+                        Submit
+                    </ion-button>
+                </form>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+</ion-content>

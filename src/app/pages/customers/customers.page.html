@@ -3,19 +3,24 @@
         <ion-buttons slot="start">
             <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>Products</ion-title>
+        <ion-title>Customers</ion-title>
     </ion-toolbar>
 </ion-header>
 
 <ion-content class="">
     <ion-item-group class="ion-margin">
-        <ion-button routerLink="/products/create">
-            Create New Product
+        <ion-button routerLink="/customers/create">
+            Create New Customer
         </ion-button>
     </ion-item-group>
 
+    <ion-col size="6" offset="6" *ngIf="!customers">
+        <ion-spinner></ion-spinner>
+    </ion-col>
+
     <ngx-datatable
-            [rows]="products | async"
+            *ngIf="customers"
+            [rows]="customers | async"
             [rowHeight]="'auto'"
             [headerHeight]="50"
             [ngClass]="tableStyle"
@@ -23,21 +28,24 @@
             [footerHeight]="50"
             class="ion-text-wrap"
     >
-        <ngx-datatable-column name="Image">
+        <ngx-datatable-column name="First Name" prop="firstName">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Last Name" prop="lastName">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column
+                name="Address"
+                [sortable]="false"
+                minWidth="130"
+        >
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <!--                <ion-img [src]="row.imageUrl"></ion-img>-->
-                <img [src]="row.imageUrl">
+                {{ row.number }} {{ row.street }} <br>
+                {{ row.city }}, {{ row.state }} {{ row.postal }}<br>
+                {{ row.country }}
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column name="ProductName" prop="productName">
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="Product Type" prop="productType" *ngIf="isDesktop">
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="Cut Or Engraved" prop="cutOrEngraved">
-        </ngx-datatable-column>
 
         <ngx-datatable-column
                 name="Edit"
@@ -48,7 +56,7 @@
                 <ion-button
                         size="small"
                         color="warning"
-                        [routerLink]="['/products', row.id, 'edit']"
+                        [routerLink]="['/customers', row.id, 'edit']"
                 >
                     Edit
                 </ion-button>
@@ -63,7 +71,7 @@
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        (click)="deleteProduct(row)"
+                        (click)="deleteCustomer(row)"
                         color="danger"
                 >
                     Delete

@@ -8,6 +8,7 @@ import {Product} from '../../models/product';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ImageUploadService} from '../../services/image-upload.service';
 import {tryCatch} from 'rxjs/internal-compatibility';
+import {Router} from '@angular/router';
 
 @Component({
     selector: 'app-product-create',
@@ -20,7 +21,8 @@ export class ProductCreatePage implements OnInit {
 
     constructor(private productService: ProductService,
                 private formBuilder: FormBuilder,
-                private imageUploadService: ImageUploadService) {
+                private imageUploadService: ImageUploadService,
+                private router: Router) {
     }
 
     ngOnInit() {
@@ -32,7 +34,6 @@ export class ProductCreatePage implements OnInit {
             productName: new FormControl('', Validators.required),
             productType: new FormControl('Dây', Validators.required),
             cutOrEngraved: new FormControl('Cut', Validators.required),
-            // imageUrl: new FormControl(Validators.required)
         });
     }
 
@@ -49,6 +50,7 @@ export class ProductCreatePage implements OnInit {
         try {
             const documentRef = await this.productService.createProduct(this.newProduct);
             console.log(documentRef);
+            await this.router.navigate(['products']);
         } catch (error) {
             console.log(error);
         }

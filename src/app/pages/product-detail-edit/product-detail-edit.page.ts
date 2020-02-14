@@ -63,7 +63,6 @@ export class ProductDetailEditPage implements OnInit {
         this.toUpdateProduct.productName = this.validationForm.value.productName;
         this.toUpdateProduct.productType = this.validationForm.value.productType;
         this.toUpdateProduct.cutOrEngraved = this.validationForm.value.cutOrEngraved;
-        this.toUpdateProduct.createdAt = new Date();
 
         try {
             const documentRef = await this.productService.updateProduct(this.toUpdateProduct);
