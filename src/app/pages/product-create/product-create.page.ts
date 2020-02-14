@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AngularFireStorage, AngularFireUploadTask} from '@angular/fire/storage';
 import {Observable} from 'rxjs';
-import {MyData} from '../file-upload-demo/file-upload-demo.page';
 import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
 import {finalize, tap} from 'rxjs/operators';
 import {ProductService} from '../../services/product.service';

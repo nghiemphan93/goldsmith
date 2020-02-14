@@ -11,7 +11,7 @@ import {Config, Platform} from '@ionic/angular';
     styleUrls: ['./demo-table.page.scss'],
 })
 export class DemoTablePage implements OnInit {
-    private companies = data;
+    companies = data;
     tableStyle = 'material';
 
     constructor(private config: Config,

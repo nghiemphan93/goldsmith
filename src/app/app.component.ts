@@ -35,11 +35,6 @@ export class AppComponent {
             title: 'Product Create',
             url: '/products/create',
             icon: 'videocam'
-        },
-        {
-            title: 'File Upload Demo',
-            url: '/file-upload-demo',
-            icon: 'videocam'
         }
     ];
 

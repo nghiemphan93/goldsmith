@@ -34,10 +34,6 @@ const routes: Routes = [
     {
         path: 'demo-table',
         loadChildren: () => import('./pages/demo-table/demo-table.module').then(m => m.DemoTablePageModule)
-    },
-    {
-        path: 'file-upload-demo',
-        loadChildren: () => import('./pages/file-upload-demo/file-upload-demo.module').then(m => m.FileUploadDemoPageModule)
     }
 ];
 

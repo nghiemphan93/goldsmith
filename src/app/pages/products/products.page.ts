@@ -3,7 +3,6 @@ import {ProductService} from '../../services/product.service';
 import {AngularFireUploadTask} from '@angular/fire/storage';
 import {Observable} from 'rxjs';
 import {AngularFirestoreCollection} from '@angular/fire/firestore';
-import {MyData} from '../file-upload-demo/file-upload-demo.page';
 import {Product} from '../../models/product';
 import {Config, Platform} from '@ionic/angular';
 

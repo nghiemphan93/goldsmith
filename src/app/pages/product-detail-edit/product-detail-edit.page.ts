@@ -50,7 +50,13 @@ export class ProductDetailEditPage implements OnInit {
     }
 
     async uploadProductImage(event: FileList) {
-        this.toUpdateProduct.imageUrl = await this.imageUploadService.uploadProductImage(event);
+        try {
+            this.toUpdateProduct.imageUrl = await this.imageUploadService.uploadProductImage(event);
+            await this.imageUploadService.deleteProductImage(this.oldImageUrl);
+            this.oldImageUrl = this.toUpdateProduct.imageUrl;
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     async submitHandler() {
@@ -60,15 +66,12 @@ export class ProductDetailEditPage implements OnInit {
         this.toUpdateProduct.createdAt = new Date();
 
         try {
-            const clgt = await this.imageUploadService.deleteProductImage(this.oldImageUrl);
-            console.log(clgt);
             const documentRef = await this.productService.updateProduct(this.toUpdateProduct);
             console.log(documentRef);
+            await this.router.navigate(['/products']);
         } catch (error) {
             console.log(error);
         }
-
-        await this.router.navigate(['/products']);
     }
 
 }
