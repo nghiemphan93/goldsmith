@@ -1,9 +1,97 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>orders</ion-title>
-  </ion-toolbar>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Orders</ion-title>
+    </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="">
+    <ion-item-group class="ion-margin">
+        <ion-button routerLink="/orders/create">
+            Create New Order
+        </ion-button>
+    </ion-item-group>
 
+    <ion-col size="6" offset="6" *ngIf="!orders">
+        <ion-spinner></ion-spinner>
+    </ion-col>
+
+    <ngx-datatable
+            *ngIf="orders"
+            [rows]="orders | async"
+            [rowHeight]="'auto'"
+            [headerHeight]="50"
+            [ngClass]="tableStyle"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            class="ion-text-wrap"
+    >
+        <ngx-datatable-column name="Order Code" prop="orderCode">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Created On" prop="createdAt">
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                {{ row.createdAt | date: 'dd/MM/yyyy' }}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Deadline" prop="orderDeadline">
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                {{ row.orderDeadline | date: 'dd/MM/yyyy' }}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Status" prop="orderStatus">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column
+                name="Details"
+                [sortable]="false"
+                *ngIf="isDesktop"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        color="warning"
+                        [routerLink]="['/orders', row.id]"
+                >
+                    Details
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column
+                name="Edit"
+                [sortable]="false"
+                *ngIf="isDesktop"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        color="warning"
+                        [routerLink]="['/orders', row.id, 'edit']"
+                >
+                    Edit
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column
+                name="Delete"
+                [sortable]="false"
+                *ngIf="isDesktop"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        (click)="deleteCustomer(row)"
+                        color="danger"
+                >
+                    Delete
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+    </ngx-datatable>
 </ion-content>
