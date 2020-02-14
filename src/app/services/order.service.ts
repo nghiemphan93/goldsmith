@@ -1,63 +1,64 @@
 import {Injectable} from '@angular/core';
 import {AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, DocumentReference} from '@angular/fire/firestore';
-import {Customer} from '../models/customer';
+import {Order} from '../models/order';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {Customer} from '../models/customer';
 
 @Injectable({
     providedIn: 'root'
 })
 export class OrderService {
-    customerCollection: AngularFirestoreCollection<Customer>;
-    customertDoc: AngularFirestoreDocument<Customer>;
-    customers: Observable<Customer[]>;
-    customer: Observable<Customer>;
+    orderCollection: AngularFirestoreCollection<Order>;
+    orderDoc: AngularFirestoreDocument<Order>;
+    orders: Observable<Order[]>;
+    order: Observable<Order>;
 
     constructor(private afs: AngularFirestore) {
-        this.customerCollection = this.afs.collection('customers', ref =>
-            ref.orderBy('lastName', 'asc'));
+        this.orderCollection = this.afs.collection('orders', ref =>
+            ref.orderBy('createdAt', 'desc'));
     }
 
-    getCustomers(): Observable<Customer[]> {
-        this.customers = this.customerCollection.snapshotChanges().pipe(
+    getOrders(): Observable<Order[]> {
+        this.orders = this.orderCollection.snapshotChanges().pipe(
             map(actions => actions.map(act => {
-                const data = act.payload.doc.data() as Customer;
+                const data = act.payload.doc.data() as Order;
                 data.id = act.payload.doc.id;
                 return data;
             }))
         );
 
-        return this.customers;
+        return this.orders;
     }
 
-    getCustomer(customerId: string): Observable<Customer> {
-        this.customertDoc = this.afs.doc<Customer>(`customers/${customerId}`);
-        this.customer = this.customertDoc.snapshotChanges().pipe(
+    getOrder(orderId: string): Observable<Order> {
+        this.orderDoc = this.afs.doc<Order>(`orders/${orderId}`);
+        this.order = this.orderDoc.snapshotChanges().pipe(
             map(action => {
                 if (action.payload.exists === false) {
                     return null;
                 } else {
-                    const data = action.payload.data() as Customer;
+                    const data = action.payload.data() as Order;
                     data.id = action.payload.id;
                     return data;
                 }
             })
         );
-        return this.customer;
+        return this.order;
     }
 
-    createCustomer(customer: Customer): Promise<DocumentReference> {
-        const data = JSON.parse(JSON.stringify(customer));
-        return this.customerCollection.add(data);
+    createOrder(order: Order): Promise<DocumentReference> {
+        const data = JSON.parse(JSON.stringify(order));
+        return this.orderCollection.add(data);
     }
 
-    updateCustomer(updatedCustomer: Customer) {
-        this.customertDoc = this.afs.doc(`customers/${updatedCustomer.id}`);
-        this.customertDoc.update(updatedCustomer);
+    updateOrder(toUpdateOrder: Order) {
+        this.orderDoc = this.afs.doc(`orders/${toUpdateOrder.id}`);
+        this.orderDoc.update(toUpdateOrder);
     }
 
-    deleteCustomer(toDeleteCustomer: Customer) {
-        this.customertDoc = this.afs.doc(`customers/${toDeleteCustomer.id}`);
-        this.customertDoc.delete();
+    deleteOrder(toDeleteOrder: Order) {
+        this.orderDoc = this.afs.doc(`orders/${toDeleteOrder.id}`);
+        this.orderDoc.delete();
     }
 }

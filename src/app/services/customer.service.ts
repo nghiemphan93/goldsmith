@@ -52,9 +52,9 @@ export class CustomerService {
         return this.customerCollection.add(data);
     }
 
-    updateCustomer(updatedCustomer: Customer) {
-        this.customertDoc = this.afs.doc(`customers/${updatedCustomer.id}`);
-        this.customertDoc.update(updatedCustomer);
+    updateCustomer(toUpdateCustomer: Customer) {
+        this.customertDoc = this.afs.doc(`customers/${toUpdateCustomer.id}`);
+        this.customertDoc.update(toUpdateCustomer);
     }
 
     deleteCustomer(toDeleteCustomer: Customer) {

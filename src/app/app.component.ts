@@ -49,12 +49,12 @@ export class AppComponent {
         {
             title: 'Orders',
             url: '/orders',
-            icon: 'person-add-outline'
+            icon: 'receipt-outline'
         },
         {
             title: 'Create Order',
             url: '/orders/create',
-            icon: 'person-add-outline'
+            icon: 'create-outline'
         }
     ];
 
