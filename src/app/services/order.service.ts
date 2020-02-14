@@ -54,11 +54,11 @@ export class OrderService {
 
     updateOrder(toUpdateOrder: Order) {
         this.orderDoc = this.afs.doc(`orders/${toUpdateOrder.id}`);
-        this.orderDoc.update(toUpdateOrder);
+        return this.orderDoc.update(toUpdateOrder);
     }
 
     deleteOrder(toDeleteOrder: Order) {
         this.orderDoc = this.afs.doc(`orders/${toDeleteOrder.id}`);
-        this.orderDoc.delete();
+        return this.orderDoc.delete();
     }
 }
