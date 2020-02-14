@@ -22,19 +22,39 @@ export class AppComponent {
             icon: 'list'
         },
         {
-            title: 'Products',
-            url: '/products',
-            icon: 'pricetags'
-        },
-        {
             title: 'Demo Table',
             url: '/demo-table',
             icon: 'videocam'
         },
         {
-            title: 'Product Create',
+            title: 'Products',
+            url: '/products',
+            icon: 'pricetags'
+        },
+        {
+            title: 'Create Product',
             url: '/products/create',
             icon: 'videocam'
+        },
+        {
+            title: 'Customers',
+            url: '/customers',
+            icon: 'people-outline'
+        },
+        {
+            title: 'Create Customer',
+            url: '/customers/create',
+            icon: 'person-add-outline'
+        },
+        {
+            title: 'Orders',
+            url: '/orders',
+            icon: 'person-add-outline'
+        },
+        {
+            title: 'Create Order',
+            url: '/orders/create',
+            icon: 'person-add-outline'
         }
     ];
 
