@@ -33,7 +33,7 @@ export class OrdersPage implements OnInit {
         console.log(row);
     }
 
-    deleteCustomer(toDeleteOrder: Order) {
+    deleteOrder(toDeleteOrder: Order) {
         console.log(toDeleteOrder);
         this.orderService.deleteOrder(toDeleteOrder);
     }

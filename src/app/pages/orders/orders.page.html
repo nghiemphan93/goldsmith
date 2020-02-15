@@ -55,7 +55,7 @@
                 <ion-button
                         size="small"
                         color="warning"
-                        [routerLink]="['/orders', row.id]"
+                        [routerLink]="['/orders', row.id, 'orderItems']"
                 >
                     Details
                 </ion-button>
@@ -86,7 +86,7 @@
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        (click)="deleteCustomer(row)"
+                        (click)="deleteOrder(row)"
                         color="danger"
                 >
                     Delete

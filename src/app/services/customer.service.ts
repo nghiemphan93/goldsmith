@@ -16,7 +16,7 @@ export class CustomerService {
 
     constructor(private afs: AngularFirestore) {
         this.customerCollection = this.afs.collection('customers', ref =>
-            ref.orderBy('lastName', 'asc'));
+            ref.orderBy('firstName', 'asc'));
     }
 
     getCustomers(): Observable<Customer[]> {
