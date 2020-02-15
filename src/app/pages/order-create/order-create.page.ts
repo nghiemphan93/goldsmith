@@ -5,6 +5,7 @@ import {CustomerService} from '../../services/customer.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Order} from '../../models/order';
 import {OrderService} from '../../services/order.service';
+import {Status} from '../../models/status.enum';
 
 @Component({
     selector: 'app-order-create',
@@ -15,8 +16,6 @@ export class OrderCreatePage implements OnInit {
     newOrder = new Order();
     validationForm: FormGroup;
     isCreated: boolean;
-    today = new Date();
-    fourDaysFromNow = new Date(new Date().setDate(new Date().getDate() + 4));
 
     constructor(private orderService: OrderService,
                 private formBuilder: FormBuilder,
@@ -26,14 +25,13 @@ export class OrderCreatePage implements OnInit {
 
     ngOnInit() {
         this.prepareFormValidation();
-        console.log(this.today);
     }
 
 
     prepareFormValidation() {
         this.validationForm = this.formBuilder.group({
             orderCode: new FormControl('', Validators.required),
-            orderStatus: new FormControl('PENDING', Validators.required),
+            orderStatus: new FormControl(Status.PENDING, Validators.required),
             orderDeadline: new FormControl('', Validators.required)
         });
     }

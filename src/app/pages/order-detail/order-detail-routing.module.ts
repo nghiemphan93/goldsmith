@@ -9,19 +9,19 @@ const routes: Routes = [
         component: OrderDetailPage
     },
     {
-        path: 'orderitems',
+        path: 'orderItems',
         loadChildren: () => import('./order-items/order-items.module').then(m => m.OrderItemsPageModule)
     },
     {
-        path: 'orderitems/create',
+        path: 'orderItems/create',
         loadChildren: () => import('./order-item-create/order-item-create.module').then(m => m.OrderItemCreatePageModule)
     },
     {
-        path: 'orderitems/:orderItemId',
+        path: 'orderItems/:orderItemId',
         loadChildren: () => import('./order-item-detail/order-item-detail.module').then(m => m.OrderItemDetailPageModule)
     },
     {
-        path: 'orderitems/:orderItemId/edit',
+        path: 'orderItems/:orderItemId/edit',
         loadChildren: () => import('./order-item-detail-edit/order-item-detail-edit.module').then(m => m.OrderItemDetailEditPageModule)
     }
 ];
