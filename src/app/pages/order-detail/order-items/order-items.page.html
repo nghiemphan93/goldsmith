@@ -1,9 +1,107 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>order-items</ion-title>
-  </ion-toolbar>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Order Items</ion-title>
+    </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="">
+    <ion-item-group class="ion-margin">
+        <ion-button [routerLink]="['/orders', orderId, 'orderItems', 'create']">
+            Create New Order Item
+        </ion-button>
+    </ion-item-group>
 
+    <ion-col size="6" offset="6" *ngIf="!orderItems">
+        <ion-spinner></ion-spinner>
+    </ion-col>
+
+    <ngx-datatable
+            *ngIf="orderItems"
+            [rows]="orderItems | async"
+            [rowHeight]="'auto'"
+            [headerHeight]="50"
+            [ngClass]="tableStyle"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            class="ion-text-wrap"
+    >
+        <ngx-datatable-column name="Comment" prop="orderItemComment">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Code" prop="orderItemCode">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Word" prop="orderItemWord">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Image" prop="orderItemImageUrl">
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <img [src]="row.orderItemImageUrl">
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Quantity" prop="orderItemQuantity">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Font" prop="orderItemFont">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Color/ Ring Size" prop="orderItemColor">
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+              <span *ngIf="row.product?.productType === 'Nhẫn'">
+                {{ row.orderItemCoatedColor }} <br>
+                Ring Size: {{ row.orderItemRingSizeUS }}
+                </span>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Color/ Necklace Size" prop="orderItemColor">
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+              <span *ngIf="row.product?.productType === 'Dây'">
+                  {{ row.product?.productName }} <br>
+                  {{ row.orderItemColor }} <br>
+                  Size: {{ row.orderItemLengthInch }}
+                </span>
+            </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Status" prop="orderStatus">
+        </ngx-datatable-column>
+
+        <ngx-datatable-column
+                name="Edit"
+                [sortable]="false"
+                *ngIf="isDesktop"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        color="warning"
+                        [routerLink]="['/orders', orderId, 'orderItems', row.id]"
+                >
+                    Edit
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column
+                name="Delete"
+                [sortable]="false"
+                *ngIf="isDesktop"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        (click)="deleteOrderItem(row)"
+                        color="danger"
+                >
+                    Delete
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+    </ngx-datatable>
 </ion-content>
