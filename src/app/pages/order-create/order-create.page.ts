@@ -16,6 +16,8 @@ export class OrderCreatePage implements OnInit {
     newOrder = new Order();
     validationForm: FormGroup;
     isCreated: boolean;
+    today = new Date();
+    fourDaysFromNow = new Date(new Date().setDate(new Date().getDate() + 4));
 
     constructor(private orderService: OrderService,
                 private formBuilder: FormBuilder,
@@ -25,6 +27,7 @@ export class OrderCreatePage implements OnInit {
 
     ngOnInit() {
         this.prepareFormValidation();
+        console.log(this.today);
     }
 
 
