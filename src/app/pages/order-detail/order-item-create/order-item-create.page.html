@@ -1,9 +1,257 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>order-item-create</ion-title>
-  </ion-toolbar>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Create Order Item</ion-title>
+    </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
 
+    <ion-grid fixed>
+        <ion-row>
+            <ion-col
+                    sizeXl="6"
+                    offsetXl="3"
+                    sizeLg="6"
+                    offsetLg="3"
+                    sizeMd="8"
+                    offsetMd="2"
+            >
+                <ion-button routerLink="/orders">
+                    To Order Items
+                </ion-button>
+
+                <form [formGroup]="validationForm">
+                    <ion-item-divider>
+                        <ion-label>Please fill in information for the Order Item</ion-label>
+                    </ion-item-divider>
+
+                    <!-- Order -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Order</ion-label>
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="order"
+                            >
+                                <ion-select-option [value]="order | async">
+                                    {{ (order | async)?.orderCode }}
+                                </ion-select-option>
+                            </ion-select>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Order Item Code   -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Order Item Code</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder=""
+                                    formControlName="orderItemCode"
+                                    slot="end"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Status   -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Status</ion-label>
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="orderItemStatus"
+                            >
+                                <ion-select-option
+                                        *ngFor="let status of statuses"
+                                        [value]="status"
+                                >{{ status }}</ion-select-option>
+                            </ion-select>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!-- Customer -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Customer</ion-label>
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="customer"
+                            >
+                                <ion-select-option
+                                        *ngFor="let customer of customers | async"
+                                        [value]="customer"
+                                >
+                                    {{ customer.firstName }} {{ customer.lastName }} <br>
+                                    {{ customer.number }} {{ customer.street }} <br>
+                                    {{ customer.city }}, {{ customer.state }} {{ customer.postal }}<br>
+                                    {{ customer.country }}
+                                </ion-select-option>
+                            </ion-select>
+
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!-- Product -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Product</ion-label>
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="product"
+                            >
+                                <ion-select-option
+                                        *ngFor="let product of products | async"
+                                        [value]="product"
+                                >
+                                    {{ product.productName }}
+                                </ion-select-option>
+                            </ion-select>
+
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Comment   -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Comment</ion-label>
+                            <ion-textarea
+                                    type="text"
+                                    placeholder=""
+                                    formControlName="orderItemComment"
+                            ></ion-textarea>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Font   -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Font</ion-label>
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="orderItemFont"
+                                    [ngStyle]="selectedFontStyle"
+                                    #orderItemFontElement
+                                    (ionChange)="changeFont(orderItemFontElement)"
+                            >
+                                <ion-select-option
+                                        *ngFor="let font of fonts"
+                                        [value]="font"
+                                >{{ font }}</ion-select-option>
+                            </ion-select>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Word   -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Word</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder=""
+                                    formControlName="orderItemWord"
+                                    [ngStyle]="selectedFontStyle"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Quantity   -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Quantity</ion-label>
+                            <ion-input
+                                    type="number"
+                                    placeholder=""
+                                    formControlName="orderItemQuantity"
+                                    slot="end"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Ring Size US  -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Ring Size US</ion-label>
+                            <ion-input
+                                    type="number"
+                                    placeholder=""
+                                    formControlName="orderItemRingSizeUS"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Length Inch   -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Length Inch</ion-label>
+                            <ion-input
+                                    type="number"
+                                    placeholder=""
+                                    formControlName="orderItemLengthInch"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Color   -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Color</ion-label>
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="orderItemColor"
+                                    #orderItemColorElement
+                                    (ionChange)="changeColor(orderItemColorElement)"
+                                    [ngStyle]="selectedColorStyle"
+                            >
+                                <ion-select-option
+                                        *ngFor="let color of colors"
+                                        [value]="color"
+
+                                >{{ color }}</ion-select-option>
+                            </ion-select>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Image Upload    -->
+                    <ion-item-group>
+                        <ion-img
+                                [src]="this.newOrderItem.orderItemImageUrl"
+                                *ngIf="newOrderItem.orderItemImageUrl"
+                        ></ion-img>
+                    </ion-item-group>
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Image</ion-label>
+                            <ion-input
+                                    type="file"
+                                    slot="end"
+                                    (change)="uploadProductImage($event.target.files)"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+
+                    <ion-button
+                            [disabled]="!validationForm.valid"
+                            class="ion-margin-top"
+                            (click)="submitHandler()"
+                            type="submit"
+                            expand="block"
+                    >
+                        Submit
+                    </ion-button>
+                    <!--                    <ion-button-->
+                    <!--                            class="ion-margin-top"-->
+                    <!--                            (click)="submitHandler()"-->
+                    <!--                            type="submit"-->
+                    <!--                            expand="block"-->
+                    <!--                    >-->
+                    <!--                        Submit-->
+                    <!--                    </ion-button>-->
+                </form>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
 </ion-content>

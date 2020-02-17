@@ -1,20 +1,24 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
-import { IonicModule } from '@ionic/angular';
+import {IonicModule} from '@ionic/angular';
 
-import { OrderItemCreatePageRoutingModule } from './order-item-create-routing.module';
+import {OrderItemCreatePageRoutingModule} from './order-item-create-routing.module';
 
-import { OrderItemCreatePage } from './order-item-create.page';
+import {OrderItemCreatePage} from './order-item-create.page';
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    OrderItemCreatePageRoutingModule
-  ],
-  declarations: [OrderItemCreatePage]
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        OrderItemCreatePageRoutingModule,
+        ReactiveFormsModule,
+        HttpClientModule
+    ],
+    declarations: [OrderItemCreatePage]
 })
-export class OrderItemCreatePageModule {}
+export class OrderItemCreatePageModule {
+}
