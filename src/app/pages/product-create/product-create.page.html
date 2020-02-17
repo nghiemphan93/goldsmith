@@ -73,6 +73,13 @@
 
                     <!--    Image Upload    -->
                     <ion-item-group>
+                        <ion-img
+                                [src]="this.newProduct.imageUrl"
+                                *ngIf="this.newProduct.imageUrl"
+                        ></ion-img>
+                    </ion-item-group>
+
+                    <ion-item-group>
                         <ion-item>
                             <ion-label>Ảnh mẫu</ion-label>
                             <!--                <ion-input type="text" placeholder="what.."></ion-input>-->
