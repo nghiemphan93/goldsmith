@@ -4,6 +4,7 @@ import {AngularFirestore} from '@angular/fire/firestore';
 import {ProductService} from './product.service';
 import {FormBuilder} from '@angular/forms';
 
+
 @Injectable({
     providedIn: 'root'
 })
@@ -13,7 +14,7 @@ export class ImageUploadService {
     ) {
     }
 
-    async uploadProductImage(event: FileList): Promise<string> {
+    async uploadProductImage(event: FileList) {
         if (event.length <= 0) {
             return null;
         }
@@ -27,9 +28,7 @@ export class ImageUploadService {
             return null;
         }
 
-        // The storage path
         const path = `productImages/${new Date().getTime()}_${file.name}`;
-
 
         // Totally optional metadata
         const customMetadata = {app: 'Product Image'};
@@ -48,7 +47,38 @@ export class ImageUploadService {
         }
     }
 
-    async deleteProductImage(imageUrl: string) {
+    async uploadOrderItemImage(event: FileList) {
+        if (event.length <= 0) {
+            return null;
+        }
+
+        // The File object
+        const file = event.item(0);
+
+        // Validation for Images Only
+        if (file.type.split('/')[0] !== 'image') {
+            console.error('unsupported file type :( ');
+            return null;
+        }
+
+        const path = `orderItemImages/${new Date().getTime()}_${file.name}`;
+
+        // Totally optional metadata
+        const customMetadata = {app: 'Order Item Image'};
+
+        // File reference
+        const fileRef = this.angularFireStorage.ref(path);
+
+        try {
+            const uploadTask = await fileRef.put(file, {customMetadata});
+            const imageUrl = await fileRef.getDownloadURL().toPromise();
+            return imageUrl;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async deleteImageFromUrl(imageUrl: string) {
         try {
             return await this.angularFireStorage.storage.refFromURL(imageUrl).delete();
         } catch (e) {
