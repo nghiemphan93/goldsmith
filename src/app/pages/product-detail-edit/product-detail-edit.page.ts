@@ -52,7 +52,7 @@ export class ProductDetailEditPage implements OnInit {
     async uploadProductImage(event: FileList) {
         try {
             this.toUpdateProduct.imageUrl = await this.imageUploadService.uploadProductImage(event);
-            await this.imageUploadService.deleteProductImage(this.oldImageUrl);
+            await this.imageUploadService.deleteImageFromUrl(this.oldImageUrl);
             this.oldImageUrl = this.toUpdateProduct.imageUrl;
         } catch (e) {
             console.log(e);

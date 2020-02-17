@@ -44,7 +44,7 @@ export class ProductsPage implements OnInit, OnDestroy {
     deleteProduct(toDeleteProduct: Product) {
         console.log(toDeleteProduct);
         if (toDeleteProduct.imageUrl) {
-            this.imageUploadService.deleteProductImage(toDeleteProduct.imageUrl);
+            this.imageUploadService.deleteImageFromUrl(toDeleteProduct.imageUrl);
         }
         this.productService.deleteProduct(toDeleteProduct);
     }
