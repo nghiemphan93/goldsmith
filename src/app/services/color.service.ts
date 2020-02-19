@@ -28,7 +28,7 @@ export class ColorService {
                 break;
             case 'GOLD':
                 // this.selectedColorClass = 'goldColor';
-                return {'background-color': 'gold'};
+                return {'background-color': 'yellow'};
                 break;
             case 'ROSE GOLD':
                 // this.selectedColorClass = 'roseGoldColor';

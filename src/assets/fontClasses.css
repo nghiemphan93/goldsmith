@@ -1,239 +1,246 @@
 .Alittlesunshine {
     font-family: A little sunshine;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .AmsterdamOne {
     font-family: Amsterdam One;
-    font-size: 3rem;
+    font-size: 1.5rem !important;
+    overflow: hidden;
 }
 
 .Angelface {
     font-family: Angelface;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .AppleChancery {
     font-family: Apple Chancery;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .Arial {
     font-family: Arial;
-    font-size: 3rem;
+    font-size: 1.5rem !important;
 }
 
 .BookmanOldStyle {
     font-family: Bookman Old Style;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .BradleyHand {
     font-family: Bradley Hand;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .BrotherhoodScript {
     font-family: Brotherhood Script;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .CallieHand {
     font-family: Callie Hand;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .Candlescript {
     font-family: Candlescript;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .CaviarDreams {
     font-family: Caviar Dreams;
-    font-size: 3rem;
+    font-size: 1.5rem !important;
 }
 
 .CenturyGothic {
     font-family: Century Gothic;
-    font-size: 3rem;
+    font-size: 1.5rem !important;
 }
 
 .ChloeRegular {
     font-family: Chloe Regular;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .ColonnaMT {
     font-family: Colonna MT;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .Copperplate {
     font-family: Copperplate;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .CosmopolitanScript {
     font-family: Cosmopolitan Script;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .CourierNormalRegular {
     font-family: Courier Normal Regular;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .DancingScriptOT {
     font-family: Dancing Script OT;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .EdwardianScriptITC {
     font-family: Edwardian Script ITC;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .EnglishTowne {
     font-family: English Towne;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .Gabriola {
     font-family: Gabriola;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .GautreauxMedium {
     font-family: Gautreaux Medium;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .GrandHotel {
     font-family: Grand Hotel;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .GreatVibes {
     font-family: Great Vibes;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .HaloHandletter {
     font-family: HaloHandletter;
-    font-size: 3rem;
+    font-size: 2.5rem !important;
 }
 
 .Honeyquick {
     font-family: Honeyquick;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .IsabellaScript {
     font-family: Isabella Script;
-    font-size: 3rem;
+    font-size: 3rem !important;
 }
 
 .JennaSue {
     font-family: Jenna Sue;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .LaurenScript {
     font-family: Lauren Script;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .LavanderiaRegular {
     font-family: Lavanderia Regular;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .LittleDaysAlt {
     font-family: Little Days Alt;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .LittleDays {
     font-family: Little Days;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .Lobster14 {
-    font-family: Lobster 1.4;
-    font-size: 3rem;
+    font-family: Lobster14;
+    font-size: 2rem !important;
 }
 
 .LucidaCalligraphy {
     font-family: Lucida Calligraphy;
-    font-size: 3rem;
+    font-size: 1.5rem !important;
 }
 
 .LucidaHandwriting {
     font-family: Lucida Handwriting;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .Maratre {
     font-family: Maratre;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .MoneyPennyScript {
     font-family: Money Penny Script;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .Monogram {
     font-family: Monogram;
-    font-size: 3rem;
+    font-size: 5rem !important;
 }
 
 .MonotypeCorsiva {
     font-family: Monotype Corsiva;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .MulberryScript {
     font-family: Mulberry Script;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .MurrayHill {
     font-family: Murray Hill;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .NellaSueDemo {
     font-family: Nella Sue Demo;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .Quiska {
     font-family: Quiska;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .Rochester {
     font-family: Rochester;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .ScriptMT {
     font-family: Script MT;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .Scriptina {
     font-family: Scriptina;
-    font-size: 3rem;
+    font-size: 2rem !important;
+    overflow: hidden;
 }
 
 .Sofia {
     font-family: Sofia;
-    font-size: 3rem;
+    font-size: 2rem !important;
 }
 
 .TimesNewRoman {
     font-family: Times New Roman;
-    font-size: 3rem;
+    font-size: 2rem !important;
+}
+
+.Wildmoon {
+    font-family: WildMoon;
+    font-size: 2rem !important;
 }

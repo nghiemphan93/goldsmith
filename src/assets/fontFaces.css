@@ -223,7 +223,7 @@
 }
 
 @font-face {
-    font-family: "Lobster 1.4";
+    font-family: "Lobster14";
     src: url("./fonts/Lobster14.woff2") format("woff2"), url("./fonts/Lobster14.woff") format("woff");
     font-weight: normal;
     font-style: normal;
@@ -666,6 +666,15 @@
 @font-face {
     font-family: "Times New Roman";
     src: url("./fonts/TimesNewRoman.woff2") format("woff2"), url("./fonts/TimesNewRoman.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "WildMoon";
+
+    src: url("./fonts/WildMoon.woff") format("woff"), /* Modern Browsers */
+    url("./fonts/WildMoon.woff2") format("woff2"); /* Modern Browsers */
     font-weight: normal;
     font-style: normal;
 }
