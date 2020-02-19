@@ -27,38 +27,34 @@ export class CustomerCreatePage implements OnInit {
 
 
     prepareFormValidation() {
-        // this.validationForm = this.formBuilder.group({
-        //     firstName: new FormControl('Veronica', Validators.required),
-        //     lastName: new FormControl('Flores', Validators.required),
-        //     nick: new FormControl('Veronica Flores'),
-        //     street: new FormControl('McConnell Ave', Validators.required),
-        //     number: new FormControl('8318', Validators.required),
-        //     extraInfor: new FormControl(''),
-        //     city: new FormControl('SAN FRANCISCO', Validators.required),
-        //     state: new FormControl('CA', Validators.required),
-        //     postal: new FormControl('90045', Validators.required),
-        //     country: new FormControl('United States', Validators.required)
-        // });
-
         this.validationForm = this.formBuilder.group({
             firstName: new FormControl('', Validators.required),
             lastName: new FormControl('', Validators.required),
             nick: new FormControl(''),
-            street: new FormControl('', Validators.required),
-            number: new FormControl('', Validators.required),
+            street: new FormControl(''),
+            number: new FormControl(''),
             extraInfor: new FormControl(''),
             city: new FormControl('', Validators.required),
             state: new FormControl('', Validators.required),
             postal: new FormControl('', Validators.required),
-            country: new FormControl('', Validators.required)
+            country: new FormControl('United States', Validators.required)
         });
     }
 
+    toTitleCase(s: string) {
+        if (typeof s !== 'string') {
+            return '';
+        }
+        return s.toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+    }
+
     async submitHandler() {
-        this.newCustomer.firstName = this.validationForm.value.firstName;
-        this.newCustomer.lastName = this.validationForm.value.lastName;
-        this.newCustomer.nick = this.validationForm.value.nick;
-        this.newCustomer.street = this.validationForm.value.street;
+        this.newCustomer.firstName = this.toTitleCase(this.validationForm.value.firstName);
+        this.newCustomer.lastName = this.toTitleCase(this.validationForm.value.lastName);
+        this.newCustomer.nick = this.toTitleCase(this.validationForm.value.nick);
+        this.newCustomer.street = this.toTitleCase(this.validationForm.value.street);
         this.newCustomer.number = this.validationForm.value.number;
         this.newCustomer.extraInfor = this.validationForm.value.extraInfor;
         this.newCustomer.city = this.validationForm.value.city.toUpperCase();
@@ -70,6 +66,9 @@ export class CustomerCreatePage implements OnInit {
         try {
             const documentRef = await this.customerService.createCustomer(this.newCustomer);
             console.log(documentRef);
+            this.validationForm.reset({
+                country: 'United States'
+            });
             await this.router.navigate(['customers']);
         } catch (e) {
             console.log(e);
