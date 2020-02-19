@@ -1,4 +1,4 @@
-export enum CoatedColor {
+export enum Color {
     'SILVER',
     'PLATINUM',
     'GOLD',

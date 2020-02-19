@@ -2,7 +2,7 @@ import {Order} from './order';
 import {Customer} from './customer';
 import {Product} from './product';
 import {Status} from './status.enum';
-import {CoatedColor} from './color.enum';
+import {Color} from './color.enum';
 
 export class OrderItem {
     id: string;
@@ -20,7 +20,7 @@ export class OrderItem {
     orderItemImageUrl: string;
     orderItemQuantity: number;
     orderItemFont: string;
-    orderItemColor: CoatedColor;
+    orderItemColor: Color;
     orderItemRingSizeUS: number;
     orderItemRingSizeVN: number;
     orderItemLengthInch: number;

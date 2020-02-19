@@ -4,7 +4,7 @@ import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
 const routes: Routes = [
     {
         path: '',
-        redirectTo: 'customers',
+        redirectTo: 'orders/934tU103Z6fuuB9WPKWK/orderItems',
         pathMatch: 'full'
     },
     {

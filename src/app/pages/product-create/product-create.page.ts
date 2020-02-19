@@ -69,6 +69,10 @@ export class ProductCreatePage implements OnInit, OnDestroy {
             this.oldImageUrl = this.newProduct.imageUrl;
             const documentRef = await this.productService.createProduct(this.newProduct);
             console.log(documentRef);
+            this.validationForm.reset({
+                productType: 'Dây',
+                cutOrEngraved: 'Cut'
+            });
             await this.router.navigate(['products']);
         } catch (error) {
             console.log(error);

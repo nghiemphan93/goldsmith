@@ -49,6 +49,7 @@ export class OrderCreatePage implements OnInit {
         try {
             const documentRef = await this.orderService.createOrder(this.newOrder);
             console.log(documentRef);
+            this.validationForm.reset();
             await this.router.navigate(['orders']);
         } catch (e) {
             console.log(e);

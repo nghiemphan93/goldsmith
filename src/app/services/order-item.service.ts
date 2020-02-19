@@ -16,7 +16,7 @@ export class OrderItemService {
         const orderItems = this.afs
             .collection<Order>('orders')
             .doc<Order>(orderId)
-            .collection<OrderItem>('orderItems')
+            .collection<OrderItem>('orderItems', ref => ref.orderBy('createdAt'))
             .snapshotChanges().pipe(
                 map(actions => actions.map(act => {
                     const data = act.payload.doc.data() as OrderItem;

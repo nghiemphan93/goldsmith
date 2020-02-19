@@ -132,12 +132,11 @@
                             <ion-select
                                     interface="action-sheet"
                                     formControlName="orderItemFont"
-                                    [ngStyle]="selectedFontStyle"
                                     #orderItemFontElement
                                     (ionChange)="changeFont(orderItemFontElement)"
                             >
                                 <ion-select-option
-                                        *ngFor="let font of fonts"
+                                        *ngFor="let font of fontNames"
                                         [value]="font"
                                 >{{ font }}</ion-select-option>
                             </ion-select>
@@ -150,9 +149,9 @@
                             <ion-label>Word</ion-label>
                             <ion-input
                                     type="text"
-                                    placeholder=""
                                     formControlName="orderItemWord"
-                                    [ngStyle]="selectedFontStyle"
+                                    [ngClass]="selectedFontClass"
+                                    slot="end"
                             ></ion-input>
                         </ion-item>
                     </ion-item-group>
@@ -178,6 +177,7 @@
                                     type="number"
                                     placeholder=""
                                     formControlName="orderItemRingSizeUS"
+                                    slot="end"
                             ></ion-input>
                         </ion-item>
                     </ion-item-group>
@@ -190,6 +190,7 @@
                                     type="number"
                                     placeholder=""
                                     formControlName="orderItemLengthInch"
+                                    slot="end"
                             ></ion-input>
                         </ion-item>
                     </ion-item-group>
@@ -242,14 +243,6 @@
                     >
                         Submit
                     </ion-button>
-                    <!--                    <ion-button-->
-                    <!--                            class="ion-margin-top"-->
-                    <!--                            (click)="submitHandler()"-->
-                    <!--                            type="submit"-->
-                    <!--                            expand="block"-->
-                    <!--                    >-->
-                    <!--                        Submit-->
-                    <!--                    </ion-button>-->
                 </form>
             </ion-col>
         </ion-row>

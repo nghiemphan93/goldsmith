@@ -27,51 +27,119 @@
             [columnMode]="'force'"
             [footerHeight]="50"
             class="ion-text-wrap"
+            style="overflow: hidden"
+
     >
-        <ngx-datatable-column name="Comment" prop="orderItemComment">
+        <!--    Comment    -->
+        <ngx-datatable-column
+                name="Comment"
+                prop="orderItemComment"
+                [cellClass]="getCommentClass"
+                *ngIf="isDesktop"
+        >
         </ngx-datatable-column>
 
-        <ngx-datatable-column name="Code" prop="orderItemCode">
+        <!--    Code    -->
+        <ngx-datatable-column
+                name="Code"
+                prop="orderItemCode"
+        >
         </ngx-datatable-column>
 
-        <ngx-datatable-column name="Word" prop="orderItemWord">
+        <!--    Word    -->
+        <ngx-datatable-column
+                name="Word"
+                prop="orderItemWord"
+                [cellClass]="getFontClass"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+              <span>
+                {{ row.orderItemWord }}
+                </span>
+            </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column name="Image" prop="orderItemImageUrl">
+        <!--    Font    -->
+        <ngx-datatable-column
+                name="Font"
+                prop="orderItemFont"
+                [cellClass]=""
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <span>
+                {{ row.orderItemFont }}
+                </span>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <!--    Image    -->
+        <ngx-datatable-column
+                name="Image"
+                prop="orderItemImageUrl"
+        >
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <img [src]="row.orderItemImageUrl">
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column name="Quantity" prop="orderItemQuantity">
+        <!--    Quantity    -->
+        <ngx-datatable-column
+                name="Quantity"
+                prop="orderItemQuantity"
+                [cellClass]="getQuantityClass"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <span>{{ row.orderItemQuantity }}</span>
+            </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column name="Font" prop="orderItemFont">
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="Color/ Ring Size" prop="orderItemColor">
+        <!--    Color/ Ring Size    -->
+        <ngx-datatable-column
+                name="Color/ Ring Size"
+                prop="product.productName"
+                [cellClass]="getRingColorClass"
+        >
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
               <span *ngIf="row.product?.productType === 'Nhẫn'">
-                {{ row.orderItemCoatedColor }} <br>
-                Ring Size: {{ row.orderItemRingSizeUS }}
-                </span>
-            </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column name="Color/ Necklace Size" prop="orderItemColor">
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-              <span *ngIf="row.product?.productType === 'Dây'">
-                  {{ row.product?.productName }} <br>
+                  <strong>{{ row.product.productName }}</strong><br>
                   {{ row.orderItemColor }} <br>
-                  Size: {{ row.orderItemLengthInch }}
+                Ring Size: {{ row.orderItemRingSizeUS }} US
                 </span>
             </ng-template>
         </ngx-datatable-column>
 
-
-        <ngx-datatable-column name="Status" prop="orderStatus">
+        <!--    Color/ Necklace Size    -->
+        <ngx-datatable-column
+                name="Color/ Necklace Size"
+                prop="product.productName"
+                [cellClass]="getNecklaceColorClass">
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+              <span *ngIf="row.product?.productType !== 'Nhẫn'">
+                  <strong>{{ row.product?.productName }} </strong><br>
+                  {{ row.orderItemColor }} <br>
+                  <span *ngIf="row.orderItemLengthInch">Size: {{ row.orderItemLengthInch }} inches</span>
+                </span>
+            </ng-template>
         </ngx-datatable-column>
 
+        <!-- Customer -->
+        <ngx-datatable-column
+                name="Customer"
+                prop="customer"
+                *ngIf="isDesktop"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size=""
+                        [routerLink]="['/customers', row.customer.id]"
+                >
+                    {{ row.customer.firstName }} <br>
+                    {{ row.customer.lastName }} <br>
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <!--    Edit    -->
         <ngx-datatable-column
                 name="Edit"
                 [sortable]="false"
@@ -88,6 +156,7 @@
             </ng-template>
         </ngx-datatable-column>
 
+        <!--    Delete    -->
         <ngx-datatable-column
                 name="Delete"
                 [sortable]="false"

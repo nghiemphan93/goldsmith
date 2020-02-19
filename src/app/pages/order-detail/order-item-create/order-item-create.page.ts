@@ -36,11 +36,12 @@ export class OrderItemCreatePage implements OnInit {
     oldImageUrl: string;
     statuses: (string | Status)[] = Object.entries(Status).filter(e => !isNaN(e[0] as any)).map(e => e[1]);
     colors: (string | Color)[];
-    fonts: string[];
+    fontNames: string[];
     // selectedColorClass = 'silverColor';
     selectedColorStyle = {'background-color': 'white'};
     selectedFontStyle = {'font-family': 'Arial', 'font-size': '1rem'};
     ringSizeUStoVN: Map<number, number>;
+    selectedFontClass = 'Arial';
 
     constructor(private orderService: OrderService,
                 private orderItemService: OrderItemService,
@@ -56,7 +57,7 @@ export class OrderItemCreatePage implements OnInit {
 
     async ngOnInit() {
         this.colors = this.colorService.getColors();
-        this.fonts = this.fontService.getFontNames();
+        this.fontNames = this.fontService.getFontNames();
         this.ringSizeUStoVN = this.configRingSizeUStoVN();
         this.orderId = this.activatedRoute.snapshot.params.orderId;
         this.order = this.orderService.getOrder(this.orderId);
@@ -75,18 +76,19 @@ export class OrderItemCreatePage implements OnInit {
             customer: new FormControl(Validators.required),
             product: new FormControl('', Validators.required),
             orderItemComment: new FormControl(''),
-            orderItemFont: new FormControl(this.fonts[4]),  // Font Arial
+            orderItemFont: new FormControl(this.fontNames[4]),  // Font Arial
             orderItemWord: new FormControl(''),
             orderItemQuantity: new FormControl(1, Validators.required),
             orderItemRingSizeUS: new FormControl(''),
             orderItemLengthInch: new FormControl(''),
             orderItemColor: new FormControl(this.colors[0], Validators.required), // Color.SILVER
+            orderItemImageUrl: new FormControl('')
         });
     }
 
     async uploadProductImage(event: FileList) {
         try {
-            this.newOrderItem.orderItemImageUrl = await this.imageUploadService.uploadProductImage(event);
+            this.newOrderItem.orderItemImageUrl = await this.imageUploadService.uploadOrderItemImage(event);
             await this.imageUploadService.deleteImageFromUrl(this.oldImageUrl);
             this.oldImageUrl = this.newOrderItem.orderItemImageUrl;
         } catch (e) {
@@ -149,6 +151,12 @@ export class OrderItemCreatePage implements OnInit {
         try {
             const documentRef = await this.orderItemService.createOrderItem(this.orderId, this.newOrderItem);
             console.log(documentRef);
+            this.validationForm.reset({
+                orderItemStatus: this.statuses[0],
+                orderItemFont: this.fontNames[4],
+                orderItemQuantity: 1,
+                orderItemColor: this.colors[0]
+            });
             await this.router.navigate(['orders', this.orderId, 'orderItems']);
         } catch (e) {
             console.log(e);
@@ -162,6 +170,10 @@ export class OrderItemCreatePage implements OnInit {
     }
 
     changeFont(orderItemFontElement: IonSelect) {
-        this.selectedFontStyle = this.fontService.changeFont(orderItemFontElement);
+        // this.selectedFontStyle = this.fontService.changeFont(orderItemFontElement);
+        let className = orderItemFontElement.value.replace(/\s/g, '');
+        className = className.replace('.', '');
+
+        this.selectedFontClass = className;
     }
 }
