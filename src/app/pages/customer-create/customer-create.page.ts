@@ -3,8 +3,6 @@ import {Customer} from '../../models/customer';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {CustomerService} from '../../services/customer.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Value} from '@angular/fire/remote-config';
-import {Observable} from 'rxjs';
 
 @Component({
     selector: 'app-customer-create',
@@ -15,36 +13,63 @@ export class CustomerCreatePage implements OnInit {
     validationForm: FormGroup;
     isCreated: boolean;
     isUpdated: boolean;
+    isDetailed: boolean;
     customer: Customer;
-
 
     constructor(private customerService: CustomerService,
                 private formBuilder: FormBuilder,
                 private activatedRoute: ActivatedRoute,
-                private router: Router) {
+                private router: Router
+    ) {
     }
 
     ngOnInit() {
-        const customerId = this.activatedRoute.snapshot.params.customerId;
-        if (customerId) {
-            try {
-                this.isUpdated = true;
-                this.customerService.getCustomer(customerId).subscribe(customerFromServer => {
-                    this.customer = customerFromServer;
-                    this.prepareFormValidationUpdate();
-                });
-            } catch (e) {
-                console.log(e);
-            }
+        this.preparePageContent();
+    }
 
-        } else {
-            this.isCreated = true;
-            this.customer = new Customer();
-            this.prepareFormValidationCreate();
+    /**
+     * Identify what purpose of the page should be.
+     * Create, Edit or Detail of a Customer
+     */
+    preparePageContent() {
+        const customerId = this.activatedRoute.snapshot.params.customerId;
+        const url = this.router.url.split('/');
+
+
+        switch (url[url.length - 1]) {
+            case 'create':
+                this.isCreated = true;
+                this.customer = new Customer();
+                this.prepareFormValidationCreate();
+                break;
+            case 'edit':
+                try {
+                    this.isUpdated = true;
+                    this.customerService.getCustomer(customerId).subscribe(customerFromServer => {
+                        this.customer = customerFromServer;
+                        this.prepareFormValidationUpdateOrDetail();
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
+                break;
+            default :
+                try {
+                    this.isDetailed = true;
+                    this.customerService.getCustomer(customerId).subscribe(customerFromServer => {
+                        this.customer = customerFromServer;
+                        this.prepareFormValidationUpdateOrDetail();
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
+                break;
         }
     }
 
-
+    /**
+     * Prepare a Reactive Form for Creating a Customer
+     */
     prepareFormValidationCreate() {
         this.validationForm = this.formBuilder.group({
             firstName: new FormControl('', Validators.required),
@@ -60,7 +85,10 @@ export class CustomerCreatePage implements OnInit {
         });
     }
 
-    prepareFormValidationUpdate() {
+    /**
+     * Prepare a Reactive Form for Editing or Showing Details of a Customer
+     */
+    prepareFormValidationUpdateOrDetail() {
         this.validationForm = this.formBuilder.group({
             firstName: new FormControl(this.customer.firstName, Validators.required),
             lastName: new FormControl(this.customer.lastName, Validators.required),
@@ -75,6 +103,10 @@ export class CustomerCreatePage implements OnInit {
         });
     }
 
+    /**
+     * Helper function to transform a string to title case
+     * @param s: any string
+     */
     toTitleCase(s: string) {
         if (typeof s !== 'string') {
             return '';
@@ -84,6 +116,9 @@ export class CustomerCreatePage implements OnInit {
             .map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
 
+    /**
+     * Function to handle Submit button
+     */
     async submitHandler() {
         this.customer.firstName = this.toTitleCase(this.validationForm.value.firstName);
         this.customer.lastName = this.toTitleCase(this.validationForm.value.lastName);
