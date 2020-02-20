@@ -16,6 +16,9 @@ import { CustomerCreatePage } from './customer-create.page';
         CustomerCreatePageRoutingModule,
         ReactiveFormsModule
     ],
-  declarations: [CustomerCreatePage]
+    exports: [
+        CustomerCreatePage
+    ],
+    declarations: [CustomerCreatePage]
 })
 export class CustomerCreatePageModule {}

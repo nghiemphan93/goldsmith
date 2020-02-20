@@ -17,6 +17,9 @@ import {NgxDatatableModule} from '@swimlane/ngx-datatable';
         CustomersPageRoutingModule,
         NgxDatatableModule
     ],
-  declarations: [CustomersPage]
+    exports: [
+        CustomersPage
+    ],
+    declarations: [CustomersPage]
 })
 export class CustomersPageModule {}

@@ -3,6 +3,7 @@ import {Customer} from '../../models/customer';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {CustomerService} from '../../services/customer.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {Observable} from 'rxjs';
 
 @Component({
     selector: 'app-customer-detail-edit',
@@ -14,6 +15,7 @@ export class CustomerDetailEditPage implements OnInit {
     topUpdateCustomer: Customer;
     validationForm: FormGroup;
     isCreated: boolean;
+    toUpdateCustomerObservable: Observable<Customer>;
 
     constructor(private customerService: CustomerService,
                 private formBuilder: FormBuilder,
@@ -22,17 +24,18 @@ export class CustomerDetailEditPage implements OnInit {
     }
 
     ngOnInit() {
-        const customerId = this.activatedRoute.snapshot.params.customerId;
-        try {
-            this.customerService.getCustomer(customerId).subscribe(customerFromServer => {
-                this.topUpdateCustomer = customerFromServer;
-                console.log(this.topUpdateCustomer);
-
-                this.prepareFormValidation();
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        // const customerId = this.activatedRoute.snapshot.params.customerId;
+        // this.toUpdateCustomerObservable = this.customerService.getCustomer(customerId);
+        // try {
+        //     this.customerService.getCustomer(customerId).subscribe(customerFromServer => {
+        //         this.topUpdateCustomer = customerFromServer;
+        //         console.log(this.topUpdateCustomer);
+        //
+        //         this.prepareFormValidation();
+        //     });
+        // } catch (e) {
+        //     console.log(e);
+        // }
 
     }
 

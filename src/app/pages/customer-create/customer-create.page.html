@@ -23,7 +23,7 @@
                     To Customers
                 </ion-button>
 
-                <form [formGroup]="validationForm">
+                <form [formGroup]="validationForm" *ngIf="customer">
                     <ion-item-divider>
                         <ion-label>Please fill in information for the Customer</ion-label>
                     </ion-item-divider>
