@@ -18,6 +18,7 @@
         <ion-spinner></ion-spinner>
     </ion-col>
 
+    <!--  Main Table Content for Desktop  -->
     <ngx-datatable
             *ngIf="customers"
             [rows]="customers | async"
@@ -28,12 +29,15 @@
             [footerHeight]="50"
             class="ion-text-wrap"
     >
+        <!--    First Name    -->
         <ngx-datatable-column name="First Name" prop="firstName">
         </ngx-datatable-column>
 
+        <!--    Last Name    -->
         <ngx-datatable-column name="Last Name" prop="lastName">
         </ngx-datatable-column>
 
+        <!--    Address    -->
         <ngx-datatable-column
                 name="Address"
                 [sortable]="false"
@@ -46,7 +50,24 @@
             </ng-template>
         </ngx-datatable-column>
 
+        <!--    Details Button    -->
+        <ngx-datatable-column
+                name="Details"
+                [sortable]="false"
+                *ngIf="isDesktop"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        color="secondary"
+                        [routerLink]="['/customers', row.id]"
+                >
+                    Details
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
 
+        <!--    Edit Button    -->
         <ngx-datatable-column
                 name="Edit"
                 [sortable]="false"
@@ -55,14 +76,16 @@
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        color="warning"
+                        color="tertiary"
                         [routerLink]="['/customers', row.id, 'edit']"
                 >
+                    <ion-icon name="settings-outline"></ion-icon>
                     Edit
                 </ion-button>
             </ng-template>
         </ngx-datatable-column>
 
+        <!--    Delete Button    -->
         <ngx-datatable-column
                 name="Delete"
                 [sortable]="false"
@@ -71,9 +94,10 @@
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        (click)="deleteCustomer(row)"
                         color="danger"
+                        (click)="presentDeleteConfirm(row)"
                 >
+                    <ion-icon name="trash-bin-outline"></ion-icon>
                     Delete
                 </ion-button>
             </ng-template>
