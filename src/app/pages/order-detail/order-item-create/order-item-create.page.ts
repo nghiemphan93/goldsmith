@@ -13,7 +13,6 @@ import {Product} from '../../../models/product';
 import {ImageUploadService} from '../../../services/image-upload.service';
 import {Status} from '../../../models/status.enum';
 import {HttpClient} from '@angular/common/http';
-import {listFiles} from 'list-files-in-dir';
 import {Color} from '../../../models/color.enum';
 import {IonSelect} from '@ionic/angular';
 import {take} from 'rxjs/operators';
