@@ -1,8 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Product} from '../../models/product';
-import {ProductService} from '../../services/product.service';
-import {Config, Platform} from '@ionic/angular';
+import {AlertController, Config, Platform} from '@ionic/angular';
 import {Customer} from '../../models/customer';
 import {CustomerService} from '../../services/customer.service';
 
@@ -19,24 +17,59 @@ export class CustomersPage implements OnInit {
 
     constructor(private customerService: CustomerService,
                 private config: Config,
-                private platform: Platform
+                private platform: Platform,
+                private alertController: AlertController
     ) {
     }
 
     ngOnInit() {
-        this.isDesktop = this.platform.is('desktop');
-        this.isMobile = !this.platform.is('desktop');
-
+        this.preparePlatform();
         this.customers = this.customerService.getCustomers();
     }
 
-
-    open(row) {
-        console.log(row);
+    /**
+     * Identify which platform is being used
+     */
+    private preparePlatform() {
+        this.isDesktop = this.platform.is('desktop');
+        this.isMobile = !this.platform.is('desktop');
     }
 
+    /**
+     * Handler to delete a customer
+     * @param toDeleteCustomer: Customer
+     */
     deleteCustomer(toDeleteCustomer: Customer) {
         console.log(toDeleteCustomer);
         this.customerService.deleteCustomer(toDeleteCustomer);
+    }
+
+    /**
+     * Showing alert when clicking Delete Button
+     * @param toDeleteCustomer: Customer
+     */
+    async presentDeleteConfirm(toDeleteCustomer: Customer) {
+        const alert = await this.alertController.create({
+            header: 'Confirm!',
+            message: '<strong>Are you sure to delete?</strong>!!!',
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel',
+                    cssClass: 'secondary',
+                    handler: (blah) => {
+                        console.log('canceled');
+                    }
+                }, {
+                    text: 'Okay',
+                    handler: () => {
+                        console.log('okay');
+                        this.deleteCustomer(toDeleteCustomer);
+                    }
+                }
+            ]
+        });
+
+        await alert.present();
     }
 }
