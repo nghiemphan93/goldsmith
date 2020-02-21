@@ -14,6 +14,7 @@ export class CustomersPage implements OnInit {
     tableStyle = 'material';
     isDesktop: boolean;
     isMobile: boolean;
+    skeletons = [1, 2];
 
     constructor(private customerService: CustomerService,
                 private config: Config,
@@ -24,7 +25,9 @@ export class CustomersPage implements OnInit {
 
     ngOnInit() {
         this.preparePlatform();
-        this.customers = this.customerService.getCustomers();
+        setTimeout(() => {
+            this.customers = this.customerService.getCustomers();
+        }, 3000);
     }
 
     /**
