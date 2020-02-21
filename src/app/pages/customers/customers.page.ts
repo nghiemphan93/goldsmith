@@ -3,6 +3,8 @@ import {Observable} from 'rxjs';
 import {AlertController, Config, Platform} from '@ionic/angular';
 import {Customer} from '../../models/customer';
 import {CustomerService} from '../../services/customer.service';
+import {Router} from '@angular/router';
+import {take} from 'rxjs/operators';
 
 @Component({
     selector: 'app-customers',
@@ -19,15 +21,14 @@ export class CustomersPage implements OnInit {
     constructor(private customerService: CustomerService,
                 private config: Config,
                 private platform: Platform,
-                private alertController: AlertController
+                private alertController: AlertController,
+                private router: Router
     ) {
     }
 
     ngOnInit() {
         this.preparePlatform();
-        setTimeout(() => {
-            this.customers = this.customerService.getCustomers();
-        }, 3000);
+        this.customers = this.customerService.getCustomers();
     }
 
     /**
@@ -74,5 +75,15 @@ export class CustomersPage implements OnInit {
         });
 
         await alert.present();
+    }
+
+    doRefresh(event) {
+        setTimeout(async () => {
+
+            event.target.complete();
+            await this.router.navigate(['customers']);
+
+            console.log('refreshed...');
+        }, 2000);
     }
 }

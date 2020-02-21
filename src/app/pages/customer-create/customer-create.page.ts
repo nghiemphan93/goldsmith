@@ -130,10 +130,10 @@ export class CustomerCreatePage implements OnInit {
         this.customer.state = this.validationForm.value.state.toUpperCase();
         this.customer.country = this.validationForm.value.country;
         this.customer.postal = this.validationForm.value.postal;
-        this.customer.createdAt = new Date();
 
         try {
             if (this.isCreated) {
+                this.customer.createdAt = new Date();
                 const documentRef = await this.customerService.createCustomer(this.customer);
                 console.log(documentRef);
             } else {

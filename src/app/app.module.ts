@@ -13,6 +13,7 @@ import {environment} from '../environments/environment';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AngularFireStorageModule} from '@angular/fire/storage';
 import {ReactiveFormsModule} from '@angular/forms';
+import {HideHeaderDirective} from './directives/hide-header.directive';
 
 @NgModule({
     declarations: [AppComponent],
