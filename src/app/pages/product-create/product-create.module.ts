@@ -16,6 +16,9 @@ import {ProductCreatePage} from './product-create.page';
         ProductCreatePageRoutingModule,
         ReactiveFormsModule
     ],
+    exports: [
+        ProductCreatePage
+    ],
     declarations: [ProductCreatePage]
 })
 export class ProductCreatePageModule {

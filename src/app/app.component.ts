@@ -29,7 +29,7 @@ export class AppComponent {
         {
             title: 'Products',
             url: '/products',
-            icon: 'pricetags'
+            icon: 'pricetag-outline'
         },
         {
             title: 'Create Product',

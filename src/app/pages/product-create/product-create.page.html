@@ -3,12 +3,13 @@
         <ion-buttons slot="start">
             <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>ProductCreate</ion-title>
+        <ion-title *ngIf="isCreated">Create Product</ion-title>
+        <ion-title *ngIf="isUpdated">Edit Product</ion-title>
+        <ion-title *ngIf="isDetailed">Product's Details</ion-title>
     </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-
     <ion-grid fixed>
         <ion-row>
             <ion-col
@@ -22,10 +23,22 @@
                 <ion-button routerLink="/products">
                     To Products
                 </ion-button>
+                <ion-button
+                        color="tertiary"
+                        *ngIf="isDetailed && product"
+                        [routerLink]="['/products', product.id, 'edit']"
+                >
+                    <ion-icon name="settings-outline"></ion-icon>
+                    Edit
+                </ion-button>
 
-                <form [formGroup]="validationForm">
+                <!--        Reactive Form        -->
+                <form
+                        [formGroup]="validationForm"
+                        *ngIf="product"
+                >
                     <ion-item-divider>
-                        <ion-label>Please fill in information for the product</ion-label>
+                        <ion-label *ngIf="isDetailed">Please fill in information for the product</ion-label>
                     </ion-item-divider>
 
                     <!--    Product Name    -->
@@ -36,7 +49,10 @@
                                     type="text"
                                     placeholder="what.."
                                     formControlName="productName"
+                                    *ngIf="!isDetailed"
                             ></ion-input>
+
+                            <ion-label *ngIf="isDetailed">{{ product.productName }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -47,6 +63,7 @@
                             <ion-select
                                     interface="popover"
                                     formControlName="productType"
+                                    *ngIf="!isDetailed"
                             >
                                 <ion-select-option>Dây</ion-select-option>
                                 <ion-select-option>Nhẫn</ion-select-option>
@@ -54,6 +71,8 @@
                                 <ion-select-option>Vòng</ion-select-option>
                                 <ion-select-option>Kẹp cài áo</ion-select-option>
                             </ion-select>
+
+                            <ion-label *ngIf="isDetailed">{{ product.productType }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -64,22 +83,25 @@
                             <ion-select
                                     interface="popover"
                                     formControlName="cutOrEngraved"
+                                    *ngIf="!isDetailed"
                             >
                                 <ion-select-option>Cut</ion-select-option>
                                 <ion-select-option>Engrave</ion-select-option>
                             </ion-select>
+
+                            <ion-label *ngIf="isDetailed">{{ product.cutOrEngraved }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
                     <!--    Image Upload    -->
                     <ion-item-group>
                         <ion-img
-                                [src]="this.newProduct.imageUrl"
-                                *ngIf="this.newProduct.imageUrl"
+                                *ngIf="this.product?.imageUrl"
+                                [src]="this.product.imageUrl"
                         ></ion-img>
                     </ion-item-group>
 
-                    <ion-item-group>
+                    <ion-item-group *ngIf="!isDetailed">
                         <ion-item>
                             <ion-label>Ảnh mẫu</ion-label>
                             <!--                <ion-input type="text" placeholder="what.."></ion-input>-->
@@ -89,18 +111,18 @@
                                     type="file"
                                     class="upload"
                                     (change)="uploadProductImage($event.target.files)"
-
                             />
                         </ion-item>
                     </ion-item-group>
 
-
+                    <!--  Submit Button  -->
                     <ion-button
                             [disabled]="!validationForm.valid"
                             class="ion-margin-top"
                             (click)="submitHandler()"
                             type="submit"
                             expand="block"
+                            *ngIf="!isDetailed"
                     >
                         Submit
                     </ion-button>
@@ -108,6 +130,9 @@
             </ion-col>
         </ion-row>
     </ion-grid>
+
+    <ion-footer style="height: 10vh">
+    </ion-footer>
 </ion-content>
 
 

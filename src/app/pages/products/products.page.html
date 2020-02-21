@@ -7,7 +7,8 @@
     </ion-toolbar>
 </ion-header>
 
-<ion-content class="">
+<!--  Main Table Content for Desktop  -->
+<ion-content *ngIf="isDesktop && (products | async)">
     <ion-item-group class="ion-margin">
         <ion-button routerLink="/products/create">
             Create New Product
@@ -23,31 +24,50 @@
             [footerHeight]="50"
             class="ion-text-wrap"
     >
+        <!--    Image    -->
         <ngx-datatable-column name="Image">
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <!--                <ion-img [src]="row.imageUrl"></ion-img>-->
                 <img [src]="row.imageUrl">
             </ng-template>
         </ngx-datatable-column>
 
+        <!--    Product Name    -->
         <ngx-datatable-column name="ProductName" prop="productName">
         </ngx-datatable-column>
 
-        <ngx-datatable-column name="Product Type" prop="productType" *ngIf="isDesktop">
+        <!--    Product Type    -->
+        <ngx-datatable-column name="Product Type" prop="productType">
         </ngx-datatable-column>
 
+        <!--    Cut or Engraved    -->
         <ngx-datatable-column name="Cut Or Engraved" prop="cutOrEngraved">
         </ngx-datatable-column>
 
+        <!--    Details Button   -->
         <ngx-datatable-column
-                name="Edit"
+                name="Details"
                 [sortable]="false"
-                *ngIf="isDesktop"
         >
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        color="warning"
+                        color="secondary"
+                        [routerLink]="['/products', row.id]"
+                >
+                    Details
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <!--    Edit Button   -->
+        <ngx-datatable-column
+                name="Edit"
+                [sortable]="false"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        color="tertiary"
                         [routerLink]="['/products', row.id, 'edit']"
                 >
                     Edit
@@ -55,20 +75,155 @@
             </ng-template>
         </ngx-datatable-column>
 
+        <!--    Delete Button    -->
         <ngx-datatable-column
                 name="Delete"
                 [sortable]="false"
-                *ngIf="isDesktop"
         >
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        (click)="deleteProduct(row)"
+                        (click)="presentDeleteConfirm(row)"
                         color="danger"
                 >
+                    <ion-icon name="trash-bin-outline"></ion-icon>
                     Delete
                 </ion-button>
             </ng-template>
         </ngx-datatable-column>
     </ngx-datatable>
+</ion-content>
+
+<!--  Cards  -->
+<ion-content
+        *ngIf="isMobile && (products | async)"
+>
+
+    <ion-item-group class="ion-margin-start ion-margin-top">
+        <ion-button routerLink="/customers/create">
+            Create New Customer
+        </ion-button>
+    </ion-item-group>
+
+    <!--      Cards as Customers      -->
+    <ion-grid>
+        <ion-row>
+            <ion-col
+                    sizeXl="3"
+                    sizeLg="4"
+                    sizeMd="6"
+                    *ngFor="let product of products | async"
+            >
+                <ion-card>
+                    <ion-img
+                            *ngIf="product.imageUrl"
+                            [src]="product.imageUrl"
+                    ></ion-img>
+                    <ion-card-header>
+                        <ion-card-title>
+                            <ion-button
+                                    color="tertiary"
+                                    [routerLink]="['/products', product.id]"
+                                    class="ion-text-wrap"
+                            >
+                                <ion-icon name="pricetag-outline"></ion-icon>
+                                {{ product.productName }}
+                            </ion-button>
+                        </ion-card-title>
+                    </ion-card-header>
+
+                    <ion-card-content>
+                        <ion-list>
+                            <ion-item>
+                                <ion-label color="primary">Product Type</ion-label>
+                                <ion-label slot="end">{{ product.productType }}</ion-label>
+                            </ion-item>
+
+                            <ion-item>
+                                <ion-label color="primary">Technology</ion-label>
+                                <ion-label slot="end">{{ product.cutOrEngraved }}</ion-label>
+                            </ion-item>
+
+                            <ion-item>
+                                <ion-button
+                                        [routerLink]="['/products', product.id, 'edit']"
+                                        color="secondary"
+                                >
+                                    <ion-icon name="settings-outline"></ion-icon>
+                                    Edit
+                                </ion-button>
+
+                                <ion-button
+                                        (click)="presentDeleteConfirm(product)"
+                                        color="danger"
+                                        slot="end"
+                                >
+                                    <ion-icon name="trash-bin-outline"></ion-icon>
+                                    Delete
+                                </ion-button>
+                            </ion-item>
+                        </ion-list>
+                    </ion-card-content>
+                </ion-card>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <ion-footer style="height: 10vh">
+    </ion-footer>
+</ion-content>
+
+<!-- Skeleton screen -->
+<ion-content *ngIf="!(products | async)">
+    <ion-card *ngFor="let skeleton of skeletons">
+        <ion-card-header>
+            <ion-card-subtitle>
+                <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+            </ion-card-subtitle>
+            <ion-card-title>
+                <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+            </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+            <ion-list>
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+            </ion-list>
+        </ion-card-content>
+    </ion-card>
 </ion-content>

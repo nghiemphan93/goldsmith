@@ -7,7 +7,7 @@
     </ion-toolbar>
 </ion-header>
 
-
+<!--  Main Table Content for Desktop  -->
 <ion-content *ngIf="isDesktop && (customers | async)">
     <ion-item-group class="ion-margin">
         <ion-button routerLink="/customers/create">
@@ -15,7 +15,6 @@
         </ion-button>
     </ion-item-group>
 
-    <!--  Main Table Content for Desktop  -->
     <ngx-datatable
             *ngIf="customers && isDesktop"
             [rows]="customers | async"
@@ -51,7 +50,6 @@
         <ngx-datatable-column
                 name="Details"
                 [sortable]="false"
-                *ngIf="isDesktop"
         >
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
@@ -68,7 +66,6 @@
         <ngx-datatable-column
                 name="Edit"
                 [sortable]="false"
-                *ngIf="isDesktop"
         >
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
@@ -86,7 +83,6 @@
         <ngx-datatable-column
                 name="Delete"
                 [sortable]="false"
-                *ngIf="isDesktop"
         >
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
@@ -102,7 +98,7 @@
     </ngx-datatable>
 </ion-content>
 
-
+<!--  Cards  -->
 <ion-content
         *ngIf="isMobile && (customers | async)"
 >

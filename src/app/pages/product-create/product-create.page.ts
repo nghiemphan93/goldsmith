@@ -8,7 +8,8 @@ import {Product} from '../../models/product';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ImageUploadService} from '../../services/image-upload.service';
 import {tryCatch} from 'rxjs/internal-compatibility';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Customer} from '../../models/customer';
 
 @Component({
     selector: 'app-product-create',
@@ -16,27 +17,72 @@ import {Router} from '@angular/router';
     styleUrls: ['./product-create.page.scss'],
 })
 export class ProductCreatePage implements OnInit, OnDestroy {
-    newProduct = new Product();
+    product: Product;
     validationForm: FormGroup;
     oldImageUrl: string;
+    isCreated: boolean;
+    isUpdated: boolean;
+    isDetailed: boolean;
 
     constructor(private productService: ProductService,
                 private formBuilder: FormBuilder,
                 private imageUploadService: ImageUploadService,
-                private router: Router) {
+                private router: Router,
+                private activatedRoute: ActivatedRoute
+    ) {
     }
 
     ngOnInit() {
-        this.prepareFormValidation();
+        this.preparePageContent();
+    }
+
+    /**
+     * Identify what purpose of the page should be.
+     * Create, Edit or Detail of a Customer
+     */
+    preparePageContent() {
+        const productId = this.activatedRoute.snapshot.params.productId;
+        const url = this.router.url.split('/');
+
+
+        switch (url[url.length - 1]) {
+            case 'create':
+                this.isCreated = true;
+                this.product = new Product();
+                this.prepareFormValidationCreate();
+                break;
+            case 'edit':
+                try {
+                    this.isUpdated = true;
+                    this.productService.getProduct(productId).subscribe(productFromServer => {
+                        this.product = productFromServer;
+                        this.prepareFormValidationUpdateOrDetail();
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
+                break;
+            default :
+                try {
+                    this.isDetailed = true;
+                    this.productService.getProduct(productId).subscribe(productFromServer => {
+                        this.product = productFromServer;
+                        this.prepareFormValidationUpdateOrDetail();
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
+                break;
+        }
     }
 
     async ngOnDestroy() {
-        if (this.oldImageUrl !== this.newProduct.imageUrl && this.oldImageUrl !== null) {
+        if (this.oldImageUrl !== this.product.imageUrl && this.oldImageUrl !== null) {
             await this.imageUploadService.deleteImageFromUrl(this.oldImageUrl);
         }
     }
 
-    prepareFormValidation() {
+    prepareFormValidationCreate() {
         this.validationForm = this.formBuilder.group({
             productName: new FormControl('', Validators.required),
             productType: new FormControl('Dây', Validators.required),
@@ -44,15 +90,23 @@ export class ProductCreatePage implements OnInit, OnDestroy {
         });
     }
 
+    prepareFormValidationUpdateOrDetail() {
+        this.validationForm = this.formBuilder.group({
+            productName: new FormControl(this.product.productName, Validators.required),
+            productType: new FormControl(this.product.productType, Validators.required),
+            cutOrEngraved: new FormControl(this.product.cutOrEngraved, Validators.required)
+        });
+    }
+
     async uploadProductImage(event: FileList) {
         try {
             if (this.oldImageUrl) {
                 await this.imageUploadService.deleteImageFromUrl(this.oldImageUrl);
-                this.oldImageUrl = this.newProduct.imageUrl;
-                this.newProduct.imageUrl = await this.imageUploadService.uploadProductImage(event);
+                this.oldImageUrl = this.product.imageUrl;
+                this.product.imageUrl = await this.imageUploadService.uploadProductImage(event);
             } else {
-                this.newProduct.imageUrl = await this.imageUploadService.uploadProductImage(event);
-                this.oldImageUrl = this.newProduct.imageUrl;
+                this.product.imageUrl = await this.imageUploadService.uploadProductImage(event);
+                this.oldImageUrl = this.product.imageUrl;
             }
         } catch (e) {
             console.log(e);
@@ -60,15 +114,22 @@ export class ProductCreatePage implements OnInit, OnDestroy {
     }
 
     async submitHandler() {
-        this.newProduct.productName = this.validationForm.value.productName;
-        this.newProduct.productType = this.validationForm.value.productType;
-        this.newProduct.cutOrEngraved = this.validationForm.value.cutOrEngraved;
-        this.newProduct.createdAt = new Date();
+        this.product.productName = this.validationForm.value.productName;
+        this.product.productType = this.validationForm.value.productType;
+        this.product.cutOrEngraved = this.validationForm.value.cutOrEngraved;
 
         try {
-            this.oldImageUrl = this.newProduct.imageUrl;
-            const documentRef = await this.productService.createProduct(this.newProduct);
-            console.log(documentRef);
+            if (this.isCreated) {
+                this.product.createdAt = new Date();
+                this.oldImageUrl = this.product.imageUrl;
+                const documentRef = await this.productService.createProduct(this.product);
+                console.log(documentRef);
+            } else {
+                this.oldImageUrl = this.product.imageUrl;
+                const documentRef = await this.productService.updateProduct(this.product);
+                console.log(documentRef);
+            }
+
             this.validationForm.reset({
                 productType: 'Dây',
                 cutOrEngraved: 'Cut'
@@ -77,8 +138,5 @@ export class ProductCreatePage implements OnInit, OnDestroy {
         } catch (error) {
             console.log(error);
         }
-
     }
-
-
 }
