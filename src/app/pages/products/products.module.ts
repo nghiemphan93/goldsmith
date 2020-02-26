@@ -8,6 +8,7 @@ import { ProductsPageRoutingModule } from './products-routing.module';
 
 import { ProductsPage } from './products.page';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
+import {SharedModule} from '../../shared/shared.module';
 
 @NgModule({
     imports: [
@@ -15,7 +16,8 @@ import {NgxDatatableModule} from '@swimlane/ngx-datatable';
         FormsModule,
         IonicModule,
         ProductsPageRoutingModule,
-        NgxDatatableModule
+        NgxDatatableModule,
+        SharedModule
     ],
   declarations: [ProductsPage]
 })

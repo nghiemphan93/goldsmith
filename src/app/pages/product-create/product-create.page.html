@@ -28,7 +28,7 @@
                         *ngIf="isDetailed && product"
                         [routerLink]="['/products', product.id, 'edit']"
                 >
-                    <ion-icon name="settings-outline"></ion-icon>
+                    <ion-icon name="settings-outline" class="ion-margin-end"></ion-icon>
                     Edit
                 </ion-button>
 
@@ -104,7 +104,6 @@
                     <ion-item-group *ngIf="!isDetailed">
                         <ion-item>
                             <ion-label>Ảnh mẫu</ion-label>
-                            <!--                <ion-input type="text" placeholder="what.."></ion-input>-->
                             <input
                                     class="fileInput"
                                     id="uploadBtn"

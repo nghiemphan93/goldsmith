@@ -82,6 +82,9 @@ export class ProductCreatePage implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Prepare a Reactive Form for Creating a Product
+     */
     prepareFormValidationCreate() {
         this.validationForm = this.formBuilder.group({
             productName: new FormControl('', Validators.required),
@@ -90,6 +93,9 @@ export class ProductCreatePage implements OnInit, OnDestroy {
         });
     }
 
+    /**
+     * Prepare a Reactive Form for Editing or Showing Details of a Product
+     */
     prepareFormValidationUpdateOrDetail() {
         this.validationForm = this.formBuilder.group({
             productName: new FormControl(this.product.productName, Validators.required),
@@ -98,6 +104,10 @@ export class ProductCreatePage implements OnInit, OnDestroy {
         });
     }
 
+    /**
+     * Helper to upload Product's Image
+     * @param event: FileList
+     */
     async uploadProductImage(event: FileList) {
         try {
             if (this.oldImageUrl) {
@@ -113,6 +123,9 @@ export class ProductCreatePage implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Handler Submit button
+     */
     async submitHandler() {
         this.product.productName = this.validationForm.value.productName;
         this.product.productType = this.validationForm.value.productType;

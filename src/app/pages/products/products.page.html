@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header #header>
     <ion-toolbar>
         <ion-buttons slot="start">
             <ion-menu-button></ion-menu-button>
@@ -11,7 +11,8 @@
 <ion-content *ngIf="isDesktop && (products | async)">
     <ion-item-group class="ion-margin">
         <ion-button routerLink="/products/create">
-            Create New Product
+            <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
+            <p>Create New Product</p>
         </ion-button>
     </ion-item-group>
 
@@ -94,19 +95,23 @@
     </ngx-datatable>
 </ion-content>
 
-<!--  Cards  -->
+<!--Cards-->
 <ion-content
         *ngIf="isMobile && (products | async)"
+        scrollEvents="true"
+        [header]="header"
+        appHideHeader
 >
 
     <ion-item-group class="ion-margin-start ion-margin-top">
-        <ion-button routerLink="/customers/create">
-            Create New Customer
+        <ion-button routerLink="/products/create">
+            <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
+            New Product
         </ion-button>
     </ion-item-group>
 
-    <!--      Cards as Customers      -->
-    <ion-grid>
+    <!--      Cards as Products      -->
+    <ion-grid fixed>
         <ion-row>
             <ion-col
                     sizeXl="3"
@@ -114,62 +119,69 @@
                     sizeMd="6"
                     *ngFor="let product of products | async"
             >
-                <ion-card>
-                    <ion-img
-                            *ngIf="product.imageUrl"
-                            [src]="product.imageUrl"
-                    ></ion-img>
-                    <ion-card-header>
-                        <ion-card-title>
+                <ion-card class="ion-no-margin ion-no-padding">
+                    <section
+                            [routerLink]="['/products', product.id]"
+                    >
+                        <ion-img
+                                *ngIf="product.imageUrl"
+                                [src]="product.imageUrl"
+                        ></ion-img>
+
+                        <ion-card-header class="ion-no-padding ion-no-margin">
+                            <ion-card-title class="ion-text-center">
+                                <ion-button
+                                        color="tertiary"
+                                        [routerLink]="['/products', product.id]"
+                                        class="ion-text-wrap"
+                                >
+                                    <ion-icon name="pricetag-outline" class="ion-margin-end"></ion-icon>
+                                    {{ product.productName }}
+                                </ion-button>
+                            </ion-card-title>
+                        </ion-card-header>
+
+                        <ion-card-content class="ion-no-margin ion-no-padding">
+                            <ion-list>
+                                <ion-item>
+                                    <ion-label color="primary">Product Type</ion-label>
+                                    <ion-label slot="end">{{ product.productType }}</ion-label>
+                                </ion-item>
+
+                                <ion-item>
+                                    <ion-label color="primary">Technology</ion-label>
+                                    <ion-label slot="end">{{ product.cutOrEngraved }}</ion-label>
+                                </ion-item>
+                            </ion-list>
+                        </ion-card-content>
+                    </section>
+
+                    <section>
+                        <ion-item>
                             <ion-button
-                                    color="tertiary"
-                                    [routerLink]="['/products', product.id]"
-                                    class="ion-text-wrap"
+                                    [routerLink]="['/products', product.id, 'edit']"
+                                    color="secondary"
                             >
-                                <ion-icon name="pricetag-outline"></ion-icon>
-                                {{ product.productName }}
+                                <ion-icon name="settings-outline" class="ion-margin-end"></ion-icon>
+                                Edit
                             </ion-button>
-                        </ion-card-title>
-                    </ion-card-header>
 
-                    <ion-card-content>
-                        <ion-list>
-                            <ion-item>
-                                <ion-label color="primary">Product Type</ion-label>
-                                <ion-label slot="end">{{ product.productType }}</ion-label>
-                            </ion-item>
-
-                            <ion-item>
-                                <ion-label color="primary">Technology</ion-label>
-                                <ion-label slot="end">{{ product.cutOrEngraved }}</ion-label>
-                            </ion-item>
-
-                            <ion-item>
-                                <ion-button
-                                        [routerLink]="['/products', product.id, 'edit']"
-                                        color="secondary"
-                                >
-                                    <ion-icon name="settings-outline"></ion-icon>
-                                    Edit
-                                </ion-button>
-
-                                <ion-button
-                                        (click)="presentDeleteConfirm(product)"
-                                        color="danger"
-                                        slot="end"
-                                >
-                                    <ion-icon name="trash-bin-outline"></ion-icon>
-                                    Delete
-                                </ion-button>
-                            </ion-item>
-                        </ion-list>
-                    </ion-card-content>
+                            <ion-button
+                                    (click)="presentDeleteConfirm(product)"
+                                    color="danger"
+                                    slot="end"
+                            >
+                                <ion-icon name="trash-bin-outline" class="ion-margin-end"></ion-icon>
+                                Delete
+                            </ion-button>
+                        </ion-item>
+                    </section>
                 </ion-card>
             </ion-col>
         </ion-row>
     </ion-grid>
 
-    <ion-footer style="height: 10vh">
+    <ion-footer style="height: 10vh" #footer>
     </ion-footer>
 </ion-content>
 
