@@ -50,8 +50,20 @@ export class FontService {
         return {Scriptina: true};
     }
 
-    getFontClass({row, column, value}): any {
+    getFontabcClass({row, column, value}): any {
         let className = row.orderItemFont.replace(/\s/g, '');
+        className = className.replace('.', '');
+        const fontClass = {};
+        fontClass[className] = true;
+        return fontClass;
+    }
+
+    /**
+     * Return css font class given font name
+     * @param fontName: string
+     */
+    getFontClass(fontName: string) {
+        let className = fontName.replace(/\s/g, '');
         className = className.replace('.', '');
         const fontClass = {};
         fontClass[className] = true;

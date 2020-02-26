@@ -14,6 +14,10 @@ export class ImageUploadService {
     ) {
     }
 
+    /**
+     * Update product's image to Firebase Storage
+     * @param event: FileList
+     */
     async uploadProductImage(event: FileList) {
         if (event.length <= 0) {
             return null;
@@ -47,6 +51,10 @@ export class ImageUploadService {
         }
     }
 
+    /**
+     * Upload Order Item's Image to Firebase Storage
+     * @param event: File List
+     */
     async uploadOrderItemImage(event: FileList) {
         if (event.length <= 0) {
             return null;
@@ -78,6 +86,10 @@ export class ImageUploadService {
         }
     }
 
+    /**
+     * Delete Image given URL from Firebase Storage
+     * @param imageUrl: string
+     */
     async deleteImageFromUrl(imageUrl: string) {
         try {
             return await this.angularFireStorage.storage.refFromURL(imageUrl).delete();

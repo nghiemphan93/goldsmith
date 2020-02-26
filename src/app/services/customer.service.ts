@@ -10,7 +10,7 @@ import {Customer} from '../models/customer';
 })
 export class CustomerService {
     customerCollection: AngularFirestoreCollection<Customer>;
-    customertDoc: AngularFirestoreDocument<Customer>;
+    customerDoc: AngularFirestoreDocument<Customer>;
     customers: Observable<Customer[]>;
     customer: Observable<Customer>;
 
@@ -32,8 +32,8 @@ export class CustomerService {
     }
 
     getCustomer(customerId: string): Observable<Customer> {
-        this.customertDoc = this.afs.doc<Customer>(`customers/${customerId}`);
-        this.customer = this.customertDoc.snapshotChanges().pipe(
+        this.customerDoc = this.afs.doc<Customer>(`customers/${customerId}`);
+        this.customer = this.customerDoc.snapshotChanges().pipe(
             map(action => {
                 if (action.payload.exists === false) {
                     return null;
@@ -53,13 +53,13 @@ export class CustomerService {
     }
 
     updateCustomer(toUpdateCustomer: Customer) {
-        this.customertDoc = this.afs.doc(`customers/${toUpdateCustomer.id}`);
-        this.customertDoc.update(toUpdateCustomer);
+        this.customerDoc = this.afs.doc(`customers/${toUpdateCustomer.id}`);
+        this.customerDoc.update(toUpdateCustomer);
     }
 
     deleteCustomer(toDeleteCustomer: Customer) {
-        this.customertDoc = this.afs.doc(`customers/${toDeleteCustomer.id}`);
-        this.customertDoc.delete();
+        this.customerDoc = this.afs.doc(`customers/${toDeleteCustomer.id}`);
+        this.customerDoc.delete();
     }
 }
 

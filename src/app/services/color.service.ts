@@ -11,6 +11,9 @@ export class ColorService {
     constructor() {
     }
 
+    /**
+     * Return color array from Color Enum
+     */
     getColors() {
         return this.colors;
     }
@@ -35,5 +38,16 @@ export class ColorService {
                 return {'background-color': '#ffbcd2'};
                 break;
         }
+    }
+
+    /**
+     * Return css color class given color name
+     * @param colorName: string
+     */
+    getColorClass(colorName: string) {
+        const className = colorName.replace(/\s/g, '');
+        const colorClass = {};
+        colorClass[className] = true;
+        return colorClass;
     }
 }
