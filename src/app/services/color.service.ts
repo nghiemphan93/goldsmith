@@ -44,8 +44,8 @@ export class ColorService {
      * Return css color class given color name
      * @param colorName: string
      */
-    getColorClass(colorName: string) {
-        const className = colorName.replace(/\s/g, '');
+    getColorClass(colorName: string | Color) {
+        const className = colorName.toString().replace(/\s/g, '');
         const colorClass = {};
         colorClass[className] = true;
         return colorClass;

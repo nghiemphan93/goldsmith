@@ -3,12 +3,13 @@ import {OrderItemService} from '../../../services/order-item.service';
 import {Observable} from 'rxjs';
 import {Order} from '../../../models/order';
 import {OrderService} from '../../../services/order.service';
-import {Config, Platform} from '@ionic/angular';
+import {AlertController, Config, Platform} from '@ionic/angular';
 import {OrderItem} from '../../../models/orderitem';
 import {ActivatedRoute} from '@angular/router';
 import {FontService} from '../../../services/font.service';
 import {ColorService} from '../../../services/color.service';
 import {take} from 'rxjs/operators';
+import {Customer} from '../../../models/customer';
 
 
 @Component({
@@ -23,22 +24,25 @@ export class OrderItemsPage implements OnInit {
     isDesktop: boolean;
     isMobile: boolean;
     orderId: string;
-    selectedColorStyle = {'background-color': 'red'};
-    backgroundRed = 'backgroundRed';
+    order: Observable<Order>;
     fontNames: string[];
+    skeletons = [1, 2];
 
     constructor(private orderItemService: OrderItemService,
+                private orderService: OrderService,
                 private config: Config,
                 private platform: Platform,
                 private activatedRoute: ActivatedRoute,
                 private fontService: FontService,
-                private colorService: ColorService
+                private colorService: ColorService,
+                private alertController: AlertController
     ) {
     }
 
     ngOnInit() {
         this.fontNames = this.fontService.getFontNames();
         this.orderId = this.activatedRoute.snapshot.params.orderId;
+        this.order = this.orderService.getOrder(this.orderId);
 
         this.isDesktop = this.platform.is('desktop');
         this.isMobile = !this.platform.is('desktop');
@@ -46,24 +50,66 @@ export class OrderItemsPage implements OnInit {
         this.orderItems = this.orderItemService.getOrderItems(this.orderId).pipe(take(5));
     }
 
+    /**
+     * Handler to delete an Order Item
+     * @param toDeleteOrderItem: OrderItem
+     */
     deleteOrderItem(toDeleteOrderItem: OrderItem) {
         console.log(toDeleteOrderItem);
         this.orderItemService.deleteOrderItem(this.orderId, toDeleteOrderItem);
     }
 
-    private setupFontColorStatus() {
 
+    /**
+     * Showing alert when clicking Delete Button
+     * @param toDeleteOrderItem: Customer
+     */
+    async presentDeleteConfirm(toDeleteOrderItem: OrderItem) {
+        const alert = await this.alertController.create({
+            header: 'Confirm!',
+            message: '<strong>Are you sure to delete?</strong>!!!',
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel',
+                    cssClass: 'secondary',
+                    handler: (blah) => {
+                        console.log('canceled');
+                    }
+                }, {
+                    text: 'Okay',
+                    handler: () => {
+                        console.log('okay');
+                        this.deleteOrderItem(toDeleteOrderItem);
+                    }
+                }
+            ]
+        });
+
+        await alert.present();
     }
 
-    getFontClass({row, column, value}): any {
-        let className = row.orderItemFont.replace(/\s/g, '');
-        className = className.replace('.', '');
-        const fontClass = {};
-        fontClass[className] = true;
-        return fontClass;
+    /**
+     * Return css color class given Oder Item's color
+     */
+    getColorClass(orderItem: OrderItem) {
+        return this.colorService.getColorClass(orderItem.orderItemColor);
     }
 
-    getRingColorClass({row, column, value}) {
+    /**
+     * Return css font class given Oder Item's font
+     */
+    getFontClass(orderItem: OrderItem) {
+        return this.fontService.getFontClass(orderItem.orderItemFont);
+    }
+
+    /**
+     * Return css ring color class for Table Cell
+     * @param row: OrderItem
+     * @param column: Column
+     * @param value: string
+     */
+    getRingColorClassCell({row, column, value}) {
         if (row.orderItemRingSizeUS) {
             const className = row.orderItemColor.replace(/\s/g, '');
 
@@ -73,7 +119,13 @@ export class OrderItemsPage implements OnInit {
         }
     }
 
-    getNecklaceColorClass({row, column, value}) {
+    /**
+     * Return css necklace color class for Table Cell
+     * @param row: OrderItem
+     * @param column: Column
+     * @param value: string
+     */
+    getNecklaceColorClassCell({row, column, value}) {
         if (row.orderItemLengthInch) {
             const className = row.orderItemColor.replace(/\s/g, '');
 
@@ -83,13 +135,39 @@ export class OrderItemsPage implements OnInit {
         }
     }
 
-    getQuantityClass({row, column, value}) {
+    /**
+     * Return css quantity class for Table Cell
+     * @param row: OrderItem
+     * @param column: Column
+     * @param value: string
+     */
+    getQuantityClassCell({row, column, value}) {
         if (row.orderItemQuantity !== 1) {
             return {quantityGreaterThanOne: true};
         }
     }
 
-    getCommentClass({row, column, value}) {
+    /**
+     * Return css comment class for Table Cell
+     * @param row: OrderItem
+     * @param column: Column
+     * @param value: string
+     */
+    getCommentClassCell({row, column, value}) {
         return {commentClass: true};
+    }
+
+    /**
+     * Return css font class for Table Cell
+     * @param row: OrderItem
+     * @param column: Column
+     * @param value: string
+     */
+    getFontClassCell({row, column, value}): any {
+        let className = row.orderItemFont.replace(/\s/g, '');
+        className = className.replace('.', '');
+        const fontClass = {};
+        fontClass[className] = true;
+        return fontClass;
     }
 }
