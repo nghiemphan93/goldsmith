@@ -14,6 +14,7 @@ import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AngularFireStorageModule} from '@angular/fire/storage';
 import {ReactiveFormsModule} from '@angular/forms';
 import {HideHeaderDirective} from './directives/hide-header.directive';
+import {HideHeaderBDirective} from './directives/hide-header-b.directive';
 
 @NgModule({
     declarations: [AppComponent],

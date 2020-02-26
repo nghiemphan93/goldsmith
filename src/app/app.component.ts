@@ -17,16 +17,6 @@ export class AppComponent {
             icon: 'home'
         },
         {
-            title: 'List',
-            url: '/list',
-            icon: 'list'
-        },
-        {
-            title: 'Demo Table',
-            url: '/demo-table',
-            icon: 'videocam'
-        },
-        {
             title: 'Products',
             url: '/products',
             icon: 'pricetag-outline'
