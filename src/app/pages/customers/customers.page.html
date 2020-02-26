@@ -101,16 +101,20 @@
 <!--  Cards  -->
 <ion-content
         *ngIf="isMobile && (customers | async)"
+        scrollEvents="true"
+        [header]="header"
+        appHideHeader
 >
 
     <ion-item-group class="ion-margin-start ion-margin-top">
         <ion-button routerLink="/customers/create">
-            Create New Customer
+            <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
+            New Customer
         </ion-button>
     </ion-item-group>
 
     <!--      Cards as Customers      -->
-    <ion-grid>
+    <ion-grid fixed>
         <ion-row>
             <ion-col
                     sizeXl="3"
@@ -118,67 +122,74 @@
                     sizeMd="6"
                     *ngFor="let customer of customers | async"
             >
-                <ion-card>
-                    <ion-card-header>
-                        <ion-card-subtitle>{{ customer.nick }}</ion-card-subtitle>
-                        <ion-card-title>
+                <ion-card class="ion-no-margin ion-no-padding">
+                    <section
+                            [routerLink]="['/customers', customer.id]"
+                    >
+                        <ion-card-header class="ion-no-margin">
+                            <ion-card-subtitle>{{ customer.nick }}</ion-card-subtitle>
+                            <ion-card-title class="ion-text-center">
+                                <ion-button
+                                        color="tertiary"
+                                        [routerLink]="['/customers', customer.id]"
+                                        class="ion-text-wrap"
+                                >
+                                    <ion-icon name="person-outline" class="ion-margin-end"></ion-icon>
+                                    {{ customer.firstName }}, {{ customer.lastName }}
+                                </ion-button>
+                            </ion-card-title>
+                        </ion-card-header>
+
+                        <ion-card-content class="ion-no-margin ion-no-padding">
+                            <ion-list>
+                                <ion-item>
+                                    <ion-label color="primary">Address</ion-label>
+                                    <ion-label>{{ customer.number }} {{ customer.street }}</ion-label>
+                                </ion-item>
+
+                                <ion-item>
+                                    <ion-label color="primary">Extra Infor</ion-label>
+                                    <ion-label slot="end">{{ customer.extraInfor }}</ion-label>
+                                </ion-item>
+
+                                <ion-item>
+                                    <ion-label color="primary">City</ion-label>
+                                    <ion-label>{{ customer.city }}</ion-label>
+                                </ion-item>
+
+                                <ion-item *ngIf="customer.nick">
+                                    <ion-label color="primary">State, Code</ion-label>
+                                    <ion-label>{{ customer.state }}, {{ customer.postal }}</ion-label>
+                                </ion-item>
+
+                                <ion-item>
+                                    <ion-label color="primary">Country</ion-label>
+                                    <ion-label>{{ customer.country }}</ion-label>
+                                </ion-item>
+                            </ion-list>
+                        </ion-card-content>
+                    </section>
+
+                    <section>
+                        <ion-item>
                             <ion-button
-                                    color="tertiary"
-                                    [routerLink]="['/customers', customer.id]"
+                                    [routerLink]="['/customers', customer.id, 'edit']"
+                                    color="secondary"
                             >
-                                <ion-icon name="person-outline"></ion-icon>
-                                {{ customer.firstName }}, {{ customer.lastName }}
+                                <ion-icon name="settings-outline" class="ion-margin-end"></ion-icon>
+                                Edit
                             </ion-button>
-                        </ion-card-title>
-                    </ion-card-header>
 
-                    <ion-card-content>
-                        <ion-list>
-                            <ion-item>
-                                <ion-label color="primary">Address</ion-label>
-                                <ion-label>{{ customer.number }} {{ customer.street }}</ion-label>
-                            </ion-item>
-
-                            <ion-item>
-                                <ion-label color="primary">Extra Infor</ion-label>
-                                <ion-label slot="end">{{ customer.extraInfor }}</ion-label>
-                            </ion-item>
-
-                            <ion-item>
-                                <ion-label color="primary">City</ion-label>
-                                <ion-label>{{ customer.city }}</ion-label>
-                            </ion-item>
-
-                            <ion-item *ngIf="customer.nick">
-                                <ion-label color="primary">State, Code</ion-label>
-                                <ion-label>{{ customer.state }}, {{ customer.postal }}</ion-label>
-                            </ion-item>
-
-                            <ion-item>
-                                <ion-label color="primary">Country</ion-label>
-                                <ion-label>{{ customer.country }}</ion-label>
-                            </ion-item>
-
-                            <ion-item>
-                                <ion-button
-                                        [routerLink]="['/customers', customer.id, 'edit']"
-                                        color="secondary"
-                                >
-                                    <ion-icon name="settings-outline"></ion-icon>
-                                    Edit
-                                </ion-button>
-
-                                <ion-button
-                                        (click)="presentDeleteConfirm(customer)"
-                                        color="danger"
-                                        slot="end"
-                                >
-                                    <ion-icon name="trash-bin-outline"></ion-icon>
-                                    Delete
-                                </ion-button>
-                            </ion-item>
-                        </ion-list>
-                    </ion-card-content>
+                            <ion-button
+                                    (click)="presentDeleteConfirm(customer)"
+                                    color="danger"
+                                    slot="end"
+                            >
+                                <ion-icon name="trash-bin-outline" class="ion-margin-end"></ion-icon>
+                                Delete
+                            </ion-button>
+                        </ion-item>
+                    </section>
                 </ion-card>
             </ion-col>
         </ion-row>

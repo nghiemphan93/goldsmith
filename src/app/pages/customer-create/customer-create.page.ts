@@ -117,7 +117,7 @@ export class CustomerCreatePage implements OnInit {
     }
 
     /**
-     * Function to handle Submit button
+     * Handler Submit button
      */
     async submitHandler() {
         this.customer.firstName = this.toTitleCase(this.validationForm.value.firstName);
