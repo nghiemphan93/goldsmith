@@ -6,7 +6,8 @@ import {OrderDetailPage} from './order-detail.page';
 const routes: Routes = [
     {
         path: '',
-        component: OrderDetailPage
+        redirectTo: 'orderItems',
+        pathMatch: 'full'
     },
     {
         path: 'orderItems',

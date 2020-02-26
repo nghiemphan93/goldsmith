@@ -6,6 +6,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Order} from '../../models/order';
 import {OrderService} from '../../services/order.service';
 import {Status} from '../../models/status.enum';
+import {Product} from '../../models/product';
+import {StatusService} from '../../services/status.service';
 
 @Component({
     selector: 'app-order-create',
@@ -13,43 +15,101 @@ import {Status} from '../../models/status.enum';
     styleUrls: ['./order-create.page.scss'],
 })
 export class OrderCreatePage implements OnInit {
-    newOrder = new Order();
+    order: Order;
     validationForm: FormGroup;
     isCreated: boolean;
-    today = new Date();
-    fourDaysFromNow = new Date(new Date().setDate(new Date().getDate() + 4));
+    isUpdated: boolean;
+    minDeadline = new Date(new Date().setDate(new Date().getDate() + 4));
+    statuses: (string | Status)[];
 
     constructor(private orderService: OrderService,
                 private formBuilder: FormBuilder,
                 private activatedRoute: ActivatedRoute,
-                private router: Router) {
+                private router: Router,
+                private statusService: StatusService
+    ) {
     }
 
     ngOnInit() {
-        this.prepareFormValidation();
-        console.log(this.today);
+        this.preparePageContent();
     }
 
+    /**
+     * Identify what purpose of the page should be.
+     * Create or Edit of an Order
+     */
+    preparePageContent() {
+        this.statuses = this.statusService.getStatuses();
+        const orderId = this.activatedRoute.snapshot.params.orderId;
+        const url = this.router.url.split('/');
 
-    prepareFormValidation() {
+        switch (url[url.length - 1]) {
+            case 'create':
+                this.isCreated = true;
+                this.order = new Order();
+                this.prepareFormValidationCreate();
+                break;
+            case 'edit':
+                try {
+                    this.isUpdated = true;
+                    this.orderService.getOrder(orderId).subscribe(orderFromServer => {
+                        this.order = orderFromServer;
+                        this.prepareFormValidationUpdate();
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Prepare a Reactive Form for Creating an Order
+     */
+    prepareFormValidationCreate() {
         this.validationForm = this.formBuilder.group({
             orderCode: new FormControl('', Validators.required),
-            orderStatus: new FormControl(Status.PENDING, Validators.required),
+            orderStatus: new FormControl(this.statuses[0], Validators.required),
             orderDeadline: new FormControl('', Validators.required)
         });
     }
 
-    async submitHandler() {
-        this.newOrder.orderCode = this.validationForm.value.orderCode;
-        this.newOrder.orderStatus = this.validationForm.value.orderStatus;
-        this.newOrder.orderDeadline = this.validationForm.value.orderDeadline;
-        this.newOrder.createdAt = new Date();
+    /**
+     * Prepare a Reactive Form for Updating an Order
+     */
+    prepareFormValidationUpdate() {
+        this.validationForm = this.formBuilder.group({
+            orderCode: new FormControl(this.order.orderCode, Validators.required),
+            orderStatus: new FormControl(this.order.orderStatus, Validators.required),
+            orderDeadline: new FormControl(this.order.orderDeadline, Validators.required)
+        });
+    }
 
-        console.log(this.newOrder);
+    /**
+     * Handler Submit button
+     */
+    async submitHandler() {
+        this.order.orderCode = this.validationForm.value.orderCode;
+        this.order.orderStatus = this.validationForm.value.orderStatus;
+        this.order.orderDeadline = this.validationForm.value.orderDeadline;
+
         try {
-            const documentRef = await this.orderService.createOrder(this.newOrder);
-            console.log(documentRef);
-            this.validationForm.reset();
+            if (this.isCreated) {
+                this.order.createdAt = new Date();
+                const documentRef = await this.orderService.createOrder(this.order);
+                console.log(documentRef);
+                this.validationForm.reset();
+            } else {
+                const documentRef = await this.orderService.updateOrder(this.order);
+                console.log(documentRef);
+                this.validationForm.reset();
+            }
+
+            this.validationForm.reset({
+                orderCode: '',
+                orderStatus: this.statuses[0],
+                orderDeadline: '',
+            });
             await this.router.navigate(['orders']);
         } catch (e) {
             console.log(e);

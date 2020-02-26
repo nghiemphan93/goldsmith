@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header #header>
     <ion-toolbar>
         <ion-buttons slot="start">
             <ion-menu-button></ion-menu-button>
@@ -7,7 +7,10 @@
     </ion-toolbar>
 </ion-header>
 
-<ion-content class="">
+<!--  Main Table Content for Desktop  -->
+<ion-content
+        *ngIf="isDesktop && (orders | async)"
+>
     <ion-item-group class="ion-margin">
         <ion-button routerLink="/orders/create">
             Create New Order
@@ -28,24 +31,29 @@
             [footerHeight]="50"
             class="ion-text-wrap"
     >
+        <!--    Order Code    -->
         <ngx-datatable-column name="Order Code" prop="orderCode">
         </ngx-datatable-column>
 
+        <!--    Order Created At    -->
         <ngx-datatable-column name="Created On" prop="createdAt">
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 {{ row.createdAt | date: 'dd/MM/yyyy' }}
             </ng-template>
         </ngx-datatable-column>
 
+        <!--    Order Deadline    -->
         <ngx-datatable-column name="Deadline" prop="orderDeadline">
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 {{ row.orderDeadline | date: 'dd/MM/yyyy' }}
             </ng-template>
         </ngx-datatable-column>
 
+        <!--    Order Status    -->
         <ngx-datatable-column name="Status" prop="orderStatus">
         </ngx-datatable-column>
 
+        <!--    Order Details    -->
         <ngx-datatable-column
                 name="Details"
                 [sortable]="false"
@@ -61,6 +69,7 @@
             </ng-template>
         </ngx-datatable-column>
 
+        <!--    Order Edit    -->
         <ngx-datatable-column
                 name="Edit"
                 [sortable]="false"
@@ -77,6 +86,7 @@
             </ng-template>
         </ngx-datatable-column>
 
+        <!--    Order Delete    -->
         <ngx-datatable-column
                 name="Delete"
                 [sortable]="false"
@@ -93,4 +103,150 @@
             </ng-template>
         </ngx-datatable-column>
     </ngx-datatable>
+</ion-content>
+
+
+<!--Cards-->
+<ion-content
+        *ngIf="isMobile && (orders | async)"
+        scrollEvents="true"
+        [header]="header"
+        appHideHeader
+>
+
+    <ion-item-group class="ion-margin-start ion-margin-top">
+        <ion-button routerLink="/orders/create">
+            <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
+            New Order
+        </ion-button>
+    </ion-item-group>
+
+    <!--      Cards as Orders      -->
+    <ion-grid fixed>
+        <ion-row>
+            <ion-col
+                    sizeXl="3"
+                    sizeLg="4"
+                    sizeMd="6"
+                    *ngFor="let order of orders | async"
+            >
+                <ion-card class="ion-no-margin ion-no-padding">
+                    <section
+                            [routerLink]="['/orders', order.id, 'orderItems']"
+                    >
+                        <ion-card-header class="ion-no-padding ion-no-margin">
+                            <ion-card-title class="ion-text-center">
+                                <ion-button
+                                        color="tertiary"
+                                        [routerLink]="['/orders', order.id]"
+                                        class="ion-text-wrap"
+                                >
+                                    <ion-icon name="pricetag-outline" class="ion-margin-end"></ion-icon>
+                                    {{ order.orderCode }}
+                                </ion-button>
+                            </ion-card-title>
+                        </ion-card-header>
+
+                        <ion-card-content class="ion-no-margin ion-no-padding">
+                            <ion-list>
+                                <ion-item>
+                                    <ion-label color="primary">Status</ion-label>
+                                    <ion-label slot="end">{{ order.orderStatus }}</ion-label>
+                                </ion-item>
+
+                                <ion-item>
+                                    <ion-label color="primary">Created On</ion-label>
+                                    <ion-label slot="end">{{ order.createdAt | date: 'dd/MM/yyyy' }}</ion-label>
+                                </ion-item>
+
+                                <ion-item>
+                                    <ion-label color="primary">Deadline</ion-label>
+                                    <ion-label slot="end">{{ order.orderDeadline | date: 'dd/MM/yyyy'}}</ion-label>
+                                </ion-item>
+                            </ion-list>
+                        </ion-card-content>
+                    </section>
+
+                    <section>
+                        <ion-item>
+                            <ion-button
+                                    [routerLink]="['/orders', order.id, 'edit']"
+                                    color="secondary"
+                            >
+                                <ion-icon name="settings-outline" class="ion-margin-end"></ion-icon>
+                                Edit
+                            </ion-button>
+
+                            <ion-button
+                                    (click)="presentDeleteConfirm(order)"
+                                    color="danger"
+                                    slot="end"
+                            >
+                                <ion-icon name="trash-bin-outline" class="ion-margin-end"></ion-icon>
+                                Delete
+                            </ion-button>
+                        </ion-item>
+                    </section>
+                </ion-card>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <ion-footer style="height: 10vh" #footer>
+    </ion-footer>
+</ion-content>
+
+<!-- Skeleton screen -->
+<ion-content *ngIf="!(orders | async)">
+    <ion-card *ngFor="let skeleton of skeletons">
+        <ion-card-header>
+            <ion-card-subtitle>
+                <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+            </ion-card-subtitle>
+            <ion-card-title>
+                <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+            </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+            <ion-list>
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+            </ion-list>
+        </ion-card-content>
+    </ion-card>
 </ion-content>

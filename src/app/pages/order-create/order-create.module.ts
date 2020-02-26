@@ -16,6 +16,9 @@ import { OrderCreatePage } from './order-create.page';
         OrderCreatePageRoutingModule,
         ReactiveFormsModule
     ],
-  declarations: [OrderCreatePage]
+    exports: [
+        OrderCreatePage
+    ],
+    declarations: [OrderCreatePage]
 })
 export class OrderCreatePageModule {}

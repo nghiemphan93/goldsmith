@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { OrderDetailEditPageRoutingModule } from './order-detail-edit-routing.module';
 
 import { OrderDetailEditPage } from './order-detail-edit.page';
+import {OrderCreatePageModule} from '../order-create/order-create.module';
 
 @NgModule({
     imports: [
@@ -14,7 +15,8 @@ import { OrderDetailEditPage } from './order-detail-edit.page';
         FormsModule,
         IonicModule,
         OrderDetailEditPageRoutingModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        OrderCreatePageModule
     ],
   declarations: [OrderDetailEditPage]
 })
