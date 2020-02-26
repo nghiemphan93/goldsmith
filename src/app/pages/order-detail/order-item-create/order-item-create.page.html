@@ -3,12 +3,13 @@
         <ion-buttons slot="start">
             <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>Create Order Item</ion-title>
+        <ion-title *ngIf="isCreated">Create Order Item</ion-title>
+        <ion-title *ngIf="isUpdated">Edit Order Item</ion-title>
+        <ion-title *ngIf="isDetailed">Order Item's Details</ion-title>
     </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-
+<ion-content class="ion-padding" >
     <ion-grid fixed>
         <ion-row>
             <ion-col
@@ -19,27 +20,57 @@
                     sizeMd="8"
                     offsetMd="2"
             >
-                <ion-button routerLink="/orders">
+                <ion-button [routerLink]="['/orders', this.orderId, 'orderItems']">
                     To Order Items
                 </ion-button>
+                <ion-button
+                        color="tertiary"
+                        *ngIf="isDetailed && orderItem"
+                        [routerLink]="['/orders', orderId, 'orderItems', orderItem.id, 'edit']"
+                >
+                    <ion-icon name="settings-outline"></ion-icon>
+                    Edit
+                </ion-button>
 
-                <form [formGroup]="validationForm">
+                <!--        Reactive Form        -->
+                <form
+                        [formGroup]="validationForm"
+                        *ngIf="orderItem"
+                >
                     <ion-item-divider>
-                        <ion-label>Please fill in information for the Order Item</ion-label>
+                        <ion-label *ngIf="!isDetailed">Please fill in information for the Order Item</ion-label>
                     </ion-item-divider>
 
                     <!-- Order -->
                     <ion-item-group>
                         <ion-item>
                             <ion-label>Order</ion-label>
+                            <!--            Create                -->
                             <ion-select
                                     interface="action-sheet"
                                     formControlName="order"
+                                    *ngIf="isCreated"
+                                    [compareWith]="compareWithFn"
                             >
-                                <ion-select-option [value]="order | async">
-                                    {{ (order | async)?.orderCode }}
+                                <ion-select-option [value]="(this.order | async)">
+                                    {{ (this.order | async)?.orderCode }}
                                 </ion-select-option>
                             </ion-select>
+
+                            <!--            Update                -->
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="order"
+                                    *ngIf="isUpdated"
+                                    [compareWith]="compareWithFn"
+                            >
+                                <ion-select-option [value]="orderItem.order">
+                                    {{ orderItem.order.orderCode }}
+                                </ion-select-option>
+                            </ion-select>
+
+                            <!--             Detail               -->
+                            <ion-label *ngIf="isDetailed">{{ orderItem.order.orderCode }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -52,7 +83,10 @@
                                     placeholder=""
                                     formControlName="orderItemCode"
                                     slot="end"
+                                    *ngIf="!isDetailed"
                             ></ion-input>
+
+                            <ion-label *ngIf="isDetailed">{{ orderItem.orderItemCode }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -63,12 +97,15 @@
                             <ion-select
                                     interface="action-sheet"
                                     formControlName="orderItemStatus"
+                                    *ngIf="!isDetailed"
                             >
                                 <ion-select-option
                                         *ngFor="let status of statuses"
                                         [value]="status"
                                 >{{ status }}</ion-select-option>
                             </ion-select>
+
+                            <ion-label *ngIf="isDetailed">{{ orderItem.orderItemStatus }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -76,9 +113,12 @@
                     <ion-item-group>
                         <ion-item>
                             <ion-label>Customer</ion-label>
+                            <!--            Create                -->
                             <ion-select
                                     interface="action-sheet"
                                     formControlName="customer"
+                                    *ngIf="isCreated"
+                                    [compareWith]="compareWithFn"
                             >
                                 <ion-select-option
                                         *ngFor="let customer of customers | async"
@@ -91,6 +131,33 @@
                                 </ion-select-option>
                             </ion-select>
 
+                            <!--            Update                -->
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="customer"
+                                    *ngIf="isUpdated"
+                                    [compareWith]="compareWithFn"
+                                    [selectedText]="orderItem.customer.firstName + ' ' + orderItem.customer.lastName"
+                            >
+                                <ion-select-option
+                                        *ngFor="let customer of customers | async"
+                                        [value]="customer"
+                                >
+                                    {{ customer.firstName }} {{ customer.lastName }} <br>
+                                    {{ customer.number }} {{ customer.street }} <br>
+                                    {{ customer.city }}, {{ customer.state }} {{ customer.postal }}<br>
+                                    {{ customer.country }}
+                                </ion-select-option>
+                            </ion-select>
+
+                            <!--            Detail                -->
+                            <ion-label *ngIf="isDetailed">
+                                {{ this.orderItem.customer.firstName }} {{ this.orderItem.customer.lastName }} <br>
+                                {{ this.orderItem.customer.number }} {{ this.orderItem.customer.street }} <br>
+                                {{ this.orderItem.customer.city }}
+                                , {{ this.orderItem.customer.state }} {{ this.orderItem.customer.postal }}<br>
+                                {{ this.orderItem.customer.country }}
+                            </ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -98,9 +165,12 @@
                     <ion-item-group>
                         <ion-item>
                             <ion-label>Product</ion-label>
+                            <!--            Create                -->
                             <ion-select
                                     interface="action-sheet"
                                     formControlName="product"
+                                    *ngIf="isCreated"
+                                    [compareWith]="compareWithFn"
                             >
                                 <ion-select-option
                                         *ngFor="let product of products | async"
@@ -110,6 +180,24 @@
                                 </ion-select-option>
                             </ion-select>
 
+                            <!--            Update                -->
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="product"
+                                    *ngIf="isUpdated"
+                                    [compareWith]="compareWithFn"
+                                    [selectedText]="orderItem.product.productName"
+                            >
+                                <ion-select-option
+                                        *ngFor="let product of products | async"
+                                        [value]="product"
+                                >
+                                    {{ product.productName }}
+                                </ion-select-option>
+                            </ion-select>
+
+                            <!--            Detail                -->
+                            <ion-label *ngIf="isDetailed">{{ orderItem.product.productName }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -121,7 +209,10 @@
                                     type="text"
                                     placeholder=""
                                     formControlName="orderItemComment"
+                                    *ngIf="!isDetailed"
                             ></ion-textarea>
+
+                            <ion-label *ngIf="isDetailed">{{ orderItem.orderItemComment }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -132,14 +223,18 @@
                             <ion-select
                                     interface="action-sheet"
                                     formControlName="orderItemFont"
-                                    #orderItemFontElement
-                                    (ionChange)="changeFont(orderItemFontElement)"
+                                    *ngIf="!isDetailed"
                             >
                                 <ion-select-option
                                         *ngFor="let font of fontNames"
                                         [value]="font"
                                 >{{ font }}</ion-select-option>
                             </ion-select>
+
+                            <ion-label
+                                    *ngIf="isDetailed"
+                            >{{ orderItem.orderItemFont }}
+                            </ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -150,9 +245,18 @@
                             <ion-input
                                     type="text"
                                     formControlName="orderItemWord"
-                                    [ngClass]="selectedFontClass"
+                                    [ngClass]="getFontClass()"
                                     slot="end"
+                                    *ngIf="!isDetailed"
                             ></ion-input>
+
+                            <ion-input
+                                    slot="end"
+                                    type="text"
+                                    *ngIf="isDetailed"
+                                    [ngClass]="getFontClass()"
+                            >{{ orderItem.orderItemWord }}
+                            </ion-input>
                         </ion-item>
                     </ion-item-group>
 
@@ -165,7 +269,10 @@
                                     placeholder=""
                                     formControlName="orderItemQuantity"
                                     slot="end"
+                                    *ngIf="!isDetailed"
                             ></ion-input>
+
+                            <ion-label *ngIf="isDetailed">{{ orderItem.orderItemQuantity }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -178,7 +285,10 @@
                                     placeholder=""
                                     formControlName="orderItemRingSizeUS"
                                     slot="end"
+                                    *ngIf="!isDetailed"
                             ></ion-input>
+
+                            <ion-label *ngIf="isDetailed">{{ orderItem.orderItemRingSizeUS }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -191,7 +301,10 @@
                                     placeholder=""
                                     formControlName="orderItemLengthInch"
                                     slot="end"
+                                    *ngIf="!isDetailed"
                             ></ion-input>
+
+                            <ion-label *ngIf="isDetailed">{{ orderItem.orderItemLengthInch }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
@@ -200,46 +313,50 @@
                         <ion-item>
                             <ion-label>Color</ion-label>
                             <ion-select
+                                    *ngIf="!isDetailed"
                                     interface="action-sheet"
                                     formControlName="orderItemColor"
-                                    #orderItemColorElement
-                                    (ionChange)="changeColor(orderItemColorElement)"
-                                    [ngStyle]="selectedColorStyle"
+                                    [ngClass]="getColorClass()"
                             >
                                 <ion-select-option
                                         *ngFor="let color of colors"
                                         [value]="color"
-
                                 >{{ color }}</ion-select-option>
                             </ion-select>
+
+                            <ion-label
+                                    *ngIf="isDetailed"
+                                    [ngClass]="getColorClass()"
+                            >{{ orderItem.orderItemColor }}</ion-label>
                         </ion-item>
                     </ion-item-group>
 
                     <!--    Image Upload    -->
                     <ion-item-group>
                         <ion-img
-                                [src]="this.newOrderItem.orderItemImageUrl"
-                                *ngIf="newOrderItem.orderItemImageUrl"
+                                [src]="this.orderItem.orderItemImageUrl"
+                                *ngIf="orderItem.orderItemImageUrl"
                         ></ion-img>
                     </ion-item-group>
-                    <ion-item-group>
+                    <ion-item-group *ngIf="!isDetailed">
                         <ion-item>
                             <ion-label>Image</ion-label>
                             <ion-input
                                     type="file"
                                     slot="end"
-                                    (change)="uploadProductImage($event.target.files)"
+                                    (change)="uploadOrderItemImage($event.target.files)"
                             ></ion-input>
                         </ion-item>
                     </ion-item-group>
 
-
+                    <!--    Submit    -->
                     <ion-button
                             [disabled]="!validationForm.valid"
                             class="ion-margin-top"
                             (click)="submitHandler()"
                             type="submit"
                             expand="block"
+                            *ngIf="!isDetailed"
                     >
                         Submit
                     </ion-button>
@@ -247,4 +364,7 @@
             </ion-col>
         </ion-row>
     </ion-grid>
+
+    <ion-footer style="height: 10vh">
+    </ion-footer>
 </ion-content>

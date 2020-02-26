@@ -8,8 +8,7 @@ import {OrderItem} from '../../../models/orderitem';
 import {ActivatedRoute} from '@angular/router';
 import {FontService} from '../../../services/font.service';
 import {ColorService} from '../../../services/color.service';
-
-// tslint:disable-next-line:max-line-length
+import {take} from 'rxjs/operators';
 
 
 @Component({
@@ -25,9 +24,7 @@ export class OrderItemsPage implements OnInit {
     isMobile: boolean;
     orderId: string;
     selectedColorStyle = {'background-color': 'red'};
-    selectedFontStyle = {Scriptina: true};
     backgroundRed = 'backgroundRed';
-    selectedColor: string;
     fontNames: string[];
 
     constructor(private orderItemService: OrderItemService,
@@ -46,7 +43,7 @@ export class OrderItemsPage implements OnInit {
         this.isDesktop = this.platform.is('desktop');
         this.isMobile = !this.platform.is('desktop');
 
-        this.orderItems = this.orderItemService.getOrderItems(this.orderId);
+        this.orderItems = this.orderItemService.getOrderItems(this.orderId).pipe(take(5));
     }
 
     deleteOrderItem(toDeleteOrderItem: OrderItem) {
@@ -56,20 +53,6 @@ export class OrderItemsPage implements OnInit {
 
     private setupFontColorStatus() {
 
-    }
-
-    testColor(row: any) {
-        // console.log('jaiwejfi');
-        // console.log(row);
-        return this.backgroundRed;
-    }
-
-    configFontClass(orderItemFontElement: any) {
-        // console.log(orderItemFontElement);
-    }
-
-    loadTest() {
-        console.log('loading test...');
     }
 
     getFontClass({row, column, value}): any {

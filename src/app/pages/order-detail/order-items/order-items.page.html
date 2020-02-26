@@ -44,6 +44,14 @@
                 name="Code"
                 prop="orderItemCode"
         >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size=""
+                        [routerLink]="['/orders', orderId, 'orderItems', row.id]"
+                >
+                    {{ row.orderItemCode }}
+                </ion-button>
+            </ng-template>
         </ngx-datatable-column>
 
         <!--    Word    -->
@@ -143,13 +151,12 @@
         <ngx-datatable-column
                 name="Edit"
                 [sortable]="false"
-                *ngIf="isDesktop"
         >
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
                         color="warning"
-                        [routerLink]="['/orders', orderId, 'orderItems', row.id]"
+                        [routerLink]="['/orders', orderId, 'orderItems', row.id, 'edit']"
                 >
                     Edit
                 </ion-button>

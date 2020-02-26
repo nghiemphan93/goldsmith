@@ -12,12 +12,10 @@ import {Customer} from '../../../models/customer';
 import {Product} from '../../../models/product';
 import {ImageUploadService} from '../../../services/image-upload.service';
 import {Status} from '../../../models/status.enum';
-import {HttpClient} from '@angular/common/http';
 import {Color} from '../../../models/color.enum';
-import {IonSelect} from '@ionic/angular';
-import {take} from 'rxjs/operators';
 import {FontService} from '../../../services/font.service';
 import {ColorService} from '../../../services/color.service';
+import {StatusService} from '../../../services/status.service';
 
 
 @Component({
@@ -26,21 +24,20 @@ import {ColorService} from '../../../services/color.service';
     styleUrls: ['./order-item-create.page.scss'],
 })
 export class OrderItemCreatePage implements OnInit {
-    newOrderItem: OrderItem = new OrderItem();
+    orderItem: OrderItem;
     validationForm: FormGroup;
     orderId: string;
     order: Observable<Order>;
     customers: Observable<Customer[]>;
     products: Observable<Product[]>;
     oldImageUrl: string;
-    statuses: (string | Status)[] = Object.entries(Status).filter(e => !isNaN(e[0] as any)).map(e => e[1]);
+    statuses: (string | Status)[];
     colors: (string | Color)[];
     fontNames: string[];
-    // selectedColorClass = 'silverColor';
-    selectedColorStyle = {'background-color': 'white'};
-    selectedFontStyle = {'font-family': 'Arial', 'font-size': '1rem'};
-    ringSizeUStoVN: Map<number, number>;
-    selectedFontClass = 'Arial';
+    ringSizeUStoVNMapper: Map<number, number>;
+    isCreated: boolean;
+    isUpdated: boolean;
+    isDetailed: boolean;
 
     constructor(private orderService: OrderService,
                 private orderItemService: OrderItemService,
@@ -51,25 +48,78 @@ export class OrderItemCreatePage implements OnInit {
                 private router: Router,
                 private imageUploadService: ImageUploadService,
                 private fontService: FontService,
-                private colorService: ColorService) {
+                private colorService: ColorService,
+                private statusService: StatusService
+    ) {
     }
 
     async ngOnInit() {
+        this.prepareAttributes();
+        this.preparePageContent();
+    }
+
+    /**
+     * Prepare all Observables for the page
+     */
+    prepareAttributes() {
+        this.statuses = this.statusService.getStatuses();
         this.colors = this.colorService.getColors();
         this.fontNames = this.fontService.getFontNames();
-        this.ringSizeUStoVN = this.configRingSizeUStoVN();
+        this.ringSizeUStoVNMapper = this.configRingSizeUStoVN();
         this.orderId = this.activatedRoute.snapshot.params.orderId;
         this.order = this.orderService.getOrder(this.orderId);
         this.customers = this.customerService.getCustomers();
         this.products = this.productService.getProducts();
-        this.prepareFormValidation();
-
-        // this.order.pipe(take(1)).subscribe(or => console.log(or));
     }
 
-    prepareFormValidation() {
+    /**
+     * Identify what purpose of the page should be.
+     * Create, Edit or Showing Detail of an Order Item
+     */
+    preparePageContent() {
+        const orderId = this.activatedRoute.snapshot.params.orderId;
+        const orderItemId = this.activatedRoute.snapshot.params.orderItemId;
+        const url = this.router.url.split('/');
+        this.order = this.orderService.getOrder(orderId);
+
+
+        switch (url[url.length - 1]) {
+            case 'create':
+                this.isCreated = true;
+                this.orderItem = new OrderItem();
+                this.prepareFormValidationCreate();
+                break;
+            case 'edit':
+                try {
+                    this.isUpdated = true;
+                    this.orderItemService.getOrderItem(orderId, orderItemId).subscribe(orderItemFromServer => {
+                        this.orderItem = orderItemFromServer;
+                        this.prepareFormValidationUpdateOrDetail();
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
+                break;
+            default :
+                try {
+                    this.isDetailed = true;
+                    this.orderItemService.getOrderItem(orderId, orderItemId).subscribe(orderItemFromServer => {
+                        this.orderItem = orderItemFromServer;
+                        this.prepareFormValidationUpdateOrDetail();
+                    });
+                } catch (e) {
+                    console.log(e);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Prepare a Reactive Form for Creating an Order Item
+     */
+    prepareFormValidationCreate() {
         this.validationForm = this.formBuilder.group({
-            order: new FormControl('', Validators.required),
+            order: new FormControl(Validators.required),
             orderItemCode: new FormControl('', Validators.required),
             orderItemStatus: new FormControl(this.statuses[0]), // PENDING
             customer: new FormControl(Validators.required),
@@ -85,16 +135,44 @@ export class OrderItemCreatePage implements OnInit {
         });
     }
 
-    async uploadProductImage(event: FileList) {
+    /**
+     * Prepare a Reactive Form for Updating or Showing Detail of an Order Item
+     */
+    prepareFormValidationUpdateOrDetail() {
+        this.validationForm = this.formBuilder.group({
+            order: new FormControl(this.orderItem.order, Validators.required),
+            orderItemCode: new FormControl(this.orderItem.orderItemCode, Validators.required),
+            orderItemStatus: new FormControl(this.orderItem.orderItemStatus),
+            customer: new FormControl(this.orderItem.customer, Validators.required),
+            product: new FormControl(this.orderItem.product, Validators.required),
+            orderItemComment: new FormControl(this.orderItem.orderItemComment),
+            orderItemFont: new FormControl(this.orderItem.orderItemFont),
+            orderItemWord: new FormControl(this.orderItem.orderItemWord),
+            orderItemQuantity: new FormControl(this.orderItem.orderItemQuantity, Validators.required),
+            orderItemRingSizeUS: new FormControl(this.orderItem.orderItemRingSizeUS),
+            orderItemLengthInch: new FormControl(this.orderItem.orderItemLengthInch),
+            orderItemColor: new FormControl(this.orderItem.orderItemColor, Validators.required),
+            orderItemImageUrl: new FormControl(this.orderItem.orderItemImageUrl)
+        });
+    }
+
+    /**
+     * Helper to upload Order Item's Image
+     * @param event: FileList
+     */
+    async uploadOrderItemImage(event: FileList) {
         try {
-            this.newOrderItem.orderItemImageUrl = await this.imageUploadService.uploadOrderItemImage(event);
+            this.orderItem.orderItemImageUrl = await this.imageUploadService.uploadOrderItemImage(event);
             await this.imageUploadService.deleteImageFromUrl(this.oldImageUrl);
-            this.oldImageUrl = this.newOrderItem.orderItemImageUrl;
+            this.oldImageUrl = this.orderItem.orderItemImageUrl;
         } catch (e) {
             console.log(e);
         }
     }
 
+    /**
+     * Prepare Ring Size Converter from US to VN
+     */
     configRingSizeUStoVN() {
         const ringSizeUStoVN = new Map();
         ringSizeUStoVN.set(2, 1);
@@ -123,56 +201,78 @@ export class OrderItemCreatePage implements OnInit {
         return ringSizeUStoVN;
     }
 
-    async submitHandler() {
-        this.newOrderItem.order = this.validationForm.value.order;
-        this.newOrderItem.orderItemCode = this.validationForm.value.orderItemCode;
-        this.newOrderItem.orderItemStatus = this.validationForm.value.orderItemStatus;
-        this.newOrderItem.customer = this.validationForm.value.customer;
-        this.newOrderItem.product = this.validationForm.value.product;
-        this.newOrderItem.orderItemComment = this.validationForm.value.orderItemComment;
-        this.newOrderItem.orderItemFont = this.validationForm.value.orderItemFont;
-        this.newOrderItem.orderItemWord = this.validationForm.value.orderItemWord;
-        this.newOrderItem.orderItemQuantity = this.validationForm.value.orderItemQuantity;
-
+    /**
+     * Transfer data from Reactive From to Order Item Object
+     */
+    transferDataFromFormToObject() {
+        this.orderItem.order = this.validationForm.value.order;
+        this.orderItem.orderItemCode = this.validationForm.value.orderItemCode;
+        this.orderItem.orderItemStatus = this.validationForm.value.orderItemStatus;
+        this.orderItem.customer = this.validationForm.value.customer;
+        this.orderItem.product = this.validationForm.value.product;
+        this.orderItem.orderItemComment = this.validationForm.value.orderItemComment;
+        this.orderItem.orderItemFont = this.validationForm.value.orderItemFont;
+        this.orderItem.orderItemWord = this.validationForm.value.orderItemWord;
+        this.orderItem.orderItemQuantity = this.validationForm.value.orderItemQuantity;
         if (this.validationForm.value.orderItemRingSizeUS) {
-            this.newOrderItem.orderItemRingSizeUS = this.validationForm.value.orderItemRingSizeUS;
-            this.newOrderItem.orderItemRingSizeVN = this.ringSizeUStoVN.get(this.newOrderItem.orderItemRingSizeUS);
+            this.orderItem.orderItemRingSizeUS = this.validationForm.value.orderItemRingSizeUS;
+            this.orderItem.orderItemRingSizeVN = this.ringSizeUStoVNMapper.get(this.orderItem.orderItemRingSizeUS);
         }
         if (this.validationForm.value.orderItemLengthInch) {
-            this.newOrderItem.orderItemLengthInch = this.validationForm.value.orderItemLengthInch;
-            this.newOrderItem.orderItemLengthCm = Number((this.newOrderItem.orderItemLengthInch * 2.54).toFixed(2));
+            this.orderItem.orderItemLengthInch = this.validationForm.value.orderItemLengthInch;
+            this.orderItem.orderItemLengthCm = Number((this.orderItem.orderItemLengthInch * 2.54).toFixed(2));
         }
+        this.orderItem.orderItemColor = this.validationForm.value.orderItemColor;
+    }
 
-
-        this.newOrderItem.orderItemColor = this.validationForm.value.orderItemColor;
-        this.newOrderItem.createdAt = new Date();
+    /**
+     * Handler Submit button
+     */
+    async submitHandler() {
+        this.transferDataFromFormToObject();
 
         try {
-            const documentRef = await this.orderItemService.createOrderItem(this.orderId, this.newOrderItem);
-            console.log(documentRef);
+            if (this.isCreated) {
+                this.orderItem.createdAt = new Date();
+                const documentRef = await this.orderItemService.createOrderItem(this.orderId, this.orderItem);
+                console.log(documentRef);
+            } else {
+                const documentRef = await this.orderItemService.updateOrderItem(this.orderId, this.orderItem);
+                console.log(documentRef);
+                console.log(this.orderItem);
+            }
             this.validationForm.reset({
-                orderItemStatus: this.statuses[0],
-                orderItemFont: this.fontNames[4],
+                orderItemStatus: this.statuses[0],  // PENDING
+                orderItemFont: this.fontNames[4],   // ARIAL
                 orderItemQuantity: 1,
-                orderItemColor: this.colors[0]
+                orderItemColor: this.colors[0]      // SILVER
             });
             await this.router.navigate(['orders', this.orderId, 'orderItems']);
         } catch (e) {
             console.log(e);
         }
-        console.log(this.newOrderItem);
     }
 
-
-    changeColor(orderItemColorElement: IonSelect) {
-        this.selectedColorStyle = this.colorService.changeColor(orderItemColorElement);
+    /**
+     * Helper to select data for <ion-select>
+     * @param o1: Object
+     * @param o2: Object
+     */
+    compareWithFn(o1, o2) {
+        return o1 && o2 ? o1.id === o2.id : o1 === o2;
     }
 
-    changeFont(orderItemFontElement: IonSelect) {
-        // this.selectedFontStyle = this.fontService.changeFont(orderItemFontElement);
-        let className = orderItemFontElement.value.replace(/\s/g, '');
-        className = className.replace('.', '');
+    /**
+     * Return css color class given Oder Item's color
+     */
+    getColorClass() {
+        return this.colorService.getColorClass(this.validationForm.value.orderItemColor);
+    }
 
-        this.selectedFontClass = className;
+    /**
+     * Return css font class given Oder Item's font
+     */
+    getFontClass() {
+        return this.fontService.getFontClass(this.validationForm.value.orderItemFont);
     }
 }

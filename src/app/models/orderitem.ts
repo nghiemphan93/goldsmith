@@ -6,9 +6,6 @@ import {Color} from './color.enum';
 
 export class OrderItem {
     id: string;
-    // orderId: string;
-    // customerId: string;
-    // productId: string;
 
     order: Order;
     customer: Customer;

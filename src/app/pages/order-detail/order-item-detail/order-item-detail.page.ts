@@ -12,10 +12,6 @@ export class OrderItemDetailPage implements OnInit {
     }
 
     ngOnInit() {
-        this.orderItemService.getOrderItem('934tU103Z6fuuB9WPKWK', 'iowKnytsJPQsX9fGeHDj')
-            .subscribe(orderItem => {
-                console.log(orderItem);
-            });
     }
 
 }
