@@ -1,4 +1,4 @@
-<ion-header #header>
+<ion-header>
     <ion-toolbar>
         <ion-buttons slot="start">
             <ion-menu-button></ion-menu-button>
@@ -96,11 +96,14 @@
 </ion-content>
 
 <!--Cards-->
+<!--<ion-content-->
+<!--        *ngIf="isMobile && (products | async)"-->
+<!--        scrollEvents="true"-->
+<!--        [header]="header"-->
+<!--        appHideHeader-->
+<!--&gt;-->
 <ion-content
         *ngIf="isMobile && (products | async)"
-        scrollEvents="true"
-        [header]="header"
-        appHideHeader
 >
 
     <ion-item-group class="ion-margin-start ion-margin-top">
