@@ -14,7 +14,8 @@ import {Customer} from '../../models/customer';
     styleUrls: ['./products.page.scss'],
 })
 export class ProductsPage implements OnInit, OnDestroy {
-    products: Observable<Product[]>;
+    productsDesktop$: Observable<Product[]>;
+    productsMobile$: Observable<Product[]>[] = [];
     tableStyle = 'material';
     isDesktop: boolean;
     isMobile: boolean;
@@ -30,7 +31,12 @@ export class ProductsPage implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.preparePlatform();
-        this.products = this.productService.getProducts();
+        if (this.isDesktop) {
+            this.productsDesktop$ = this.productService.getProducts();
+        } else {
+            this.productsMobile$.push(this.productService.getLimitedProductsAfterStart());
+        }
+
     }
 
     /**
@@ -42,6 +48,10 @@ export class ProductsPage implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        if (this.productService.isFullyLoaded()) {
+            this.productService.setFullyLoaded(false);
+        }
+
     }
 
     /**
@@ -83,5 +93,26 @@ export class ProductsPage implements OnInit, OnDestroy {
             await this.imageUploadService.deleteImageFromUrl(toDeleteProduct.imageUrl);
         }
         this.productService.deleteProduct(toDeleteProduct);
+    }
+
+    /**
+     * Triggered when content being scrolled 100px above the bottom to load for more Products
+     * @param event: CustomerEvent
+     */
+    loadData(event: any) {
+        const lastProduct$ = this.productService.getLimitedProductsAfterLastDoc();
+        lastProduct$.subscribe(data => {
+            if (this.productService.isFullyLoaded() === false) {
+                this.productsMobile$.push(lastProduct$);
+                if (data.length !== 0) {
+                    // data.forEach(product => console.log(product.productName));
+                    // console.log(this.productService.isFullyLoaded());
+                    event.target.complete();
+                } else {
+                    this.productService.setFullyLoaded(true);
+                    event.target.disabled = true;
+                }
+            }
+        });
     }
 }

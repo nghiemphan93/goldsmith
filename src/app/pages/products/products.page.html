@@ -8,7 +8,7 @@
 </ion-header>
 
 <!--  Main Table Content for Desktop  -->
-<ion-content *ngIf="isDesktop && (products | async)">
+<ion-content *ngIf="isDesktop && (productsDesktop$ | async)">
     <ion-item-group class="ion-margin">
         <ion-button routerLink="/products/create">
             <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
@@ -17,7 +17,7 @@
     </ion-item-group>
 
     <ngx-datatable
-            [rows]="products | async"
+            [rows]="productsDesktop$ | async"
             [rowHeight]="'auto'"
             [headerHeight]="50"
             [ngClass]="tableStyle"
@@ -103,7 +103,7 @@
 <!--        appHideHeader-->
 <!--&gt;-->
 <ion-content
-        *ngIf="isMobile && (products | async)"
+        *ngIf="isMobile && (productsMobile$[0] | async)"
 >
 
     <ion-item-group class="ion-margin-start ion-margin-top">
@@ -115,14 +115,19 @@
 
     <!--      Cards as Products      -->
     <ion-grid fixed>
-        <ion-row>
+        <ion-row
+                *ngFor="let products of productsMobile$"
+        >
             <ion-col
                     sizeXl="3"
                     sizeLg="4"
                     sizeMd="6"
                     *ngFor="let product of products | async"
             >
-                <ion-card class="ion-no-margin ion-no-padding">
+                <ion-card
+                        class="ion-no-margin ion-no-padding"
+
+                >
                     <section
                             [routerLink]="['/products', product.id]"
                     >
@@ -184,12 +189,19 @@
         </ion-row>
     </ion-grid>
 
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+        <ion-infinite-scroll-content
+                loadingSpinner="bubbles"
+                loadingText="Loading more data...">
+        </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+
     <ion-footer style="height: 10vh" #footer>
     </ion-footer>
 </ion-content>
 
 <!-- Skeleton screen -->
-<ion-content *ngIf="!(products | async)">
+<ion-content *ngIf="!(productsMobile$[0] | async) && !(productsDesktop$ | async)">
     <ion-card *ngFor="let skeleton of skeletons">
         <ion-card-header>
             <ion-card-subtitle>
