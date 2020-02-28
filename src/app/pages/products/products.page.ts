@@ -1,12 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../services/product.service';
 import {AngularFireUploadTask} from '@angular/fire/storage';
-import {Observable} from 'rxjs';
+import {forkJoin, Observable, of, pipe, range, Subscription} from 'rxjs';
 import {AngularFirestoreCollection} from '@angular/fire/firestore';
 import {Product} from '../../models/product';
 import {AlertController, Config, Platform} from '@ionic/angular';
 import {ImageUploadService} from '../../services/image-upload.service';
-import {Customer} from '../../models/customer';
 
 @Component({
     selector: 'app-products',
@@ -36,8 +35,8 @@ export class ProductsPage implements OnInit, OnDestroy {
         } else {
             this.productsMobile$.push(this.productService.getLimitedProductsAfterStart());
         }
-
     }
+
 
     /**
      * Identify which platform is being used
@@ -48,10 +47,9 @@ export class ProductsPage implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.productService.isFullyLoaded()) {
-            this.productService.setFullyLoaded(false);
+        if (this.productService.isPageFullyLoaded()) {
+            this.productService.setPageFullyLoaded(false);
         }
-
     }
 
     /**
@@ -96,23 +94,15 @@ export class ProductsPage implements OnInit, OnDestroy {
     }
 
     /**
-     * Triggered when content being scrolled 100px above the bottom to load for more Products
+     * Triggered when content being scrolled 100px above the page's bottom to load for more Products
      * @param event: CustomerEvent
      */
     loadData(event: any) {
-        const lastProduct$ = this.productService.getLimitedProductsAfterLastDoc();
-        lastProduct$.subscribe(data => {
-            if (this.productService.isFullyLoaded() === false) {
-                this.productsMobile$.push(lastProduct$);
-                if (data.length !== 0) {
-                    // data.forEach(product => console.log(product.productName));
-                    // console.log(this.productService.isFullyLoaded());
-                    event.target.complete();
-                } else {
-                    this.productService.setFullyLoaded(true);
-                    event.target.disabled = true;
-                }
-            }
-        });
+        if (this.productService.isPageFullyLoaded()) {
+            event.target.disabled = true;
+        } else {
+            this.productsMobile$.push(this.productService.getLimitedProductsAfterLastDoc());
+            event.target.complete();
+        }
     }
 }

@@ -8,6 +8,7 @@
 </ion-header>
 
 <!--  Main Table Content for Desktop  -->
+<!--<ion-content *ngIf="isDesktop && products.length > 0">-->
 <ion-content *ngIf="isDesktop && (productsDesktop$ | async)">
     <ion-item-group class="ion-margin">
         <ion-button routerLink="/products/create">
@@ -95,13 +96,13 @@
     </ngx-datatable>
 </ion-content>
 
-<!--Cards-->
-<!--<ion-content-->
-<!--        *ngIf="isMobile && (products | async)"-->
-<!--        scrollEvents="true"-->
-<!--        [header]="header"-->
-<!--        appHideHeader-->
-<!--&gt;-->
+<!--&lt;!&ndash;Cards&ndash;&gt;-->
+<!--&lt;!&ndash;<ion-content&ndash;&gt;-->
+<!--&lt;!&ndash;        *ngIf="isMobile && (products | async)"&ndash;&gt;-->
+<!--&lt;!&ndash;        scrollEvents="true"&ndash;&gt;-->
+<!--&lt;!&ndash;        [header]="header"&ndash;&gt;-->
+<!--&lt;!&ndash;        appHideHeader&ndash;&gt;-->
+<!--&lt;!&ndash;&gt;&ndash;&gt;-->
 <ion-content
         *ngIf="isMobile && (productsMobile$[0] | async)"
 >
@@ -254,3 +255,4 @@
         </ion-card-content>
     </ion-card>
 </ion-content>
+
