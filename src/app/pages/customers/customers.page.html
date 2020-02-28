@@ -8,7 +8,7 @@
 </ion-header>
 
 <!--  Main Table Content for Desktop  -->
-<ion-content *ngIf="isDesktop && (customers | async)">
+<ion-content *ngIf="isDesktop && (customersDesktop$ | async)">
     <ion-item-group class="ion-margin">
         <ion-button routerLink="/customers/create">
             Create New Customer
@@ -16,8 +16,8 @@
     </ion-item-group>
 
     <ngx-datatable
-            *ngIf="customers && isDesktop"
-            [rows]="customers | async"
+            *ngIf="customersDesktop$ && isDesktop"
+            [rows]="customersDesktop$ | async"
             [rowHeight]="'auto'"
             [headerHeight]="50"
             [ngClass]="tableStyle"
@@ -100,7 +100,7 @@
 
 <!--  Cards  -->
 <ion-content
-        *ngIf="isMobile && (customers | async)"
+        *ngIf="isMobile && (customersMobile$[0] | async)"
 >
 
     <ion-item-group class="ion-margin-start ion-margin-top">
@@ -112,7 +112,9 @@
 
     <!--      Cards as Customers      -->
     <ion-grid fixed>
-        <ion-row>
+        <ion-row
+                *ngFor="let customers of customersMobile$"
+        >
             <ion-col
                     sizeXl="3"
                     sizeLg="4"
@@ -192,12 +194,19 @@
         </ion-row>
     </ion-grid>
 
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+        <ion-infinite-scroll-content
+                loadingSpinner="bubbles"
+                loadingText="Loading more data...">
+        </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+
     <ion-footer style="height: 10vh">
     </ion-footer>
 </ion-content>
 
 <!-- Skeleton screen -->
-<ion-content *ngIf="!(customers | async)">
+<ion-content *ngIf="!(customersMobile$[0] | async) && !(customersDesktop$ | async)">
     <ion-card *ngFor="let skeleton of skeletons">
         <ion-card-header>
             <ion-card-subtitle>

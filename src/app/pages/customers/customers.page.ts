@@ -12,7 +12,8 @@ import {take} from 'rxjs/operators';
     styleUrls: ['./customers.page.scss'],
 })
 export class CustomersPage implements OnInit {
-    customers: Observable<Customer[]>;
+    customersDesktop$: Observable<Customer[]>;
+    customersMobile$: Observable<Customer[]>[] = [];
     tableStyle = 'material';
     isDesktop: boolean;
     isMobile: boolean;
@@ -28,7 +29,12 @@ export class CustomersPage implements OnInit {
 
     ngOnInit() {
         this.preparePlatform();
-        this.customers = this.customerService.getCustomers();
+        if (this.isDesktop) {
+            this.customersDesktop$ = this.customerService.getCustomers();
+        } else {
+            this.customersMobile$.push(this.customerService.getLimitedCustomersAfterStart());
+        }
+
     }
 
     /**
@@ -37,15 +43,6 @@ export class CustomersPage implements OnInit {
     private preparePlatform() {
         this.isDesktop = this.platform.is('desktop');
         this.isMobile = !this.platform.is('desktop');
-    }
-
-    /**
-     * Handler to delete a customer
-     * @param toDeleteCustomer: Customer
-     */
-    deleteCustomer(toDeleteCustomer: Customer) {
-        console.log(toDeleteCustomer);
-        this.customerService.deleteCustomer(toDeleteCustomer);
     }
 
     /**
@@ -77,13 +74,25 @@ export class CustomersPage implements OnInit {
         await alert.present();
     }
 
-    doRefresh(event) {
-        setTimeout(async () => {
+    /**
+     * Handler to delete a customer
+     * @param toDeleteCustomer: Customer
+     */
+    async deleteCustomer(toDeleteCustomer: Customer) {
+        console.log(toDeleteCustomer);
+        await this.customerService.deleteCustomer(toDeleteCustomer);
+    }
 
+    /**
+     * Triggered when content being scrolled 100px above the page's bottom to load for more Customers
+     * @param event: CustomerEvent
+     */
+    loadData(event: any) {
+        if (this.customerService.isPageFullyLoaded()) {
+            event.target.disabled = true;
+        } else {
+            this.customersMobile$.push(this.customerService.getLimitedCustomersAfterLastDoc());
             event.target.complete();
-            await this.router.navigate(['customers']);
-
-            console.log('refreshed...');
-        }, 2000);
+        }
     }
 }
