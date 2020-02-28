@@ -67,9 +67,9 @@ export class CustomerService {
      * Upload one new Customer to Database
      * @param customer: Customer
      */
-    createCustomer(customer: Customer): Promise<DocumentReference> {
+    async createCustomer(customer: Customer): Promise<DocumentReference> {
         const data = JSON.parse(JSON.stringify(customer));
-        return this.customerCollection.add(data);
+        return await this.customerCollection.add(data);
     }
 
     /**

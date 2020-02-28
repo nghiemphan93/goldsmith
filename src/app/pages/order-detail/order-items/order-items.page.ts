@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {OrderItemService} from '../../../services/order-item.service';
 import {Observable} from 'rxjs';
 import {Order} from '../../../models/order';
@@ -17,9 +17,9 @@ import {Customer} from '../../../models/customer';
     templateUrl: './order-items.page.html',
     styleUrls: ['./order-items.page.scss'],
 })
-export class OrderItemsPage implements OnInit {
-
-    orderItems: Observable<OrderItem[]>;
+export class OrderItemsPage implements OnInit, OnDestroy {
+    orderItemsDesktop$: Observable<OrderItem[]>;
+    orderItemsMobile$: Observable<OrderItem[]>[] = [];
     tableStyle = 'material';
     isDesktop: boolean;
     isMobile: boolean;
@@ -40,25 +40,31 @@ export class OrderItemsPage implements OnInit {
     }
 
     ngOnInit() {
-        this.fontNames = this.fontService.getFontNames();
-        this.orderId = this.activatedRoute.snapshot.params.orderId;
-        this.order = this.orderService.getOrder(this.orderId);
+        this.setup();
+        if (this.isDesktop) {
+            this.orderItemsDesktop$ = this.orderItemService.getOrderItems(this.orderId);
+        } else {
+            this.orderItemsMobile$.push(this.orderItemService.getLimitedOrderItemsAfterStart(this.orderId));
+        }
 
-        this.isDesktop = this.platform.is('desktop');
-        this.isMobile = !this.platform.is('desktop');
+    }
 
-        this.orderItems = this.orderItemService.getOrderItems(this.orderId).pipe(take(5));
+    ngOnDestroy(): void {
+        if (this.orderItemService.isPageFullyLoaded()) {
+            this.orderItemService.setPageFullyLoaded(false);
+        }
     }
 
     /**
-     * Handler to delete an Order Item
-     * @param toDeleteOrderItem: OrderItem
+     * Identify which platform is being used
      */
-    deleteOrderItem(toDeleteOrderItem: OrderItem) {
-        console.log(toDeleteOrderItem);
-        this.orderItemService.deleteOrderItem(this.orderId, toDeleteOrderItem);
+    private setup() {
+        this.fontNames = this.fontService.getFontNames();
+        this.orderId = this.activatedRoute.snapshot.params.orderId;
+        this.order = this.orderService.getOrder(this.orderId);
+        this.isDesktop = this.platform.is('desktop');
+        this.isMobile = !this.platform.is('desktop');
     }
-
 
     /**
      * Showing alert when clicking Delete Button
@@ -85,26 +91,47 @@ export class OrderItemsPage implements OnInit {
                 }
             ]
         });
-
         await alert.present();
     }
 
     /**
-     * Return css color class given Oder Item's color
+     * Handler to delete an Order Item
+     * @param toDeleteOrderItem: OrderItem
+     */
+    async deleteOrderItem(toDeleteOrderItem: OrderItem) {
+        console.log(toDeleteOrderItem);
+        await this.orderItemService.deleteOrderItem(this.orderId, toDeleteOrderItem);
+    }
+
+    /**
+     * Triggered when content being scrolled 100px above the page's bottom to load for more Order Items
+     * @param event: CustomerEvent
+     */
+    loadData(event: any) {
+        if (this.orderItemService.isPageFullyLoaded()) {
+            event.target.disabled = true;
+        } else {
+            this.orderItemsMobile$.push(this.orderItemService.getLimitedOrderItemsAfterLastDoc(this.orderId));
+            event.target.complete();
+        }
+    }
+
+    /**
+     * Return css Color Class given Oder Item's color
      */
     getColorClass(orderItem: OrderItem) {
         return this.colorService.getColorClass(orderItem.orderItemColor);
     }
 
     /**
-     * Return css font class given Oder Item's font
+     * Return css Font Class given Oder Item's font
      */
     getFontClass(orderItem: OrderItem) {
         return this.fontService.getFontClass(orderItem.orderItemFont);
     }
 
     /**
-     * Return css ring color class for Table Cell
+     * Return css Ring Color Class for Table Cell
      * @param row: OrderItem
      * @param column: Column
      * @param value: string
@@ -120,7 +147,7 @@ export class OrderItemsPage implements OnInit {
     }
 
     /**
-     * Return css necklace color class for Table Cell
+     * Return css Necklace Color Class for Table Cell
      * @param row: OrderItem
      * @param column: Column
      * @param value: string
@@ -136,7 +163,7 @@ export class OrderItemsPage implements OnInit {
     }
 
     /**
-     * Return css quantity class for Table Cell
+     * Return css Quantity Class for Table Cell
      * @param row: OrderItem
      * @param column: Column
      * @param value: string
@@ -148,7 +175,7 @@ export class OrderItemsPage implements OnInit {
     }
 
     /**
-     * Return css comment class for Table Cell
+     * Return css Comment Class for Table Cell
      * @param row: OrderItem
      * @param column: Column
      * @param value: string
@@ -158,7 +185,7 @@ export class OrderItemsPage implements OnInit {
     }
 
     /**
-     * Return css font class for Table Cell
+     * Return css Font Class for Table Cell
      * @param row: OrderItem
      * @param column: Column
      * @param value: string

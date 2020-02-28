@@ -67,9 +67,9 @@ export class OrderService {
      * Upload one new Order to Database
      * @param order: Order
      */
-    createOrder(order: Order): Promise<DocumentReference> {
+    async createOrder(order: Order): Promise<DocumentReference> {
         const data = JSON.parse(JSON.stringify(order));
-        return this.orderCollection.add(data);
+        return await this.orderCollection.add(data);
     }
 
     /**

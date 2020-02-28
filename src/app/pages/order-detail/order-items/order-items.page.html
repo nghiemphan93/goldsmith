@@ -13,7 +13,7 @@
 
 <!--  Main Table Content for Desktop  -->
 <ion-content
-        *ngIf="isDesktop && (orderItems | async)"
+        *ngIf="isDesktop && (orderItemsDesktop$ | async)"
 >
     <ion-item-group class="ion-margin">
         <ion-button [routerLink]="['/orders', orderId, 'orderItems', 'create']">
@@ -21,13 +21,13 @@
         </ion-button>
     </ion-item-group>
 
-    <ion-col size="6" offset="6" *ngIf="!orderItems">
+    <ion-col size="6" offset="6" *ngIf="!orderItemsDesktop$">
         <ion-spinner></ion-spinner>
     </ion-col>
 
     <ngx-datatable
-            *ngIf="orderItems"
-            [rows]="orderItems | async"
+            *ngIf="orderItemsDesktop$"
+            [rows]="orderItemsDesktop$ | async"
             [rowHeight]="'auto'"
             [headerHeight]="50"
             [ngClass]="tableStyle"
@@ -192,7 +192,7 @@
 
 <!--Cards-->
 <ion-content
-        *ngIf="isMobile && (orderItems | async)"
+        *ngIf="isMobile && (orderItemsMobile$[0] | async)"
 >
 
     <ion-item-group class="ion-margin-start ion-margin-top">
@@ -203,7 +203,9 @@
 
     <!--      Cards as Orders      -->
     <ion-grid fixed>
-        <ion-row>
+        <ion-row
+                *ngFor="let orderItems of orderItemsMobile$"
+        >
             <ion-col
                     sizeXl="3"
                     sizeLg="4"
@@ -316,12 +318,19 @@
         </ion-row>
     </ion-grid>
 
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+        <ion-infinite-scroll-content
+                loadingSpinner="bubbles"
+                loadingText="Loading more data...">
+        </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+
     <ion-footer style="height: 10vh" #footer>
     </ion-footer>
 </ion-content>
 
 <!-- Skeleton screen -->
-<ion-content *ngIf="!(orderItems | async)">
+<ion-content *ngIf="!(orderItemsMobile$[0] | async) && !(orderItemsDesktop$ | async)">
     <ion-card *ngFor="let skeleton of skeletons">
         <ion-card-header>
             <ion-card-subtitle>
