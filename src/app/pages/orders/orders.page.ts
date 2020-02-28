@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
 import {AlertController, Config, Platform} from '@ionic/angular';
 import {Order} from '../../models/order';
@@ -10,8 +10,9 @@ import {Product} from '../../models/product';
     templateUrl: './orders.page.html',
     styleUrls: ['./orders.page.scss'],
 })
-export class OrdersPage implements OnInit {
-    orders: Observable<Order[]>;
+export class OrdersPage implements OnInit, OnDestroy {
+    ordersDesktop$: Observable<Order[]>;
+    ordersMobile$: Observable<Order[]>[] = [];
     tableStyle = 'material';
     isDesktop: boolean;
     isMobile: boolean;
@@ -26,7 +27,18 @@ export class OrdersPage implements OnInit {
 
     ngOnInit() {
         this.preparePlatform();
-        this.orders = this.orderService.getOrders();
+        if (this.isDesktop) {
+            this.ordersDesktop$ = this.orderService.getOrders();
+        } else {
+            this.ordersMobile$.push(this.orderService.getLimitedOrdersAfterStart());
+        }
+
+    }
+
+    ngOnDestroy(): void {
+        if (this.orderService.isPageFullyLoaded()) {
+            this.orderService.setPageFullyLoaded(false);
+        }
     }
 
     /**
@@ -70,8 +82,21 @@ export class OrdersPage implements OnInit {
      * handler to delete an order
      * @param toDeleteOrder: Order
      */
-    deleteOrder(toDeleteOrder: Order) {
+    async deleteOrder(toDeleteOrder: Order) {
         console.log(toDeleteOrder);
-        this.orderService.deleteOrder(toDeleteOrder);
+        await this.orderService.deleteOrder(toDeleteOrder);
+    }
+
+    /**
+     * Triggered when content being scrolled 100px above the page's bottom to load for more Orders
+     * @param event: CustomerEvent
+     */
+    loadData(event: any) {
+        if (this.orderService.isPageFullyLoaded()) {
+            event.target.disabled = true;
+        } else {
+            this.ordersMobile$.push(this.orderService.getLimitedOrdersAfterLastDoc());
+            event.target.complete();
+        }
     }
 }

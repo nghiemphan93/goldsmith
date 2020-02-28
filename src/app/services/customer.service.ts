@@ -78,7 +78,7 @@ export class CustomerService {
      */
     async updateCustomer(toUpdateCustomer: Customer) {
         this.customerDoc = this.afs.doc(`customers/${toUpdateCustomer.id}`);
-        await this.customerDoc.update(toUpdateCustomer);
+        return await this.customerDoc.update(toUpdateCustomer);
     }
 
     /**
@@ -87,7 +87,7 @@ export class CustomerService {
      */
     async deleteCustomer(toDeleteCustomer: Customer) {
         this.customerDoc = this.afs.doc(`customers/${toDeleteCustomer.id}`);
-        await this.customerDoc.delete();
+        return await this.customerDoc.delete();
     }
 
     /**

@@ -37,18 +37,18 @@ export class ProductsPage implements OnInit, OnDestroy {
         }
     }
 
+    ngOnDestroy() {
+        if (this.productService.isPageFullyLoaded()) {
+            this.productService.setPageFullyLoaded(false);
+        }
+    }
+
     /**
      * Identify which platform is being used
      */
     private preparePlatform() {
         this.isDesktop = this.platform.is('desktop');
         this.isMobile = !this.platform.is('desktop');
-    }
-
-    ngOnDestroy() {
-        if (this.productService.isPageFullyLoaded()) {
-            this.productService.setPageFullyLoaded(false);
-        }
     }
 
     /**
