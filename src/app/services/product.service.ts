@@ -75,18 +75,18 @@ export class ProductService {
      * Update one Product to Database
      * @param updatedProduct: Product
      */
-    updateProduct(updatedProduct: Product) {
+    async updateProduct(updatedProduct: Product) {
         this.productDoc = this.afs.doc(`products/${updatedProduct.id}`);
-        this.productDoc.update(updatedProduct);
+        await this.productDoc.update(updatedProduct);
     }
 
     /**
      * Delete one Product from Database
      * @param toDeleteProduct: Product
      */
-    deleteProduct(toDeleteProduct: Product) {
+    async deleteProduct(toDeleteProduct: Product) {
         this.productDoc = this.afs.doc(`products/${toDeleteProduct.id}`);
-        this.productDoc.delete();
+        await this.productDoc.delete();
     }
 
     /**
@@ -167,7 +167,7 @@ export class ProductService {
         console.log(isAdded);
         console.log('-----------------------------------');
         if (isAdded) {
-            this.lastDocSnapshot = actions[actions.length - 1].payload.doc; // Remember last document payload
+            this.lastDocSnapshot = actions[actions.length - 1].payload.doc; // Remember last Document Snapshot
         }
     }
 

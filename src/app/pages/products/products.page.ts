@@ -37,7 +37,6 @@ export class ProductsPage implements OnInit, OnDestroy {
         }
     }
 
-
     /**
      * Identify which platform is being used
      */
@@ -90,7 +89,7 @@ export class ProductsPage implements OnInit, OnDestroy {
         if (toDeleteProduct.imageUrl) {
             await this.imageUploadService.deleteImageFromUrl(toDeleteProduct.imageUrl);
         }
-        this.productService.deleteProduct(toDeleteProduct);
+        await this.productService.deleteProduct(toDeleteProduct);
     }
 
     /**
