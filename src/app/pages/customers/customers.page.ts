@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
 import {AlertController, Config, Platform} from '@ionic/angular';
 import {Customer} from '../../models/customer';
@@ -11,7 +11,7 @@ import {take} from 'rxjs/operators';
     templateUrl: './customers.page.html',
     styleUrls: ['./customers.page.scss'],
 })
-export class CustomersPage implements OnInit {
+export class CustomersPage implements OnInit, OnDestroy {
     customersDesktop$: Observable<Customer[]>;
     customersMobile$: Observable<Customer[]>[] = [];
     tableStyle = 'material';
@@ -34,7 +34,12 @@ export class CustomersPage implements OnInit {
         } else {
             this.customersMobile$.push(this.customerService.getLimitedCustomersAfterStart());
         }
+    }
 
+    ngOnDestroy(): void {
+        if (this.customerService.isPageFullyLoaded()) {
+            this.customerService.setPageFullyLoaded(false);
+        }
     }
 
     /**

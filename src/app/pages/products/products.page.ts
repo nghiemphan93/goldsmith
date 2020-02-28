@@ -45,7 +45,7 @@ export class ProductsPage implements OnInit, OnDestroy {
         this.isMobile = !this.platform.is('desktop');
     }
 
-    ngOnDestroy(): void {
+    ngOnDestroy() {
         if (this.productService.isPageFullyLoaded()) {
             this.productService.setPageFullyLoaded(false);
         }
