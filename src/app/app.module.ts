@@ -24,6 +24,7 @@ import {HideHeaderBDirective} from './directives/hide-header-b.directive';
         IonicModule.forRoot(),
         AppRoutingModule,
         AngularFireModule.initializeApp(environment.firebase),
+        AngularFirestoreModule.enablePersistence(),
         AngularFirestoreModule,
         AngularFireStorageModule,
         ReactiveFormsModule

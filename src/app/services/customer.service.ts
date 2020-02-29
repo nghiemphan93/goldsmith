@@ -33,11 +33,15 @@ export class CustomerService {
      */
     getCustomers(): Observable<Customer[]> {
         this.customers = this.customerCollection.snapshotChanges().pipe(
-            map(actions => actions.map(act => {
-                const data = act.payload.doc.data() as Customer;
-                data.id = act.payload.doc.id;
-                return data;
-            }))
+            map(actions => {
+                actions.forEach(act => console.log(act.payload.doc.data().firstName + ' ' + act.payload.doc.metadata.fromCache + ' ' + act.payload.type));
+
+                return actions.map(act => {
+                    const data = act.payload.doc.data() as Customer;
+                    data.id = act.payload.doc.id;
+                    return data;
+                });
+            })
         );
 
         return this.customers;

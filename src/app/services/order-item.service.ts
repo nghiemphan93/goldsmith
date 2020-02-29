@@ -32,11 +32,15 @@ export class OrderItemService {
             .doc<Order>(orderId)
             .collection<OrderItem>('orderItems', ref => ref.orderBy('createdAt'))
             .snapshotChanges().pipe(
-                map(actions => actions.map(act => {
-                    const data = act.payload.doc.data() as OrderItem;
-                    data.id = act.payload.doc.id;
-                    return data;
-                }))
+                map(actions => {
+                    actions.forEach(act => console.log(act.payload.doc.data().orderItemCode + ' ' + act.payload.doc.metadata.fromCache));
+
+                    return actions.map(act => {
+                        const data = act.payload.doc.data() as OrderItem;
+                        data.id = act.payload.doc.id;
+                        return data;
+                    });
+                })
             );
 
         return orderItems;
