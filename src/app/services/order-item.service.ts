@@ -15,7 +15,7 @@ import {OrderItem} from '../models/orderitem';
     providedIn: 'root'
 })
 export class OrderItemService {
-    pageLimit = 5;
+    pageLimit = 10;
     lastDocSnapshot: QueryDocumentSnapshot<unknown>;
     pageFullyLoaded = false;
 
@@ -115,7 +115,7 @@ export class OrderItemService {
 
 
     /**
-     * Return the first 5 Order Items from an Order
+     * Return the first limited Order Items from an Order
      */
     getLimitedOrderItemsAfterStart(orderId: string): Observable<OrderItem[]> {
         const orderItems = this.afs
@@ -147,7 +147,7 @@ export class OrderItemService {
     }
 
     /**
-     * Return the next 5 Order Items from the last Query's Document Snapshot of an Order
+     * Return the next limited Order Items from the last Query's Document Snapshot of an Order
      */
     getLimitedOrderItemsAfterLastDoc(orderId: string): Observable<OrderItem[]> {
         const orderItems = this.afs
