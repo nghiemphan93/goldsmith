@@ -19,7 +19,7 @@ export class CustomerService {
     customerDoc: AngularFirestoreDocument<Customer>;
     customers: Observable<Customer[]>;
     customer: Observable<Customer>;
-    pageLimit = 5;
+    pageLimit = 10;
     lastDocSnapshot: QueryDocumentSnapshot<unknown>;
     pageFullyLoaded = false;
 
@@ -95,7 +95,7 @@ export class CustomerService {
     }
 
     /**
-     * Return the first 5 Customers from the top of the ordered result
+     * Return the first limited Customers from the top of the ordered result
      */
     getLimitedCustomersAfterStart(): Observable<Customer[]> {
         this.customers = this.afs.collection('customers', ref =>
@@ -123,7 +123,7 @@ export class CustomerService {
     }
 
     /**
-     * Return the next 5 Customers from the last Query's Document Snapshot
+     * Return the next limited Customers from the last Query's Document Snapshot
      */
     getLimitedCustomersAfterLastDoc(): Observable<Customer[]> {
         this.customers = this.afs.collection('customers', ref =>

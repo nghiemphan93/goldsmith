@@ -12,8 +12,9 @@ import {take} from 'rxjs/operators';
     styleUrls: ['./customers.page.scss'],
 })
 export class CustomersPage implements OnInit, OnDestroy {
-    customersDesktop$: Observable<Customer[]>;
     customersMobile$: Observable<Customer[]>[] = [];
+    customersDesktop$: Observable<Customer[]>[] = [];
+    customers: Customer[] = [];
     tableStyle = 'material';
     isDesktop: boolean;
     isMobile: boolean;
@@ -30,7 +31,10 @@ export class CustomersPage implements OnInit, OnDestroy {
     ngOnInit() {
         this.preparePlatform();
         if (this.isDesktop) {
-            this.customersDesktop$ = this.customerService.getCustomers();
+            this.customersDesktop$.push(this.customerService.getLimitedCustomersAfterStart());
+            this.customersDesktop$[0].subscribe(moreCustomers => {
+                this.addPaginatedCustomers(moreCustomers);
+            });
         } else {
             this.customersMobile$.push(this.customerService.getLimitedCustomersAfterStart());
         }
@@ -96,8 +100,32 @@ export class CustomersPage implements OnInit, OnDestroy {
         if (this.customerService.isPageFullyLoaded()) {
             event.target.disabled = true;
         } else {
-            this.customersMobile$.push(this.customerService.getLimitedCustomersAfterLastDoc());
-            event.target.complete();
+            if (this.isMobile) {
+                this.customersMobile$.push(this.customerService.getLimitedCustomersAfterLastDoc());
+                event.target.complete();
+            } else {
+                this.customersDesktop$.push(this.customerService.getLimitedCustomersAfterLastDoc());
+                this.customersDesktop$[this.customersDesktop$.length - 1].subscribe(moreCustomers => {
+                    this.addPaginatedCustomers(moreCustomers);
+                    event.target.complete();
+                });
+            }
+        }
+    }
+
+    private addPaginatedCustomers(moreCustomers: Customer[]) {
+        if (moreCustomers.length > 0) {
+            const customerIndex = this.customers.findIndex(customer => customer.id === moreCustomers[0].id);
+            console.log('edited customer: ' + customerIndex);
+            if (customerIndex >= 0) {
+                const customers = [...this.customers];
+                customers.splice(customerIndex, moreCustomers.length, ...moreCustomers);
+                this.customers = customers;
+            } else {
+                let customers = [...this.customers];
+                customers = [...customers, ...moreCustomers];
+                this.customers = [...customers];
+            }
         }
     }
 }
