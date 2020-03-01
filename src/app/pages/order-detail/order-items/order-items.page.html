@@ -12,9 +12,7 @@
 </ion-header>
 
 <!--  Main Table Content for Desktop  -->
-<ion-content
-        *ngIf="isDesktop && (orderItemsDesktop$ | async)"
->
+<ion-content *ngIf="isDesktop && (orderItemsDesktop$[0] | async)">
     <ion-item-group class="ion-margin">
         <ion-button [routerLink]="['/orders', orderId, 'orderItems', 'create']">
             New Order Item
@@ -26,8 +24,8 @@
     </ion-col>
 
     <ngx-datatable
-            *ngIf="orderItemsDesktop$"
-            [rows]="orderItemsDesktop$ | async"
+            *ngIf="isDesktop && (orderItemsDesktop$[0] | async)"
+            [rows]="orderItems"
             [rowHeight]="'auto'"
             [headerHeight]="50"
             [ngClass]="tableStyle"
@@ -187,6 +185,13 @@
             </ng-template>
         </ngx-datatable-column>
     </ngx-datatable>
+
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+        <ion-infinite-scroll-content
+                loadingSpinner="bubbles"
+                loadingText="Loading more data...">
+        </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
 </ion-content>
 
 
@@ -330,7 +335,7 @@
 </ion-content>
 
 <!-- Skeleton screen -->
-<ion-content *ngIf="!(orderItemsMobile$[0] | async) && !(orderItemsDesktop$ | async)">
+<ion-content *ngIf="!(orderItemsMobile$[0] | async) && !(orderItemsDesktop$[0] | async)">
     <ion-card *ngFor="let skeleton of skeletons">
         <ion-card-header>
             <ion-card-subtitle>
