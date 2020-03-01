@@ -17,8 +17,6 @@ export class FontService {
 
 
     constructor() {
-        // console.log(this.fontClasses);
-        // this.generateFontClasses();
     }
 
     generateFontClasses() {
@@ -34,28 +32,6 @@ export class FontService {
 
     getFontClasses() {
         return this.fontClasses;
-    }
-
-    changeFont(orderItemFontElement: IonSelect) {
-        console.log(orderItemFontElement.value);
-        return {
-            'font-family': orderItemFontElement.value,
-            'font-size': '2rem'
-        };
-    }
-
-    getFontaClass(fontName: string) {
-        // const fontClassIndex = this.fontNames.indexOf(fontName);
-        // console.log(this.fontClasses[fontClassIndex]);
-        return {Scriptina: true};
-    }
-
-    getFontabcClass({row, column, value}): any {
-        let className = row.orderItemFont.replace(/\s/g, '');
-        className = className.replace('.', '');
-        const fontClass = {};
-        fontClass[className] = true;
-        return fontClass;
     }
 
     /**

@@ -18,28 +18,6 @@ export class ColorService {
         return this.colors;
     }
 
-    changeColor(orderItemColorElement: IonSelect) {
-        // console.log(orderItemColorElement.value)
-        switch (orderItemColorElement.value) {
-            case 'SILVER':
-                // this.selectedColorClass = 'silverColor';
-                return {'background-color': 'white'};
-                break;
-            case 'PLATINUM':
-                // this.selectedColorClass = 'platinumColor';
-                return {'background-color': '#e5e4e2'};
-                break;
-            case 'GOLD':
-                // this.selectedColorClass = 'goldColor';
-                return {'background-color': 'yellow'};
-                break;
-            case 'ROSE GOLD':
-                // this.selectedColorClass = 'roseGoldColor';
-                return {'background-color': '#ffbcd2'};
-                break;
-        }
-    }
-
     /**
      * Return css color class given color name
      * @param colorName: string
