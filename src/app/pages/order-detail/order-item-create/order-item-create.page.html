@@ -9,7 +9,7 @@
     </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" >
+<ion-content class="ion-padding">
     <ion-grid fixed>
         <ion-row>
             <ion-col
@@ -52,8 +52,8 @@
                                     *ngIf="isCreated"
                                     [compareWith]="compareWithFn"
                             >
-                                <ion-select-option [value]="(this.order | async)">
-                                    {{ (this.order | async)?.orderCode }}
+                                <ion-select-option [value]="(this.order$ | async)">
+                                    {{ (this.order$ | async)?.orderCode }}
                                 </ion-select-option>
                             </ion-select>
 
@@ -121,7 +121,7 @@
                                     [compareWith]="compareWithFn"
                             >
                                 <ion-select-option
-                                        *ngFor="let customer of customers | async"
+                                        *ngFor="let customer of customers$ | async"
                                         [value]="customer"
                                 >
                                     {{ customer.firstName }} {{ customer.lastName }} <br>
@@ -140,7 +140,7 @@
                                     [selectedText]="orderItem.customer.firstName + ' ' + orderItem.customer.lastName"
                             >
                                 <ion-select-option
-                                        *ngFor="let customer of customers | async"
+                                        *ngFor="let customer of customers$ | async"
                                         [value]="customer"
                                 >
                                     {{ customer.firstName }} {{ customer.lastName }} <br>
@@ -173,7 +173,7 @@
                                     [compareWith]="compareWithFn"
                             >
                                 <ion-select-option
-                                        *ngFor="let product of products | async"
+                                        *ngFor="let product of products$ | async"
                                         [value]="product"
                                 >
                                     {{ product.productName }}
@@ -189,7 +189,7 @@
                                     [selectedText]="orderItem.product.productName"
                             >
                                 <ion-select-option
-                                        *ngFor="let product of products | async"
+                                        *ngFor="let product of products$ | async"
                                         [value]="product"
                                 >
                                     {{ product.productName }}

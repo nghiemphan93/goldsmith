@@ -16,6 +16,8 @@ import {Color} from '../../../models/color.enum';
 import {FontService} from '../../../services/font.service';
 import {ColorService} from '../../../services/color.service';
 import {StatusService} from '../../../services/status.service';
+import {CustomerCacheService} from '../../../services/customer-cache.service';
+import {ProductCacheService} from '../../../services/product-cache.service';
 
 
 @Component({
@@ -27,9 +29,9 @@ export class OrderItemCreatePage implements OnInit {
     orderItem: OrderItem;
     validationForm: FormGroup;
     orderId: string;
-    order: Observable<Order>;
-    customers: Observable<Customer[]>;
-    products: Observable<Product[]>;
+    order$: Observable<Order>;
+    customers$: Observable<Customer[]>;
+    products$: Observable<Product[]>;
     oldImageUrl: string;
     statuses: (string | Status)[];
     colors: (string | Color)[];
@@ -49,7 +51,9 @@ export class OrderItemCreatePage implements OnInit {
                 private imageUploadService: ImageUploadService,
                 private fontService: FontService,
                 private colorService: ColorService,
-                private statusService: StatusService
+                private statusService: StatusService,
+                private customerCacheService: CustomerCacheService,
+                private productCacheService: ProductCacheService
     ) {
     }
 
@@ -67,9 +71,9 @@ export class OrderItemCreatePage implements OnInit {
         this.fontNames = this.fontService.getFontNames();
         this.ringSizeUStoVNMapper = this.configRingSizeUStoVN();
         this.orderId = this.activatedRoute.snapshot.params.orderId;
-        this.order = this.orderService.getOrder(this.orderId);
-        this.customers = this.customerService.getCustomers();
-        this.products = this.productService.getProducts();
+        this.order$ = this.orderService.getOrder(this.orderId);
+        this.customers$ = this.customerCacheService.getCustomersCache();
+        this.products$ = this.productCacheService.getProductsCache();
     }
 
     /**
@@ -80,7 +84,7 @@ export class OrderItemCreatePage implements OnInit {
         const orderId = this.activatedRoute.snapshot.params.orderId;
         const orderItemId = this.activatedRoute.snapshot.params.orderItemId;
         const url = this.router.url.split('/');
-        this.order = this.orderService.getOrder(orderId);
+        this.order$ = this.orderService.getOrder(orderId);
 
 
         switch (url[url.length - 1]) {
