@@ -9,7 +9,7 @@ import {Order} from '../models/order';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Customer} from '../models/customer';
-import {Product} from "../models/product";
+import {Product} from '../models/product';
 
 @Injectable({
     providedIn: 'root'
@@ -19,7 +19,7 @@ export class OrderService {
     orderDoc: AngularFirestoreDocument<Order>;
     orders: Observable<Order[]>;
     order: Observable<Order>;
-    pageLimit = 5;
+    pageLimit = 10;
     lastDocSnapshot: QueryDocumentSnapshot<unknown>;
     pageFullyLoaded = false;
 
@@ -91,7 +91,7 @@ export class OrderService {
     }
 
     /**
-     * Return the first 5 Orders from the top of the ordered result
+     * Return the first limited Orders from the top of the ordered result
      */
     getLimitedOrdersAfterStart(): Observable<Order[]> {
         this.orders = this.afs.collection('orders', ref =>
@@ -119,7 +119,7 @@ export class OrderService {
     }
 
     /**
-     * Return the next 5 Orders from the last Query's Document Snapshot
+     * Return the next limited Orders from the last Query's Document Snapshot
      */
     getLimitedOrdersAfterLastDoc(): Observable<Order[]> {
         this.orders = this.afs.collection('orders', ref =>
