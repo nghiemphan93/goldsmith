@@ -17,7 +17,7 @@ export class ProductService {
     productDoc: AngularFirestoreDocument<Product>;
     products: Observable<Product[]>;
     product: Observable<Product>;
-    pageLimit = 5;
+    pageLimit = 10;
     lastDocSnapshot: QueryDocumentSnapshot<unknown>;
     pageFullyLoaded = false;
 
@@ -32,11 +32,15 @@ export class ProductService {
     getProducts(): Observable<Product[]> {
         // Get Products with the ids
         this.products = this.productCollection.snapshotChanges().pipe(
-            map(actions => actions.map(act => {
-                const data = act.payload.doc.data() as Product;
-                data.id = act.payload.doc.id;
-                return data;
-            }))
+            map(actions => {
+                actions.forEach(act => console.log(act.payload.doc.data().productName + ' ' + act.payload.doc.metadata.fromCache + ' ' + act.payload.type));
+
+                return actions.map(act => {
+                    const data = act.payload.doc.data() as Product;
+                    data.id = act.payload.doc.id;
+                    return data;
+                });
+            })
         );
 
         return this.products;
@@ -90,7 +94,7 @@ export class ProductService {
     }
 
     /**
-     * Return the first 5 Products from the top of the ordered result
+     * Return the first limited Products from the top of the ordered result
      */
     getLimitedProductsAfterStart(): Observable<Product[]> {
         this.products = this.afs.collection('products', ref =>
@@ -118,7 +122,7 @@ export class ProductService {
     }
 
     /**
-     * Return the next 5 Products from the last Query's Document Snapshot
+     * Return the next limited Products from the last Query's Document Snapshot
      */
     getLimitedProductsAfterLastDoc(): Observable<Product[]> {
         this.products = this.afs.collection('products', ref =>

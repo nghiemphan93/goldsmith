@@ -13,8 +13,9 @@ import {ImageUploadService} from '../../services/image-upload.service';
     styleUrls: ['./products.page.scss'],
 })
 export class ProductsPage implements OnInit, OnDestroy {
-    productsDesktop$: Observable<Product[]>;
+    productsDesktop$: Observable<Product[]>[] = [];
     productsMobile$: Observable<Product[]>[] = [];
+    products: Product[] = [];
     tableStyle = 'material';
     isDesktop: boolean;
     isMobile: boolean;
@@ -31,7 +32,10 @@ export class ProductsPage implements OnInit, OnDestroy {
     ngOnInit() {
         this.preparePlatform();
         if (this.isDesktop) {
-            this.productsDesktop$ = this.productService.getProducts();
+            this.productsDesktop$.push(this.productService.getLimitedProductsAfterStart());
+            this.productsDesktop$[0].subscribe(moreProducts => {
+                this.addPaginatedProducts(moreProducts);
+            });
         } else {
             this.productsMobile$.push(this.productService.getLimitedProductsAfterStart());
         }
@@ -100,8 +104,36 @@ export class ProductsPage implements OnInit, OnDestroy {
         if (this.productService.isPageFullyLoaded()) {
             event.target.disabled = true;
         } else {
-            this.productsMobile$.push(this.productService.getLimitedProductsAfterLastDoc());
-            event.target.complete();
+            if (this.isMobile) {
+                this.productsMobile$.push(this.productService.getLimitedProductsAfterLastDoc());
+                event.target.complete();
+            } else {
+                this.productsDesktop$.push(this.productService.getLimitedProductsAfterLastDoc());
+                this.productsDesktop$[this.productsDesktop$.length - 1].subscribe(moreProducts => {
+                    this.addPaginatedProducts(moreProducts);
+                    event.target.complete();
+                });
+            }
+        }
+    }
+
+    /**
+     * Add new or updated Products to this.products based on product's index
+     * @param moreProducts: Product[]
+     */
+    private addPaginatedProducts(moreProducts: Product[]) {
+        if (moreProducts.length > 0) {
+            const productIndex = this.products.findIndex(product => product.id === moreProducts[0].id);
+            console.log('edited product: ' + productIndex);
+            if (productIndex >= 0) {
+                const products = [...this.products];
+                products.splice(productIndex, moreProducts.length, ...moreProducts);
+                this.products = products;
+            } else {
+                let products = [...this.products];
+                products = [...products, ...moreProducts];
+                this.products = [...products];
+            }
         }
     }
 }
