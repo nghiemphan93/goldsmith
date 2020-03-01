@@ -23,8 +23,7 @@ export class CustomersPage implements OnInit, OnDestroy {
     constructor(private customerService: CustomerService,
                 private config: Config,
                 private platform: Platform,
-                private alertController: AlertController,
-                private router: Router
+                private alertController: AlertController
     ) {
     }
 
@@ -113,6 +112,10 @@ export class CustomersPage implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Add new or updated Customers to this.customers based on customer's index
+     * @param moreCustomers: Customer[]
+     */
     private addPaginatedCustomers(moreCustomers: Customer[]) {
         if (moreCustomers.length > 0) {
             const customerIndex = this.customers.findIndex(customer => customer.id === moreCustomers[0].id);
