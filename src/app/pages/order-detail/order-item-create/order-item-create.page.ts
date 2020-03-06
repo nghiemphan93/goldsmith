@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Order} from '../../../models/order';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {OrderService} from '../../../services/order.service';
@@ -7,7 +7,7 @@ import {OrderItem} from '../../../models/orderitem';
 import {OrderItemService} from '../../../services/order-item.service';
 import {CustomerService} from '../../../services/customer.service';
 import {ProductService} from '../../../services/product.service';
-import {Observable, of} from 'rxjs';
+import {Observable, of, Subscription} from 'rxjs';
 import {Customer} from '../../../models/customer';
 import {Product} from '../../../models/product';
 import {ImageUploadService} from '../../../services/image-upload.service';
@@ -25,7 +25,8 @@ import {ProductCacheService} from '../../../services/product-cache.service';
     templateUrl: './order-item-create.page.html',
     styleUrls: ['./order-item-create.page.scss'],
 })
-export class OrderItemCreatePage implements OnInit {
+export class OrderItemCreatePage implements OnInit, OnDestroy {
+    subscription = new Subscription();
     orderItem: OrderItem;
     validationForm: FormGroup;
     orderId: string;
@@ -57,9 +58,15 @@ export class OrderItemCreatePage implements OnInit {
     ) {
     }
 
-    async ngOnInit() {
+    ngOnInit() {
         this.prepareAttributes();
         this.preparePageContent();
+    }
+
+    ngOnDestroy(): void {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
     }
 
     /**
@@ -72,8 +79,8 @@ export class OrderItemCreatePage implements OnInit {
         this.ringSizeUStoVNMapper = this.configRingSizeUStoVN();
         this.orderId = this.activatedRoute.snapshot.params.orderId;
         this.order$ = this.orderService.getOrder(this.orderId);
-        this.customers$ = this.customerCacheService.getCustomersCache();
-        this.products$ = this.productCacheService.getProductsCache();
+        this.customers$ = this.customerCacheService.getCustomersCache$();
+        this.products$ = this.productCacheService.getProductsCache$();
     }
 
     /**
@@ -96,10 +103,10 @@ export class OrderItemCreatePage implements OnInit {
             case 'edit':
                 try {
                     this.isUpdated = true;
-                    this.orderItemService.getOrderItem(orderId, orderItemId).subscribe(orderItemFromServer => {
+                    this.subscription.add(this.orderItemService.getOrderItem(orderId, orderItemId).subscribe(orderItemFromServer => {
                         this.orderItem = orderItemFromServer;
                         this.prepareFormValidationUpdateOrDetail();
-                    });
+                    }));
                 } catch (e) {
                     console.log(e);
                 }
@@ -107,10 +114,10 @@ export class OrderItemCreatePage implements OnInit {
             default :
                 try {
                     this.isDetailed = true;
-                    this.orderItemService.getOrderItem(orderId, orderItemId).subscribe(orderItemFromServer => {
+                    this.subscription.add(this.orderItemService.getOrderItem(orderId, orderItemId).subscribe(orderItemFromServer => {
                         this.orderItem = orderItemFromServer;
                         this.prepareFormValidationUpdateOrDetail();
-                    });
+                    }));
                 } catch (e) {
                     console.log(e);
                 }
@@ -248,7 +255,7 @@ export class OrderItemCreatePage implements OnInit {
             this.validationForm.reset({
                 orderItemStatus: this.statuses[0],  // PENDING
                 orderItemFont: this.fontNames[4],   // ARIAL
-                orderItemQuantity: 1,
+                orderItemQuantity: 1,               // 1
                 orderItemColor: this.colors[0]      // SILVER
             });
             await this.router.navigate(['orders', this.orderId, 'orderItems']);

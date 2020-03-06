@@ -1,15 +1,17 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Customer} from '../../models/customer';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {CustomerService} from '../../services/customer.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {Subscription} from 'rxjs';
 
 @Component({
     selector: 'app-customer-create',
     templateUrl: './customer-create.page.html',
     styleUrls: ['./customer-create.page.scss'],
 })
-export class CustomerCreatePage implements OnInit {
+export class CustomerCreatePage implements OnInit, OnDestroy {
+    subscription = new Subscription();
     validationForm: FormGroup;
     isCreated: boolean;
     isUpdated: boolean;
@@ -25,6 +27,12 @@ export class CustomerCreatePage implements OnInit {
 
     ngOnInit() {
         this.preparePageContent();
+    }
+
+    ngOnDestroy(): void {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
     }
 
     /**
@@ -45,10 +53,10 @@ export class CustomerCreatePage implements OnInit {
             case 'edit':
                 try {
                     this.isUpdated = true;
-                    this.customerService.getCustomer(customerId).subscribe(customerFromServer => {
+                    this.subscription.add(this.customerService.getCustomer(customerId).subscribe(customerFromServer => {
                         this.customer = customerFromServer;
                         this.prepareFormValidationUpdateOrDetail();
-                    });
+                    }));
                 } catch (e) {
                     console.log(e);
                 }
@@ -56,10 +64,10 @@ export class CustomerCreatePage implements OnInit {
             default :
                 try {
                     this.isDetailed = true;
-                    this.customerService.getCustomer(customerId).subscribe(customerFromServer => {
+                    this.subscription.add(this.customerService.getCustomer(customerId).subscribe(customerFromServer => {
                         this.customer = customerFromServer;
                         this.prepareFormValidationUpdateOrDetail();
-                    });
+                    }));
                 } catch (e) {
                     console.log(e);
                 }

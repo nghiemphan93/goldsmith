@@ -7,7 +7,8 @@ import {
 } from '@angular/fire/firestore';
 import {Product} from '../models/product';
 import {Observable, of} from 'rxjs';
-import {map, take} from 'rxjs/operators';
+import {filter, map, take, takeUntil} from 'rxjs/operators';
+import {AuthService} from './auth.service';
 
 @Injectable({
     providedIn: 'root'
@@ -21,7 +22,10 @@ export class ProductService {
     lastDocSnapshot: QueryDocumentSnapshot<unknown>;
     pageFullyLoaded = false;
 
-    constructor(private afs: AngularFirestore) {
+    constructor(private afs: AngularFirestore,
+                private authService: AuthService
+    ) {
+        console.log('product service created...');
         this.productCollection = this.afs.collection('products', ref =>
             ref.orderBy('productName', 'asc'));
     }
@@ -32,6 +36,7 @@ export class ProductService {
     getProducts(): Observable<Product[]> {
         // Get Products with the ids
         this.products = this.productCollection.snapshotChanges().pipe(
+            takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(actions => {
                 actions.forEach(act => console.log(act.payload.doc.data().productName + ' ' + act.payload.doc.metadata.fromCache + ' ' + act.payload.type));
 
@@ -53,6 +58,7 @@ export class ProductService {
     getProduct(productId: string): Observable<Product> {
         this.productDoc = this.afs.doc<Product>(`products/${productId}`);
         this.product = this.productDoc.snapshotChanges().pipe(
+            takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(action => {
                 if (action.payload.exists === false) {
                     return null;
@@ -70,9 +76,9 @@ export class ProductService {
      * Upload one new Product to Database
      * @param product: Product
      */
-    createProduct(product: Product): Promise<DocumentReference> {
+    async createProduct(product: Product): Promise<DocumentReference> {
         const data = JSON.parse(JSON.stringify(product));
-        return this.productCollection.add(data);
+        return await this.productCollection.add(data);
     }
 
     /**
@@ -95,12 +101,14 @@ export class ProductService {
 
     /**
      * Return the first limited Products from the top of the ordered result
+     * Used for Pagination
      */
     getLimitedProductsAfterStart(): Observable<Product[]> {
         this.products = this.afs.collection('products', ref =>
             ref
                 .orderBy('productName', 'asc')
                 .limit(this.pageLimit)).snapshotChanges().pipe(
+            takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(actions => {
                     try {
                         if (this.isPageFullyLoaded() === false) {
@@ -123,6 +131,7 @@ export class ProductService {
 
     /**
      * Return the next limited Products from the last Query's Document Snapshot
+     * Used for Pagination
      */
     getLimitedProductsAfterLastDoc(): Observable<Product[]> {
         this.products = this.afs.collection('products', ref =>
@@ -131,6 +140,7 @@ export class ProductService {
                 .limit(this.pageLimit)
                 .startAfter(this.lastDocSnapshot))
             .snapshotChanges().pipe(
+                takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
                 map(actions => {
                         try {
                             if (actions.length === 0) {
@@ -157,12 +167,12 @@ export class ProductService {
      * Helper to save the last Document Snapshot
      * @param actions: DocumentChangeAction<any>[]
      */
-    private saveLastDocSnapshot(actions: DocumentChangeAction<unknown>[]) {
+    private saveLastDocSnapshot(actions: DocumentChangeAction<unknown>[]): void {
         let isAdded = true;
         console.log('-----------------------------------');
         actions.forEach(act => {
             // @ts-ignore
-            console.log(act.payload.doc.data().productName + ' ' + act.type);
+            console.log(act.payload.doc.data().productName + ' from cache=' + act.payload.doc.metadata.fromCache + ' type=' + act.type);
             if (act.type !== 'added') {
                 isAdded = false;
                 return;
@@ -176,7 +186,7 @@ export class ProductService {
     }
 
     /**
-     * If all data were fully loaded
+     * Return if all data were fully loaded
      */
     isPageFullyLoaded() {
         return this.pageFullyLoaded;

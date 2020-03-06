@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {AlertController, Config, Platform} from '@ionic/angular';
 import {Order} from '../../models/order';
 import {OrderService} from '../../services/order.service';
@@ -36,6 +36,8 @@ export class OrdersPage implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        console.log('bye bye OrdersPage...');
+
         if (this.orderService.isPageFullyLoaded()) {
             this.orderService.setPageFullyLoaded(false);
         }
@@ -79,7 +81,7 @@ export class OrdersPage implements OnInit, OnDestroy {
     }
 
     /**
-     * handler to delete an order
+     * Handler to delete an order
      * @param toDeleteOrder: Order
      */
     async deleteOrder(toDeleteOrder: Order) {

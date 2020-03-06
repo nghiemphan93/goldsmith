@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Customer} from '../../models/customer';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {CustomerService} from '../../services/customer.service';
@@ -8,13 +8,15 @@ import {OrderService} from '../../services/order.service';
 import {Status} from '../../models/status.enum';
 import {Product} from '../../models/product';
 import {StatusService} from '../../services/status.service';
+import {Subscription} from 'rxjs';
 
 @Component({
     selector: 'app-order-create',
     templateUrl: './order-create.page.html',
     styleUrls: ['./order-create.page.scss'],
 })
-export class OrderCreatePage implements OnInit {
+export class OrderCreatePage implements OnInit, OnDestroy {
+    subscription = new Subscription();
     order: Order;
     validationForm: FormGroup;
     isCreated: boolean;
@@ -32,6 +34,13 @@ export class OrderCreatePage implements OnInit {
 
     ngOnInit() {
         this.preparePageContent();
+    }
+
+    ngOnDestroy(): void {
+        console.log('finished editing...');
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
     }
 
     /**
@@ -52,10 +61,10 @@ export class OrderCreatePage implements OnInit {
             case 'edit':
                 try {
                     this.isUpdated = true;
-                    this.orderService.getOrder(orderId).subscribe(orderFromServer => {
+                    this.subscription.add(this.orderService.getOrder(orderId).subscribe(orderFromServer => {
                         this.order = orderFromServer;
                         this.prepareFormValidationUpdate();
-                    });
+                    }));
                 } catch (e) {
                     console.log(e);
                 }

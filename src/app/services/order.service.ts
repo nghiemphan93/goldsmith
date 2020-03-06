@@ -7,9 +7,10 @@ import {
 } from '@angular/fire/firestore';
 import {Order} from '../models/order';
 import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {filter, map, takeUntil} from 'rxjs/operators';
 import {Customer} from '../models/customer';
 import {Product} from '../models/product';
+import {AuthService} from './auth.service';
 
 @Injectable({
     providedIn: 'root'
@@ -23,7 +24,10 @@ export class OrderService {
     lastDocSnapshot: QueryDocumentSnapshot<unknown>;
     pageFullyLoaded = false;
 
-    constructor(private afs: AngularFirestore) {
+    constructor(private afs: AngularFirestore,
+                private authService: AuthService
+    ) {
+        console.log('order service created...');
         this.orderCollection = this.afs.collection('orders', ref =>
             ref.orderBy('createdAt', 'desc'));
     }
@@ -33,6 +37,7 @@ export class OrderService {
      */
     getOrders(): Observable<Order[]> {
         this.orders = this.orderCollection.snapshotChanges().pipe(
+            takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(actions => actions.map(act => {
                 const data = act.payload.doc.data() as Order;
                 data.id = act.payload.doc.id;
@@ -50,6 +55,7 @@ export class OrderService {
     getOrder(orderId: string): Observable<Order> {
         this.orderDoc = this.afs.doc<Order>(`orders/${orderId}`);
         this.order = this.orderDoc.snapshotChanges().pipe(
+            takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(action => {
                 if (action.payload.exists === false) {
                     return null;
@@ -92,12 +98,14 @@ export class OrderService {
 
     /**
      * Return the first limited Orders from the top of the ordered result
+     * Used for Pagination
      */
     getLimitedOrdersAfterStart(): Observable<Order[]> {
         this.orders = this.afs.collection('orders', ref =>
             ref
                 .orderBy('createdAt', 'desc')
                 .limit(this.pageLimit)).snapshotChanges().pipe(
+            takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(actions => {
                     try {
                         if (this.isPageFullyLoaded() === false) {
@@ -120,34 +128,40 @@ export class OrderService {
 
     /**
      * Return the next limited Orders from the last Query's Document Snapshot
+     * Used for Pagination
      */
     getLimitedOrdersAfterLastDoc(): Observable<Order[]> {
-        this.orders = this.afs.collection('orders', ref =>
-            ref
-                .orderBy('createdAt', 'desc')
-                .limit(this.pageLimit)
-                .startAfter(this.lastDocSnapshot))
-            .snapshotChanges().pipe(
-                map(actions => {
-                        try {
-                            if (actions.length === 0) {
-                                this.setPageFullyLoaded(true);
+        try {
+            this.orders = this.afs.collection('orders', ref =>
+                ref
+                    .orderBy('createdAt', 'desc')
+                    .limit(this.pageLimit)
+                    .startAfter(this.lastDocSnapshot))
+                .snapshotChanges().pipe(
+                    takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
+                    map(actions => {
+                            try {
+                                if (actions.length === 0) {
+                                    this.setPageFullyLoaded(true);
+                                }
+                                if (this.isPageFullyLoaded() === false) {
+                                    this.saveLastDocSnapshot(actions);
+                                }
+                                return actions.map(act => {
+                                    const data = act.payload.doc.data() as Order;
+                                    data.id = act.payload.doc.id;
+                                    return data;
+                                });
+                            } catch (e) {
+                                return [];
                             }
-                            if (this.isPageFullyLoaded() === false) {
-                                this.saveLastDocSnapshot(actions);
-                            }
-                            return actions.map(act => {
-                                const data = act.payload.doc.data() as Order;
-                                data.id = act.payload.doc.id;
-                                return data;
-                            });
-                        } catch (e) {
-                            return [];
                         }
-                    }
-                )
-            );
-        return this.orders;
+                    )
+                );
+            return this.orders;
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     /**
@@ -159,7 +173,7 @@ export class OrderService {
         console.log('-----------------------------------');
         actions.forEach(act => {
             // @ts-ignore
-            console.log(act.payload.doc.data().createdAt + ' ' + act.payload.doc.data().orderCode + ' ' + act.type);
+            console.log(act.payload.doc.data().orderCode + ' from cache=' + act.payload.doc.metadata.fromCache + ' type=' + act.type);
             if (act.type !== 'added') {
                 isAdded = false;
                 return;

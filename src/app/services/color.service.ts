@@ -9,6 +9,7 @@ export class ColorService {
     colors: (string | Color)[] = Object.entries(Color).filter(e => !isNaN(e[0] as any)).map(e => e[1]);
 
     constructor() {
+        console.log('color service created...');
     }
 
     /**

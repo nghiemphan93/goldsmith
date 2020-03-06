@@ -3,6 +3,10 @@ import {Component} from '@angular/core';
 import {Platform} from '@ionic/angular';
 import {SplashScreen} from '@ionic-native/splash-screen/ngx';
 import {StatusBar} from '@ionic-native/status-bar/ngx';
+import {AuthService} from './services/auth.service';
+import {Router} from '@angular/router';
+import {AngularFirestore} from '@angular/fire/firestore';
+import {of} from 'rxjs';
 
 @Component({
     selector: 'app-root',
@@ -10,12 +14,9 @@ import {StatusBar} from '@ionic-native/status-bar/ngx';
     styleUrls: ['app.component.scss']
 })
 export class AppComponent {
+    isAuth$ = this.authService.getIsAuth$();
+
     public appPages = [
-        {
-            title: 'Home',
-            url: '/home',
-            icon: 'home'
-        },
         {
             title: 'Products',
             url: '/products',
@@ -51,7 +52,10 @@ export class AppComponent {
     constructor(
         private platform: Platform,
         private splashScreen: SplashScreen,
-        private statusBar: StatusBar
+        private statusBar: StatusBar,
+        private authService: AuthService,
+        private router: Router,
+        private afs: AngularFirestore
     ) {
         this.initializeApp();
     }
@@ -61,5 +65,14 @@ export class AppComponent {
             this.statusBar.styleDefault();
             this.splashScreen.hide();
         });
+    }
+
+    async signOutHandler() {
+        try {
+            await this.authService.signOut();
+            await this.router.navigate(['signin']);
+        } catch (e) {
+            console.log(e);
+        }
     }
 }

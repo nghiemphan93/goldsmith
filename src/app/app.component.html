@@ -7,16 +7,56 @@
                 </ion-toolbar>
             </ion-header>
             <ion-content>
-                <ion-list>
-                    <ion-menu-toggle auto-hide="true" *ngFor="let p of appPages">
-                        <ion-item [routerDirection]="'root'" [routerLink]="[p.url]">
+                <ion-menu-toggle
+                        auto-hide="true"
+                >
+                    <ion-list
+                            *ngIf="isAuth$ | async"
+                    >
+                        <ion-item
+                                *ngFor="let p of appPages"
+                                [routerDirection]="'root'"
+                                [routerLink]="[p.url]"
+                        >
                             <ion-icon slot="start" [name]="p.icon"></ion-icon>
                             <ion-label>
                                 {{p.title}}
                             </ion-label>
                         </ion-item>
-                    </ion-menu-toggle>
-                </ion-list>
+                    </ion-list>
+
+                    <ion-item-divider></ion-item-divider>
+
+                    <ion-list>
+                        <ion-item
+                                [routerDirection]="'root'"
+                                routerLink="/signup"
+                                *ngIf="!(isAuth$ | async)"
+                        >
+                            <ion-icon slot="start" name="person-add-outline"></ion-icon>
+                            <ion-label>Sign Up</ion-label>
+                        </ion-item>
+
+                        <ion-item
+                                [routerDirection]="'root'"
+                                routerLink="/signin"
+                                *ngIf="!(isAuth$ | async)"
+                        >
+                            <ion-icon slot="start" name="person-outline"></ion-icon>
+                            <ion-label>Sign In</ion-label>
+                        </ion-item>
+
+                        <ion-item
+                                [routerDirection]="'root'"
+                                button=""
+                                (click)="signOutHandler()"
+                                *ngIf="isAuth$ | async"
+                        >
+                            <ion-icon slot="start" name="log-out-outline"></ion-icon>
+                            <ion-label>Sign Out</ion-label>
+                        </ion-item>
+                    </ion-list>
+                </ion-menu-toggle>
             </ion-content>
         </ion-menu>
         <ion-router-outlet id="main-content"></ion-router-outlet>

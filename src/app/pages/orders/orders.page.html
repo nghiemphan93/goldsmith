@@ -95,7 +95,7 @@
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        (click)="deleteOrder(row)"
+                        (click)="presentDeleteConfirm(row)"
                         color="danger"
                 >
                     Delete

@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {OrderItemService} from '../../../services/order-item.service';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {Order} from '../../../models/order';
 import {OrderService} from '../../../services/order.service';
 import {AlertController, Config, Platform} from '@ionic/angular';
@@ -10,7 +10,7 @@ import {FontService} from '../../../services/font.service';
 import {ColorService} from '../../../services/color.service';
 import {take} from 'rxjs/operators';
 import {Customer} from '../../../models/customer';
-import {Product} from "../../../models/product";
+import {Product} from '../../../models/product';
 
 
 @Component({
@@ -19,6 +19,7 @@ import {Product} from "../../../models/product";
     styleUrls: ['./order-items.page.scss'],
 })
 export class OrderItemsPage implements OnInit, OnDestroy {
+    subscription = new Subscription();
     orderItemsDesktop$: Observable<OrderItem[]>[] = [];
     orderItemsMobile$: Observable<OrderItem[]>[] = [];
     orderItems: OrderItem[] = [];
@@ -45,9 +46,9 @@ export class OrderItemsPage implements OnInit, OnDestroy {
         this.setup();
         if (this.isDesktop) {
             this.orderItemsDesktop$.push(this.orderItemService.getLimitedOrderItemsAfterStart(this.orderId));
-            this.orderItemsDesktop$[0].subscribe(moreOrderItems => {
+            this.subscription.add(this.orderItemsDesktop$[0].subscribe(moreOrderItems => {
                 this.addPaginatedOrderItems(moreOrderItems);
-            });
+            }));
         } else {
             this.orderItemsMobile$.push(this.orderItemService.getLimitedOrderItemsAfterStart(this.orderId));
         }
@@ -55,8 +56,13 @@ export class OrderItemsPage implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        console.log('bye bye OrderItemsPage...');
+
         if (this.orderItemService.isPageFullyLoaded()) {
             this.orderItemService.setPageFullyLoaded(false);
+        }
+        if (this.subscription) {
+            this.subscription.unsubscribe();
         }
     }
 
@@ -121,10 +127,10 @@ export class OrderItemsPage implements OnInit, OnDestroy {
                 event.target.complete();
             } else {
                 this.orderItemsDesktop$.push(this.orderItemService.getLimitedOrderItemsAfterLastDoc(this.orderId));
-                this.orderItemsDesktop$[this.orderItemsDesktop$.length - 1].subscribe(moreOrderItems => {
+                this.subscription.add(this.orderItemsDesktop$[this.orderItemsDesktop$.length - 1].subscribe(moreOrderItems => {
                     this.addPaginatedOrderItems(moreOrderItems);
                     event.target.complete();
-                });
+                }));
             }
         }
     }
@@ -136,7 +142,12 @@ export class OrderItemsPage implements OnInit, OnDestroy {
     private addPaginatedOrderItems(moreOrderItems: OrderItem[]) {
         if (moreOrderItems.length > 0) {
             const orderItemIndex = this.orderItems.findIndex(orderItem => orderItem.id === moreOrderItems[0].id);
-            console.log('edited order item: ' + orderItemIndex);
+            if (orderItemIndex >= 0) {
+                console.log('edited order item from block: ' + orderItemIndex);
+            } else {
+                console.log('loaded more order items');
+            }
+
             if (orderItemIndex >= 0) {
                 const orderItems = [...this.orderItems];
                 orderItems.splice(orderItemIndex, moreOrderItems.length, ...moreOrderItems);

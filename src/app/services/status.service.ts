@@ -8,6 +8,7 @@ export class StatusService {
     statuses: (string | Status)[] = Object.entries(Status).filter(e => !isNaN(e[0] as any)).map(e => e[1]);
 
     constructor() {
+        console.log('status service created...');
     }
 
     /**

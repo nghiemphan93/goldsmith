@@ -15,6 +15,8 @@ import {AngularFireStorageModule} from '@angular/fire/storage';
 import {ReactiveFormsModule} from '@angular/forms';
 import {HideHeaderDirective} from './directives/hide-header.directive';
 import {HideHeaderBDirective} from './directives/hide-header-b.directive';
+import {AngularFireAuthModule} from '@angular/fire/auth';
+import {AngularFireAuthGuardModule} from '@angular/fire/auth-guard';
 
 @NgModule({
     declarations: [AppComponent],
@@ -24,9 +26,11 @@ import {HideHeaderBDirective} from './directives/hide-header-b.directive';
         IonicModule.forRoot(),
         AppRoutingModule,
         AngularFireModule.initializeApp(environment.firebase),
-        AngularFirestoreModule.enablePersistence(),
+        // AngularFirestoreModule.enablePersistence(),
         AngularFirestoreModule,
         AngularFireStorageModule,
+        AngularFireAuthModule,
+        AngularFireAuthGuardModule,
         ReactiveFormsModule
     ],
     providers: [

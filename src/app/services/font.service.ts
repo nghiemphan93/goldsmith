@@ -17,8 +17,12 @@ export class FontService {
 
 
     constructor() {
+        console.log('font service created...');
     }
 
+    /**
+     * Generate Font css Classes from Font Names
+     */
     generateFontClasses() {
         for (let i = 0; i < this.fontNames.length; i++) {
             const fontClass = `.${this.fontClasses[i]} { font-family: ${this.fontNames[i]}; font-size: 3rem; }`;

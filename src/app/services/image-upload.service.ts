@@ -12,6 +12,7 @@ export class ImageUploadService {
 
     constructor(private angularFireStorage: AngularFireStorage,
     ) {
+        console.log('image upload service created...');
     }
 
     /**

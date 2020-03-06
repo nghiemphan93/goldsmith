@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AngularFireStorage, AngularFireUploadTask} from '@angular/fire/storage';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firestore';
 import {finalize, tap} from 'rxjs/operators';
 import {ProductService} from '../../services/product.service';
@@ -17,6 +17,7 @@ import {Customer} from '../../models/customer';
     styleUrls: ['./product-create.page.scss'],
 })
 export class ProductCreatePage implements OnInit, OnDestroy {
+    subscription = new Subscription();
     product: Product;
     validationForm: FormGroup;
     oldImageUrl: string;
@@ -34,6 +35,15 @@ export class ProductCreatePage implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.preparePageContent();
+    }
+
+    async ngOnDestroy() {
+        if (this.oldImageUrl !== this.product.imageUrl && this.oldImageUrl !== null) {
+            await this.imageUploadService.deleteImageFromUrl(this.oldImageUrl);
+        }
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
     }
 
     /**
@@ -54,10 +64,10 @@ export class ProductCreatePage implements OnInit, OnDestroy {
             case 'edit':
                 try {
                     this.isUpdated = true;
-                    this.productService.getProduct(productId).subscribe(productFromServer => {
+                    this.subscription.add(this.productService.getProduct(productId).subscribe(productFromServer => {
                         this.product = productFromServer;
                         this.prepareFormValidationUpdateOrDetail();
-                    });
+                    }));
                 } catch (e) {
                     console.log(e);
                 }
@@ -65,20 +75,14 @@ export class ProductCreatePage implements OnInit, OnDestroy {
             default :
                 try {
                     this.isDetailed = true;
-                    this.productService.getProduct(productId).subscribe(productFromServer => {
+                    this.subscription.add(this.productService.getProduct(productId).subscribe(productFromServer => {
                         this.product = productFromServer;
                         this.prepareFormValidationUpdateOrDetail();
-                    });
+                    }));
                 } catch (e) {
                     console.log(e);
                 }
                 break;
-        }
-    }
-
-    async ngOnDestroy() {
-        if (this.oldImageUrl !== this.product.imageUrl && this.oldImageUrl !== null) {
-            await this.imageUploadService.deleteImageFromUrl(this.oldImageUrl);
         }
     }
 

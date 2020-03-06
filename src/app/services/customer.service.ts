@@ -8,8 +8,10 @@ import {
 } from '@angular/fire/firestore';
 import {Product} from '../models/product';
 import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {filter, map, takeUntil} from 'rxjs/operators';
 import {Customer} from '../models/customer';
+import {AngularFireAuth} from '@angular/fire/auth';
+import {AuthService} from './auth.service';
 
 @Injectable({
     providedIn: 'root'
@@ -23,7 +25,10 @@ export class CustomerService {
     lastDocSnapshot: QueryDocumentSnapshot<unknown>;
     pageFullyLoaded = false;
 
-    constructor(private afs: AngularFirestore) {
+    constructor(private afs: AngularFirestore,
+                private authService: AuthService
+    ) {
+        console.log('customer service created...');
         this.customerCollection = this.afs.collection('customers', ref =>
             ref.orderBy('firstName', 'asc'));
     }
@@ -33,6 +38,7 @@ export class CustomerService {
      */
     getCustomers(): Observable<Customer[]> {
         this.customers = this.customerCollection.snapshotChanges().pipe(
+            takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(actions => {
                 actions.forEach(act => console.log(act.payload.doc.data().firstName + ' ' + act.payload.doc.metadata.fromCache + ' ' + act.payload.type));
 
@@ -54,6 +60,7 @@ export class CustomerService {
     getCustomer(customerId: string): Observable<Customer> {
         this.customerDoc = this.afs.doc<Customer>(`customers/${customerId}`);
         this.customer = this.customerDoc.snapshotChanges().pipe(
+            takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(action => {
                 if (action.payload.exists === false) {
                     return null;
@@ -96,12 +103,14 @@ export class CustomerService {
 
     /**
      * Return the first limited Customers from the top of the ordered result
+     * Used for Pagination
      */
     getLimitedCustomersAfterStart(): Observable<Customer[]> {
         this.customers = this.afs.collection('customers', ref =>
             ref
                 .orderBy('firstName', 'asc')
                 .limit(this.pageLimit)).snapshotChanges().pipe(
+            takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(actions => {
                     try {
                         if (this.isPageFullyLoaded() === false) {
@@ -124,6 +133,7 @@ export class CustomerService {
 
     /**
      * Return the next limited Customers from the last Query's Document Snapshot
+     * Used for Pagination
      */
     getLimitedCustomersAfterLastDoc(): Observable<Customer[]> {
         this.customers = this.afs.collection('customers', ref =>
@@ -132,6 +142,7 @@ export class CustomerService {
                 .limit(this.pageLimit)
                 .startAfter(this.lastDocSnapshot))
             .snapshotChanges().pipe(
+                takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
                 map(actions => {
                         try {
                             if (actions.length === 0) {
@@ -163,7 +174,7 @@ export class CustomerService {
         console.log('-----------------------------------');
         actions.forEach(act => {
             // @ts-ignore
-            console.log(act.payload.doc.data().firstName + ' ' + act.type);
+            console.log(act.payload.doc.data().firstName + ' from cache=' + act.payload.doc.metadata.fromCache + ' type=' + act.type);
             if (act.type !== 'added') {
                 isAdded = false;
                 return;

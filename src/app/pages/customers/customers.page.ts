@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {AlertController, Config, Platform} from '@ionic/angular';
 import {Customer} from '../../models/customer';
 import {CustomerService} from '../../services/customer.service';
@@ -12,6 +12,7 @@ import {take} from 'rxjs/operators';
     styleUrls: ['./customers.page.scss'],
 })
 export class CustomersPage implements OnInit, OnDestroy {
+    subscription: Subscription = new Subscription();
     customersMobile$: Observable<Customer[]>[] = [];
     customersDesktop$: Observable<Customer[]>[] = [];
     customers: Customer[] = [];
@@ -31,17 +32,22 @@ export class CustomersPage implements OnInit, OnDestroy {
         this.preparePlatform();
         if (this.isDesktop) {
             this.customersDesktop$.push(this.customerService.getLimitedCustomersAfterStart());
-            this.customersDesktop$[0].subscribe(moreCustomers => {
+            this.subscription.add(this.customersDesktop$[0].subscribe(moreCustomers => {
                 this.addPaginatedCustomers(moreCustomers);
-            });
+            }));
         } else {
             this.customersMobile$.push(this.customerService.getLimitedCustomersAfterStart());
         }
     }
 
-    ngOnDestroy(): void {
+    ngOnDestroy() {
+        console.log('bye bye CustomersPage...');
+
         if (this.customerService.isPageFullyLoaded()) {
             this.customerService.setPageFullyLoaded(false);
+        }
+        if (this.subscription) {
+            this.subscription.unsubscribe();
         }
     }
 
@@ -104,10 +110,10 @@ export class CustomersPage implements OnInit, OnDestroy {
                 event.target.complete();
             } else {
                 this.customersDesktop$.push(this.customerService.getLimitedCustomersAfterLastDoc());
-                this.customersDesktop$[this.customersDesktop$.length - 1].subscribe(moreCustomers => {
+                this.subscription.add(this.customersDesktop$[this.customersDesktop$.length - 1].subscribe(moreCustomers => {
                     this.addPaginatedCustomers(moreCustomers);
                     event.target.complete();
-                });
+                }));
             }
         }
     }
@@ -119,7 +125,12 @@ export class CustomersPage implements OnInit, OnDestroy {
     private addPaginatedCustomers(moreCustomers: Customer[]) {
         if (moreCustomers.length > 0) {
             const customerIndex = this.customers.findIndex(customer => customer.id === moreCustomers[0].id);
-            console.log('edited customer: ' + customerIndex);
+            if (customerIndex >= 0) {
+                console.log('edited customer from block: ' + customerIndex);
+            } else {
+                console.log('loaded more customers');
+            }
+
             if (customerIndex >= 0) {
                 const customers = [...this.customers];
                 customers.splice(customerIndex, moreCustomers.length, ...moreCustomers);

@@ -7,8 +7,9 @@ import {
 } from '@angular/fire/firestore';
 import {Order} from '../models/order';
 import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {filter, map, takeUntil} from 'rxjs/operators';
 import {OrderItem} from '../models/orderitem';
+import {AuthService} from './auth.service';
 
 
 @Injectable({
@@ -19,7 +20,10 @@ export class OrderItemService {
     lastDocSnapshot: QueryDocumentSnapshot<unknown>;
     pageFullyLoaded = false;
 
-    constructor(private afs: AngularFirestore) {
+    constructor(private afs: AngularFirestore,
+                private authService: AuthService
+    ) {
+        console.log('order item service created...');
     }
 
     /**
@@ -32,6 +36,7 @@ export class OrderItemService {
             .doc<Order>(orderId)
             .collection<OrderItem>('orderItems', ref => ref.orderBy('createdAt'))
             .snapshotChanges().pipe(
+                takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
                 map(actions => {
                     actions.forEach(act => console.log(act.payload.doc.data().orderItemCode + ' ' + act.payload.doc.metadata.fromCache));
 
@@ -58,6 +63,7 @@ export class OrderItemService {
             .collection<OrderItem>('orderItems')
             .doc<OrderItem>(orderItemId)
             .snapshotChanges().pipe(
+                takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
                 map(action => {
                     if (action.payload.exists === false) {
                         return null;
@@ -116,6 +122,7 @@ export class OrderItemService {
 
     /**
      * Return the first limited Order Items from an Order
+     * Used for Pagination
      */
     getLimitedOrderItemsAfterStart(orderId: string): Observable<OrderItem[]> {
         const orderItems = this.afs
@@ -126,6 +133,7 @@ export class OrderItemService {
                     .orderBy('createdAt')
                     .limit(this.pageLimit))
             .snapshotChanges().pipe(
+                takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
                 map(actions => {
                         try {
                             if (this.isPageFullyLoaded() === false) {
@@ -148,6 +156,7 @@ export class OrderItemService {
 
     /**
      * Return the next limited Order Items from the last Query's Document Snapshot of an Order
+     * Used for Pagination
      */
     getLimitedOrderItemsAfterLastDoc(orderId: string): Observable<OrderItem[]> {
         const orderItems = this.afs
@@ -159,6 +168,7 @@ export class OrderItemService {
                     .limit(this.pageLimit)
                     .startAfter(this.lastDocSnapshot))
             .snapshotChanges().pipe(
+                takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
                 map(actions => {
                         try {
                             if (actions.length === 0) {
@@ -190,7 +200,7 @@ export class OrderItemService {
         console.log('-----------------------------------');
         actions.forEach(act => {
             // @ts-ignore
-            console.log(act.payload.doc.data().orderItemCode + ' ' + act.type);
+            console.log(act.payload.doc.data().orderItemCode + ' from cache=' + act.payload.doc.metadata.fromCache + ' type=' + act.type);
             if (act.type !== 'added') {
                 isAdded = false;
                 return;

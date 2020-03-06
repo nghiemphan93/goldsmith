@@ -13,6 +13,7 @@ import {ImageUploadService} from '../../services/image-upload.service';
     styleUrls: ['./products.page.scss'],
 })
 export class ProductsPage implements OnInit, OnDestroy {
+    subscription = new Subscription();
     productsDesktop$: Observable<Product[]>[] = [];
     productsMobile$: Observable<Product[]>[] = [];
     products: Product[] = [];
@@ -33,17 +34,21 @@ export class ProductsPage implements OnInit, OnDestroy {
         this.preparePlatform();
         if (this.isDesktop) {
             this.productsDesktop$.push(this.productService.getLimitedProductsAfterStart());
-            this.productsDesktop$[0].subscribe(moreProducts => {
+            this.subscription.add(this.productsDesktop$[0].subscribe(moreProducts => {
                 this.addPaginatedProducts(moreProducts);
-            });
+            }));
         } else {
             this.productsMobile$.push(this.productService.getLimitedProductsAfterStart());
         }
     }
 
     ngOnDestroy() {
+        console.log('bye bye ProductsPage...');
         if (this.productService.isPageFullyLoaded()) {
             this.productService.setPageFullyLoaded(false);
+        }
+        if (this.subscription) {
+            this.subscription.unsubscribe();
         }
     }
 
@@ -109,10 +114,10 @@ export class ProductsPage implements OnInit, OnDestroy {
                 event.target.complete();
             } else {
                 this.productsDesktop$.push(this.productService.getLimitedProductsAfterLastDoc());
-                this.productsDesktop$[this.productsDesktop$.length - 1].subscribe(moreProducts => {
+                this.subscription.add(this.productsDesktop$[this.productsDesktop$.length - 1].subscribe(moreProducts => {
                     this.addPaginatedProducts(moreProducts);
                     event.target.complete();
-                });
+                }));
             }
         }
     }
@@ -124,7 +129,12 @@ export class ProductsPage implements OnInit, OnDestroy {
     private addPaginatedProducts(moreProducts: Product[]) {
         if (moreProducts.length > 0) {
             const productIndex = this.products.findIndex(product => product.id === moreProducts[0].id);
-            console.log('edited product: ' + productIndex);
+            if (productIndex >= 0) {
+                console.log('edited product from block: ' + productIndex);
+            } else {
+                console.log('loaded more products');
+            }
+
             if (productIndex >= 0) {
                 const products = [...this.products];
                 products.splice(productIndex, moreProducts.length, ...moreProducts);
