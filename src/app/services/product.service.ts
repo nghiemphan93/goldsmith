@@ -38,7 +38,9 @@ export class ProductService {
         this.products = this.productCollection.snapshotChanges().pipe(
             takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(actions => {
-                actions.forEach(act => console.log(act.payload.doc.data().productName + ' ' + act.payload.doc.metadata.fromCache + ' ' + act.payload.type));
+                console.log('-----------------------------------');
+                actions.forEach(act => console.log(act.payload.doc.data().productName + ' from cache=' + act.payload.doc.metadata.fromCache + ' type=' + act.payload.type));
+                console.log('-----------------------------------');
 
                 return actions.map(act => {
                     const data = act.payload.doc.data() as Product;

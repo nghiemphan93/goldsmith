@@ -38,7 +38,9 @@ export class OrderItemService {
             .snapshotChanges().pipe(
                 takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
                 map(actions => {
-                    actions.forEach(act => console.log(act.payload.doc.data().orderItemCode + ' ' + act.payload.doc.metadata.fromCache));
+                    console.log('-----------------------------------');
+                    actions.forEach(act => console.log(act.payload.doc.data().orderItemCode + ' from cache=' + act.payload.doc.metadata.fromCache + ' type=' + act.payload.doc.metadata.fromCache));
+                    console.log('-----------------------------------');
 
                     return actions.map(act => {
                         const data = act.payload.doc.data() as OrderItem;
