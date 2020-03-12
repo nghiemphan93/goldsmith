@@ -17,6 +17,7 @@ import {HideHeaderDirective} from './directives/hide-header.directive';
 import {HideHeaderBDirective} from './directives/hide-header-b.directive';
 import {AngularFireAuthModule} from '@angular/fire/auth';
 import {AngularFireAuthGuardModule} from '@angular/fire/auth-guard';
+import {AngularFireFunctionsModule} from '@angular/fire/functions';
 
 @NgModule({
     declarations: [AppComponent],
@@ -31,7 +32,8 @@ import {AngularFireAuthGuardModule} from '@angular/fire/auth-guard';
         AngularFireStorageModule,
         AngularFireAuthModule,
         AngularFireAuthGuardModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        AngularFireFunctionsModule
     ],
     providers: [
         StatusBar,

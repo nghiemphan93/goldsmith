@@ -11,6 +11,7 @@ import {AngularFirestore} from '@angular/fire/firestore';
 })
 export class SigninPage implements OnInit {
     validationForm: FormGroup;
+    error: string;
 
     constructor(private formBuilder: FormBuilder,
                 private authService: AuthService,
@@ -28,7 +29,7 @@ export class SigninPage implements OnInit {
      */
     prepareFormValidation() {
         this.validationForm = this.formBuilder.group({
-            email: new FormControl('admin@admin.com', Validators.compose([
+            email: new FormControl('admin@goldsmith.com', Validators.compose([
                 Validators.pattern(/^[a-zA-Z]{1,}[0-9]?([\.\_-]? [a-zA-Z0-9]+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/),
                 Validators.required])),
             password: new FormControl('adminadmin', Validators.required)
@@ -44,9 +45,11 @@ export class SigninPage implements OnInit {
 
         try {
             const userCredential = await this.authService.signIn(email, password);
-            await this.router.navigate(['customers']);
+            this.validationForm.reset();
+            await this.router.navigate(['orders']);
         } catch (e) {
             console.log(e);
+            this.error = e.message;
         }
     }
 }

@@ -38,6 +38,7 @@ export class ProductCreatePage implements OnInit, OnDestroy {
     }
 
     async ngOnDestroy() {
+        console.log('bye bye ProductCreatePage...');
         if (this.oldImageUrl !== this.product.imageUrl && this.oldImageUrl !== null) {
             await this.imageUploadService.deleteImageFromUrl(this.oldImageUrl);
         }

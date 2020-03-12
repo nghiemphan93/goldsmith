@@ -1,9 +1,13 @@
 import {NgModule} from '@angular/core';
 import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
-import {AngularFireAuthGuard, redirectLoggedInTo} from '@angular/fire/auth-guard';
+import {AngularFireAuthGuard, customClaims, redirectLoggedInTo} from '@angular/fire/auth-guard';
+import {pipe} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 const redirectLoggedInToOrders = () => redirectLoggedInTo(['orders']);
 const redirectLoggedInToCustomers = () => redirectLoggedInTo(['customers']);
+const devOnly = () => pipe(customClaims, map(claims => claims.DEV === true));
+const devOrAdminOnly = () => pipe(customClaims, map(claims => (claims.DEV === true) || (claims.ADMIN === true)));
 
 
 const routes: Routes = [
@@ -77,14 +81,37 @@ const routes: Routes = [
         path: 'signup',
         loadChildren: () => import('./pages/signup/signup.module').then(m => m.SignupPageModule),
         canActivate: [AngularFireAuthGuard],
-        data: {authGuardPipe: redirectLoggedInToOrders}
+        data: {authGuardPipe: devOnly}
     },
     {
         path: 'signin',
         loadChildren: () => import('./pages/signin/signin.module').then(m => m.SigninPageModule),
         canActivate: [AngularFireAuthGuard],
         data: {authGuardPipe: redirectLoggedInToCustomers}
+    },
+    {
+        path: 'users',
+        loadChildren: () => import('./pages/users/users.module').then(m => m.UsersPageModule),
+        canActivate: [AngularFireAuthGuard],
+        data: {authGuardPipe: devOrAdminOnly}
+    },
+    {
+        path: 'users/create',
+        loadChildren: () => import('./pages/user-create/user-create.module').then(m => m.UserCreatePageModule),
+        canActivate: [AngularFireAuthGuard],
+        data: {authGuardPipe: devOrAdminOnly}
+    },
+    {
+        path: 'users/:userId',
+        loadChildren: () => import('./pages/user-detail/user-detail.module').then(m => m.UserDetailPageModule),
+        canActivate: [AngularFireAuthGuard]
+    },
+    {
+        path: 'users/:userId/edit',
+        loadChildren: () => import('./pages/user-detail-edit/user-detail-edit.module').then(m => m.UserDetailEditPageModule),
+        canActivate: [AngularFireAuthGuard]
     }
+
 ];
 
 @NgModule({

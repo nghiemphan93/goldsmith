@@ -5,7 +5,7 @@ import {Status} from '../models/status.enum';
     providedIn: 'root'
 })
 export class StatusService {
-    statuses: (string | Status)[] = Object.entries(Status).filter(e => !isNaN(e[0] as any)).map(e => e[1]);
+    statuses: (string | Status)[] = Object.entries(Status).map(e => e[1]);
 
     constructor() {
         console.log('status service created...');

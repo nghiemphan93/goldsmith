@@ -102,7 +102,9 @@
                                 <ion-select-option
                                         *ngFor="let status of statuses"
                                         [value]="status"
-                                >{{ status }}</ion-select-option>
+                                >
+                                    {{ status }}
+                                </ion-select-option>
                             </ion-select>
 
                             <ion-label *ngIf="isDetailed">{{ orderItem.orderItemStatus }}</ion-label>

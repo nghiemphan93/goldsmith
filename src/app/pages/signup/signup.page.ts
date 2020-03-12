@@ -44,9 +44,6 @@ export class SignupPage implements OnInit {
 
         try {
             const userCredential = await this.authService.signUp(email, password);
-            const userDocRef = await this.afs.collection('users').doc(userCredential.user.uid).set({
-                email: userCredential.user.email
-            });
             await this.router.navigate(['orders']);
         } catch (e) {
             console.log(e);

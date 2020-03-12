@@ -1,0 +1,144 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title *ngIf="isCreated">Create User</ion-title>
+        <ion-title *ngIf="isUpdated">Edit User</ion-title>
+        <ion-title *ngIf="isDetailed">User's Details</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <ion-grid fixed>
+        <ion-row>
+            <ion-col
+                    sizeXl="6"
+                    offsetXl="3"
+                    sizeLg="6"
+                    offsetLg="3"
+                    sizeMd="8"
+                    offsetMd="2"
+            >
+                <ion-button routerLink="/users">
+                    To Users
+                </ion-button>
+                <ion-button
+                        color="tertiary"
+                        *ngIf="isDetailed && user"
+                        [routerLink]="['/users', user.uid, 'edit']"
+                        [disabled]="user.customClaims.DEV === true && (currentUser$ | async)?.customClaims?.DEV === undefined"
+
+                >
+                    <ion-icon name="settings-outline" class="ion-margin-end"></ion-icon>
+                    Edit
+                </ion-button>
+
+                <!--        Reactive Form        -->
+                <form
+                        [formGroup]="validationForm"
+                        *ngIf="user"
+                        (keydown.enter)="validationForm.valid ? submitHandler() : null"
+                >
+                    <ion-item-divider>
+                        <ion-label *ngIf="isDetailed">Please fill in information for the user</ion-label>
+                    </ion-item-divider>
+
+                    <!--    User Name    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>User Name</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="what.."
+                                    formControlName="displayName"
+                                    *ngIf="!isDetailed"
+                            ></ion-input>
+
+                            <ion-label *ngIf="isDetailed">{{ user.displayName }}</ion-label>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Email    -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Email</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="what.."
+                                    formControlName="email"
+                                    *ngIf="!isDetailed"
+                            ></ion-input>
+
+                            <ion-label *ngIf="isDetailed">{{ user.email }}</ion-label>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--    Password    -->
+                    <ion-item-group *ngIf="!isDetailed">
+                        <ion-item>
+                            <ion-label>Password</ion-label>
+                            <ion-input
+                                    type="password"
+                                    formControlName="password"
+                            ></ion-input>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--              Role              -->
+                    <ion-item-group>
+                        <ion-item *ngIf="!isDetailed">
+                            <ion-label>Role</ion-label>
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="customClaims"
+                            >
+                                <ion-select-option
+                                        *ngFor="let claim of claims"
+                                        [value]="claim"
+                                >
+                                    {{ claim }}
+                                </ion-select-option>
+                            </ion-select>
+                        </ion-item>
+
+                        <ion-item *ngIf="isDetailed">
+                            <ion-label>Role</ion-label>
+                            <ion-label>
+                                <span>{{ claimService.claimBooleanToEnum(user) }}</span>
+                                <!--                                <span *ngIf="user.customClaims.DEV">DEV</span>-->
+                                <!--                                <span *ngIf="user.customClaims.ADMIN">ADMIN</span>-->
+                                <!--                                <span *ngIf="user.customClaims.MODERATOR">MODERATOR</span>-->
+                                <!--                                <span *ngIf="user.customClaims.DESIGNER">DESIGNER</span>-->
+                            </ion-label>
+                        </ion-item>
+                    </ion-item-group>
+
+                    <!--  Submit Button  -->
+                    <ion-button
+                            [disabled]="!validationForm.valid"
+                            class="ion-margin-top"
+                            (click)="submitHandler()"
+                            type="submit"
+                            expand="block"
+                            *ngIf="!isDetailed"
+                    >
+                        Submit
+                    </ion-button>
+
+                    <ion-item
+                            *ngIf="error"
+                            class="ion-margin-top"
+                    >
+                        <ion-text color="danger">{{error}}</ion-text>
+                    </ion-item>
+                </form>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <ion-footer style="height: 10vh">
+    </ion-footer>
+</ion-content>
+
+

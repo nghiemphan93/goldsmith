@@ -1,0 +1,241 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Users</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<!--  Main Table Content for Desktop  -->
+<ion-content *ngIf="isDesktop && (users$ | async)">
+    <ion-item-group class="ion-margin">
+        <ion-button routerLink="/users/create">
+            <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
+            <p>Create New User</p>
+        </ion-button>
+    </ion-item-group>
+
+    <ngx-datatable
+            *ngIf="(users$ | async) && isDesktop"
+            [rows]="users$ | async"
+            [rowHeight]="'auto'"
+            [headerHeight]="50"
+            [ngClass]="tableStyle"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            class="ion-text-wrap"
+    >
+        <!--    User Email    -->
+        <ngx-datatable-column name="Email" prop="email">
+        </ngx-datatable-column>
+
+        <!--    User Name    -->
+        <ngx-datatable-column name="User Name" prop="displayName">
+        </ngx-datatable-column>
+
+        <!--    Role   -->
+        <ngx-datatable-column name="Role" prop="customClaims">
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <span>{{ claimService.claimBooleanToEnum(row) }}</span>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <!--    Details Button   -->
+        <ngx-datatable-column
+                name="Details"
+                [sortable]="false"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        color="secondary"
+                        [routerLink]="['/users', row.uid]"
+                >
+                    Details
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <!--    Edit Button   -->
+        <ngx-datatable-column
+                name="Edit"
+                [sortable]="false"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        color="tertiary"
+                        [routerLink]="['/users', row.uid, 'edit']"
+                        [disabled]="row.customClaims.DEV === true && (currentUser$ | async)?.customClaims?.DEV === undefined"
+                >
+                    Edit
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <!--    Delete Button    -->
+        <ngx-datatable-column
+                name="Delete"
+                [sortable]="false"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <ion-button
+                        size="small"
+                        (click)="presentDeleteConfirm(row)"
+                        color="danger"
+                        [disabled]="row.customClaims.DEV === true && (currentUser$ | async)?.customClaims?.DEV === undefined"
+                >
+                    <ion-icon name="trash-bin-outline"></ion-icon>
+                    Delete
+                </ion-button>
+            </ng-template>
+        </ngx-datatable-column>
+    </ngx-datatable>
+</ion-content>
+
+<ion-content
+        *ngIf="isMobile && (users$ | async)"
+>
+
+    <ion-item-group class="ion-margin-start ion-margin-top">
+        <ion-button routerLink="/users/create">
+            <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
+            New User
+        </ion-button>
+    </ion-item-group>
+
+    <!--      Cards as Users      -->
+    <ion-grid fixed>
+        <ion-row>
+            <ion-col
+                    sizeXl="3"
+                    sizeLg="4"
+                    sizeMd="6"
+                    *ngFor="let user of users$ | async"
+            >
+                <ion-card
+                        class="ion-no-margin ion-no-padding"
+
+                >
+                    <section
+                            [routerLink]="['/users', user.uid]"
+                    >
+                        <ion-img
+                                *ngIf="user.photoURL"
+                                [src]="user.photoURL"
+                        ></ion-img>
+
+                        <ion-card-header class="ion-no-padding ion-no-margin">
+                            <ion-card-title class="ion-text-center">
+                                <ion-button
+                                        color="tertiary"
+                                        [routerLink]="['/users', user.uid]"
+                                        class="ion-text-wrap"
+                                >
+                                    <ion-icon name="pricetag-outline" class="ion-margin-end"></ion-icon>
+                                    {{ user.email }}
+                                </ion-button>
+                            </ion-card-title>
+                        </ion-card-header>
+
+                        <ion-card-content class="ion-no-margin ion-no-padding">
+                            <ion-list>
+                                <ion-item>
+                                    <ion-label color="primary">User Name</ion-label>
+                                    <ion-label slot="end">{{ user.displayName }}</ion-label>
+                                </ion-item>
+
+                                <ion-item>
+                                    <ion-label color="primary">Role</ion-label>
+                                    <ion-label slot="end">
+                                        {{ claimService.claimBooleanToEnum(user) }}
+                                    </ion-label>
+                                </ion-item>
+                            </ion-list>
+                        </ion-card-content>
+                    </section>
+
+                    <section>
+                        <ion-item>
+                            <ion-button
+                                    [routerLink]="['/users', user.uid, 'edit']"
+                                    color="secondary"
+                            >
+                                <ion-icon name="settings-outline" class="ion-margin-end"></ion-icon>
+                                Edit
+                            </ion-button>
+
+                            <ion-button
+                                    (click)="presentDeleteConfirm(user)"
+                                    color="danger"
+                                    slot="end"
+                            >
+                                <ion-icon name="trash-bin-outline" class="ion-margin-end"></ion-icon>
+                                Delete
+                            </ion-button>
+                        </ion-item>
+                    </section>
+                </ion-card>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <ion-footer style="height: 10vh" #footer>
+    </ion-footer>
+</ion-content>
+
+<!-- Skeleton screen -->
+<ion-content *ngIf="!(users$ | async)">
+    <ion-card *ngFor="let skeleton of skeletons">
+        <ion-card-header>
+            <ion-card-subtitle>
+                <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+            </ion-card-subtitle>
+            <ion-card-title>
+                <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 20%"></ion-skeleton-text>
+            </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+            <ion-list>
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label color="primary">
+                        <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                    </ion-label>
+                    <ion-label>
+                        <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                    </ion-label>
+                </ion-item>
+            </ion-list>
+        </ion-card-content>
+    </ion-card>
+</ion-content>

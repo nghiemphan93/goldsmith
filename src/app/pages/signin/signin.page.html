@@ -18,11 +18,8 @@
                     sizeMd="8"
                     offsetMd="2"
             >
-                <ion-button routerLink="/signup">
-                    To Sign Up
-                </ion-button>
-
                 <form
+                        class="ion-margin-top"
                         [formGroup]="validationForm"
                         (keydown.enter)="validationForm.valid ? signInHandler() : null"
                 >
@@ -65,6 +62,12 @@
                         Sign In
                     </ion-button>
 
+                    <ion-item
+                            *ngIf="error"
+                            class="ion-margin-top"
+                    >
+                        <ion-text color="danger">{{error}}</ion-text>
+                    </ion-item>
                 </form>
             </ion-col>
         </ion-row>

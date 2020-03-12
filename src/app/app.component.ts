@@ -15,6 +15,7 @@ import {of} from 'rxjs';
 })
 export class AppComponent {
     isAuth$ = this.authService.getIsAuth$();
+    user$ = this.authService.getCurentUser$();
 
     public appPages = [
         {
@@ -23,29 +24,14 @@ export class AppComponent {
             icon: 'pricetag-outline'
         },
         {
-            title: 'Create Product',
-            url: '/products/create',
-            icon: 'videocam'
-        },
-        {
             title: 'Customers',
             url: '/customers',
             icon: 'people-outline'
         },
         {
-            title: 'Create Customer',
-            url: '/customers/create',
-            icon: 'person-add-outline'
-        },
-        {
             title: 'Orders',
             url: '/orders',
             icon: 'receipt-outline'
-        },
-        {
-            title: 'Create Order',
-            url: '/orders/create',
-            icon: 'create-outline'
         }
     ];
 

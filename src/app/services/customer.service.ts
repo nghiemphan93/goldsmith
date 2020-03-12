@@ -19,8 +19,8 @@ import {AuthService} from './auth.service';
 export class CustomerService {
     customerCollection: AngularFirestoreCollection<Customer>;
     customerDoc: AngularFirestoreDocument<Customer>;
-    customers: Observable<Customer[]>;
-    customer: Observable<Customer>;
+    customers$: Observable<Customer[]>;
+    customer$: Observable<Customer>;
     pageLimit = 10;
     lastDocSnapshot: QueryDocumentSnapshot<unknown>;
     pageFullyLoaded = false;
@@ -37,7 +37,7 @@ export class CustomerService {
      * Return all Customers from Database
      */
     getCustomers(): Observable<Customer[]> {
-        this.customers = this.customerCollection.snapshotChanges().pipe(
+        this.customers$ = this.customerCollection.snapshotChanges().pipe(
             takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(actions => {
                 console.log('-----------------------------------');
@@ -52,7 +52,7 @@ export class CustomerService {
             })
         );
 
-        return this.customers;
+        return this.customers$;
     }
 
     /**
@@ -61,7 +61,7 @@ export class CustomerService {
      */
     getCustomer(customerId: string): Observable<Customer> {
         this.customerDoc = this.afs.doc<Customer>(`customers/${customerId}`);
-        this.customer = this.customerDoc.snapshotChanges().pipe(
+        this.customer$ = this.customerDoc.snapshotChanges().pipe(
             takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))),
             map(action => {
                 if (action.payload.exists === false) {
@@ -73,7 +73,7 @@ export class CustomerService {
                 }
             })
         );
-        return this.customer;
+        return this.customer$;
     }
 
     /**
@@ -108,7 +108,7 @@ export class CustomerService {
      * Used for Pagination
      */
     getLimitedCustomersAfterStart(): Observable<Customer[]> {
-        this.customers = this.afs.collection('customers', ref =>
+        this.customers$ = this.afs.collection('customers', ref =>
             ref
                 .orderBy('firstName', 'asc')
                 .limit(this.pageLimit)).snapshotChanges().pipe(
@@ -130,7 +130,7 @@ export class CustomerService {
                 }
             )
         );
-        return this.customers;
+        return this.customers$;
     }
 
     /**
@@ -138,7 +138,7 @@ export class CustomerService {
      * Used for Pagination
      */
     getLimitedCustomersAfterLastDoc(): Observable<Customer[]> {
-        this.customers = this.afs.collection('customers', ref =>
+        this.customers$ = this.afs.collection('customers', ref =>
             ref
                 .orderBy('firstName', 'asc')
                 .limit(this.pageLimit)
@@ -164,7 +164,7 @@ export class CustomerService {
                     }
                 )
             );
-        return this.customers;
+        return this.customers$;
     }
 
     /**
