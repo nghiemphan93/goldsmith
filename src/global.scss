@@ -45,3 +45,12 @@
 .custom-skeleton ion-skeleton-text:last-child {
   margin-bottom: 5px;
 }
+
+// For Selected Datatable Row
+.ngx-datatable.material.single-selection .datatable-body-row.active,
+.ngx-datatable.material.single-selection .datatable-body-row.active .datatable-row-group,
+.ngx-datatable.material.multi-selection .datatable-body-row.active,
+.ngx-datatable.material.multi-selection .datatable-body-row.active .datatable-row-group, .ngx-datatable.material.multi-click-selection .datatable-body-row.active,
+.ngx-datatable.material.multi-click-selection .datatable-body-row.active .datatable-row-group {
+  background-color: var(--ion-color-success) !important;
+}

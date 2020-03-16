@@ -1,0 +1,84 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Search</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content
+        *ngIf="isDesktop"
+>
+    <ion-grid fixed>
+        <ion-row>
+            <ion-col
+                    sizeXl="6"
+                    offsetXl="3"
+                    sizeLg="6"
+                    offsetLg="3"
+                    sizeMd="8"
+                    offsetMd="2"
+            >
+                <form
+                        [formGroup]="validationForm"
+                        (keydown)="searchHandler()"
+                >
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Search</ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="what..."
+                                    formControlName="toSearchText"
+                            >
+                            </ion-input>
+                        </ion-item>
+
+                        <ion-item>
+                            <ion-label>In Orders</ion-label>
+                            <ion-select
+                                    multiple="true"
+                                    interface="alert"
+                                    formControlName="orders"
+                                    [compareWith]="compareWithFn"
+                                    (ionChange)="onSelectOrder()"
+                            >
+                                <ion-select-option
+                                        *ngFor="let order of orders$ | async"
+                                        [value]="order"
+                                >
+                                    {{ order.orderCode }}
+                                </ion-select-option>
+                            </ion-select>
+                        </ion-item>
+                    </ion-item-group>
+                </form>
+
+                <!--        Submit            -->
+                <ion-button
+                        class="ion-margin-top"
+                        (click)="testHandler()"
+                        expand="block"
+                >
+                    Test
+                </ion-button>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <!--    <section *ngIf="orderItems$[0] | async">-->
+    <!--        <div *ngFor="let orderItems of orderItems$">-->
+    <!--            <p *ngFor="let orderItem of orderItems | async">-->
+    <!--                {{ orderItem.orderItemCode }}-->
+    <!--            </p>-->
+    <!--        </div>-->
+    <!--    </section>-->
+
+    <section *ngIf="orderItems">
+        <p *ngFor="let orderItem of orderItems">
+            {{ orderItem.orderItemCode }}
+        </p>
+    </section>
+
+</ion-content>

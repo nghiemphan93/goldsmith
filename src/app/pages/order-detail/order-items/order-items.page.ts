@@ -64,6 +64,8 @@ export class OrderItemsPage implements OnInit, OnDestroy {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
+
+        window.dispatchEvent(new Event('resize'));
     }
 
     /**

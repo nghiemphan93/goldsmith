@@ -153,6 +153,7 @@ export class ProductCreatePage implements OnInit, OnDestroy {
                 cutOrEngraved: 'Cut'
             });
             await this.router.navigate(['products']);
+            window.dispatchEvent(new Event('resize'));
         } catch (error) {
             console.log(error);
         }

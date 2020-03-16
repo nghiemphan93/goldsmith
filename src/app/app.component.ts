@@ -7,6 +7,7 @@ import {AuthService} from './services/auth.service';
 import {Router} from '@angular/router';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {of} from 'rxjs';
+import {OrderItemCacheService} from './services/order-item-cache.service';
 
 @Component({
     selector: 'app-root',
@@ -32,6 +33,11 @@ export class AppComponent {
             title: 'Orders',
             url: '/orders',
             icon: 'receipt-outline'
+        },
+        {
+            title: 'Search Order Item',
+            url: '/search/orderItem',
+            icon: 'search-outline'
         }
     ];
 
@@ -41,9 +47,11 @@ export class AppComponent {
         private statusBar: StatusBar,
         private authService: AuthService,
         private router: Router,
-        private afs: AngularFirestore
+        private afs: AngularFirestore,
+        private orderItemCacheService: OrderItemCacheService
     ) {
         this.initializeApp();
+        this.initServices();
     }
 
     initializeApp() {
@@ -51,6 +59,10 @@ export class AppComponent {
             this.statusBar.styleDefault();
             this.splashScreen.hide();
         });
+    }
+
+    initServices() {
+        this.orderItemCacheService.init();
     }
 
     async signOutHandler() {

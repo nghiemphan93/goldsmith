@@ -15,11 +15,12 @@
         <ion-button routerLink="/orders/create">
             Create New Order
         </ion-button>
-    </ion-item-group>
 
-    <ion-col size="6" offset="6" *ngIf="!ordersDesktop$">
-        <ion-spinner></ion-spinner>
-    </ion-col>
+        <ion-button routerLink="/search/orderItem" color="tertiary">
+            <ion-icon name="search-outline"></ion-icon>
+            Search Order Item
+        </ion-button>
+    </ion-item-group>
 
     <ngx-datatable
             *ngIf="ordersDesktop$"
@@ -30,6 +31,7 @@
             [columnMode]="'force'"
             [footerHeight]="50"
             class="ion-text-wrap"
+            style="overflow: hidden"
     >
         <!--    Order Code    -->
         <ngx-datatable-column name="Order Code" prop="orderCode">

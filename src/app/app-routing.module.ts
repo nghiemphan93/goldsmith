@@ -110,7 +110,18 @@ const routes: Routes = [
         path: 'users/:userId/edit',
         loadChildren: () => import('./pages/user-detail-edit/user-detail-edit.module').then(m => m.UserDetailEditPageModule),
         canActivate: [AngularFireAuthGuard]
+    },
+    {
+        path: 'search/orderItem',
+        loadChildren: () => import('./pages/search-order-item/search-order-item.module').then(m => m.SearchOrderItemPageModule),
+        canActivate: [AngularFireAuthGuard]
+    },
+    {
+        path: 'search/customer',
+        loadChildren: () => import('./pages/search-customer/search-customer.module').then(m => m.SearchCustomerPageModule),
+        canActivate: [AngularFireAuthGuard]
     }
+
 
 ];
 

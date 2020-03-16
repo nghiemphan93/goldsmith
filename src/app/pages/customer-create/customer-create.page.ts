@@ -152,6 +152,7 @@ export class CustomerCreatePage implements OnInit, OnDestroy {
                 country: 'United States'
             });
             await this.router.navigate(['customers']);
+            window.dispatchEvent(new Event('resize'));
         } catch (e) {
             console.log(e);
         }

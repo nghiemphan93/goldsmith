@@ -142,13 +142,14 @@ export class OrderItemService {
                                 this.saveLastDocSnapshot(actions);
                             }
                             return actions.map(act => {
+
                                 const data = act.payload.doc.data() as OrderItem;
                                 data.id = act.payload.doc.id;
-
                                 return data;
                             });
                         } catch (e) {
                             console.log(e);
+                            return [];
                         }
                     }
                 )
@@ -185,7 +186,7 @@ export class OrderItemService {
                                 return data;
                             });
                         } catch (e) {
-                            return [];
+                            console.log(e);
                         }
                     }
                 )

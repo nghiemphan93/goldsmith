@@ -27,6 +27,7 @@
                 <form
                         [formGroup]="validationForm"
                         *ngIf="order"
+                        (keydown.enter)="validationForm.valid ? submitHandler() : null"
                 >
                     <ion-item-divider>
                         <ion-label>Please fill in information for the Order</ion-label>

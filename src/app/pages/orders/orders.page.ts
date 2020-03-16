@@ -1,9 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
+import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {AlertController, Config, Platform} from '@ionic/angular';
 import {Order} from '../../models/order';
 import {OrderService} from '../../services/order.service';
-import {Product} from '../../models/product';
+import {SelectionType} from '@swimlane/ngx-datatable';
+import {OrderItemCacheService} from '../../services/order-item-cache.service';
+
 
 @Component({
     selector: 'app-orders',
@@ -17,11 +19,15 @@ export class OrdersPage implements OnInit, OnDestroy {
     isDesktop: boolean;
     isMobile: boolean;
     skeletons = [1, 2];
+    orders: Order[] = [];
+    subscription = new Subscription();
+
 
     constructor(private orderService: OrderService,
                 private config: Config,
                 private platform: Platform,
-                private alertController: AlertController
+                private alertController: AlertController,
+                private orderItemCacheService: OrderItemCacheService
     ) {
     }
 
@@ -32,7 +38,6 @@ export class OrdersPage implements OnInit, OnDestroy {
         } else {
             this.ordersMobile$.push(this.orderService.getLimitedOrdersAfterStart());
         }
-
     }
 
     ngOnDestroy(): void {
@@ -40,6 +45,10 @@ export class OrdersPage implements OnInit, OnDestroy {
 
         if (this.orderService.isPageFullyLoaded()) {
             this.orderService.setPageFullyLoaded(false);
+        }
+
+        if (this.subscription) {
+            this.subscription.unsubscribe();
         }
     }
 

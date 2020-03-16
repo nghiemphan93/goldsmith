@@ -29,8 +29,7 @@ export class ProductCacheService {
         } else {
             console.log('make HTTP call to get Products');
             try {
-                this.productService.getProducts().pipe(
-                    takeUntil(this.authService.getIsAuth$().pipe(filter(isAuth => isAuth === false))))
+                this.productService.getProducts()
                     .subscribe(productsFromServer => {
                         this.productsCache = productsFromServer;
                         this.productsSubject.next(this.productsCache);

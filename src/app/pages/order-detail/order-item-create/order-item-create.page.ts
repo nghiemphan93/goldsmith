@@ -259,6 +259,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
                 orderItemColor: this.colors[0]      // SILVER
             });
             await this.router.navigate(['orders', this.orderId, 'orderItems']);
+            window.dispatchEvent(new Event('resize'));
         } catch (e) {
             console.log(e);
         }

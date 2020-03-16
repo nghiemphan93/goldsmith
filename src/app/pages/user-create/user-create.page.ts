@@ -138,6 +138,7 @@ export class UserCreatePage implements OnInit, OnDestroy {
 
             this.validationForm.reset();
             await this.router.navigate(['users']);
+            window.dispatchEvent(new Event('resize'));
         } catch (error) {
             console.log(error);
             this.error = error.message;

@@ -37,7 +37,7 @@ export class OrderCreatePage implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        console.log('finished editing...');
+        console.log('bye bye OrderCreatePage...');
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
@@ -120,6 +120,7 @@ export class OrderCreatePage implements OnInit, OnDestroy {
                 orderDeadline: '',
             });
             await this.router.navigate(['orders']);
+            window.dispatchEvent(new Event('resize'));
         } catch (e) {
             console.log(e);
         }

@@ -123,7 +123,7 @@ export class ProductsPage implements OnInit, OnDestroy {
     }
 
     /**
-     * Add new or updated Products to this.products based on product's index
+     * Add new or updated Products to this.products based on the first product's index
      * @param moreProducts: Product[]
      */
     private addPaginatedProducts(moreProducts: Product[]) {
@@ -131,15 +131,11 @@ export class ProductsPage implements OnInit, OnDestroy {
             const productIndex = this.products.findIndex(product => product.id === moreProducts[0].id);
             if (productIndex >= 0) {
                 console.log('edited product from block: ' + productIndex);
-            } else {
-                console.log('loaded more products');
-            }
-
-            if (productIndex >= 0) {
                 const products = [...this.products];
                 products.splice(productIndex, moreProducts.length, ...moreProducts);
                 this.products = products;
             } else {
+                console.log('loaded more products');
                 let products = [...this.products];
                 products = [...products, ...moreProducts];
                 this.products = [...products];
