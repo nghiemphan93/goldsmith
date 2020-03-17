@@ -31,6 +31,22 @@
 @import '~@swimlane/ngx-datatable/themes/material.css';
 @import '~@swimlane/ngx-datatable/assets/icons.css';
 
+/* For Ag-Grid Table */
+//@import "../node_modules/ag-grid-community/src/styles/ag-grid";
+//@import "../node_modules/ag-grid-community/src/styles/ag-theme-balham/sass/ag-theme-balham";
+@import "~ag-grid-community/src/styles/ag-grid";
+@import "~ag-grid-community/src/styles/ag-theme-balham/sass/ag-theme-balham";
+@import "~ag-grid-community/src/styles/ag-theme-material/sass/ag-theme-material";
+
+//.ag-theme-balham .ag-row-selected {
+//  background-color: red;
+//}
+//
+//.ag-theme-balham .ag-ltr .ag-row-hover {
+//  //border: 1px solid blue;
+//  background: red;
+//}
+
 @import './assets/fontFaces.css';
 @import './assets/fontClasses.css';
 @import './assets/colorClasses.css';

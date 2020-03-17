@@ -3,13 +3,11 @@
         <ion-buttons slot="start">
             <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>Search</ion-title>
+        <ion-title>Choose Orders to Search</ion-title>
     </ion-toolbar>
 </ion-header>
 
-<ion-content
-        *ngIf="isDesktop"
->
+<ion-content>
     <ion-grid fixed>
         <ion-row>
             <ion-col
@@ -22,19 +20,9 @@
             >
                 <form
                         [formGroup]="validationForm"
-                        (keydown)="searchHandler()"
                 >
                     <ion-item-group>
-                        <ion-item>
-                            <ion-label>Search</ion-label>
-                            <ion-input
-                                    type="text"
-                                    placeholder="what..."
-                                    formControlName="toSearchText"
-                            >
-                            </ion-input>
-                        </ion-item>
-
+                        <h3></h3>
                         <ion-item>
                             <ion-label>In Orders</ion-label>
                             <ion-select
@@ -52,33 +40,309 @@
                                 </ion-select-option>
                             </ion-select>
                         </ion-item>
+
+                        <ion-item>
+                            <ion-label>
+                                <ion-icon name="search-outline"></ion-icon>
+                            </ion-label>
+                            <ion-input
+                                    type="text"
+                                    placeholder="what..."
+                                    formControlName="toSearchText"
+                                    #searchInput
+                                    debounce="1000"
+                                    (ionChange)="searchHandler()"
+                            >
+                            </ion-input>
+                        </ion-item>
                     </ion-item-group>
                 </form>
-
-                <!--        Submit            -->
-                <ion-button
-                        class="ion-margin-top"
-                        (click)="testHandler()"
-                        expand="block"
-                >
-                    Test
-                </ion-button>
             </ion-col>
         </ion-row>
     </ion-grid>
 
-    <!--    <section *ngIf="orderItems$[0] | async">-->
-    <!--        <div *ngFor="let orderItems of orderItems$">-->
-    <!--            <p *ngFor="let orderItem of orderItems | async">-->
-    <!--                {{ orderItem.orderItemCode }}-->
-    <!--            </p>-->
-    <!--        </div>-->
-    <!--    </section>-->
 
-    <section *ngIf="orderItems">
-        <p *ngFor="let orderItem of orderItems">
-            {{ orderItem.orderItemCode }}
-        </p>
+    <section *ngIf="isDesktop">
+        <ngx-datatable
+                *ngIf="isDesktop"
+                [rows]="orderItemsTemp"
+                [rowHeight]="'auto'"
+                [headerHeight]="50"
+                [ngClass]="tableStyle"
+                [columnMode]="'force'"
+                [footerHeight]="50"
+                class="ion-text-wrap"
+                style="overflow: hidden"
+        >
+            <!--    Comment    -->
+            <ngx-datatable-column
+                    name="Comment"
+                    prop="orderItemComment"
+                    [cellClass]="getCommentClassCell"
+                    *ngIf="isDesktop"
+            >
+            </ngx-datatable-column>
+
+            <!--    Order    -->
+            <ngx-datatable-column
+                    name="Order"
+                    prop="order.orderCode"
+                    [sortable]="true"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <ion-button
+                            size=""
+                            [routerLink]="['/orders', row.order.id]"
+                    >
+                        {{ row.order.orderCode }}
+                    </ion-button>
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!--    Code    -->
+            <ngx-datatable-column
+                    name="Code"
+                    prop="orderItemCode"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <ion-button
+                            size=""
+                            [routerLink]="['/orders', row.order.id, 'orderItems', row.id]"
+                    >
+                        {{ row.orderItemCode }}
+                    </ion-button>
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!--    Word    -->
+            <ngx-datatable-column
+                    name="Word"
+                    prop="orderItemWord"
+                    [cellClass]="getFontClassCell"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+              <span>
+                {{ row.orderItemWord }}
+                </span>
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!--    Font    -->
+            <ngx-datatable-column
+                    name="Font"
+                    prop="orderItemFont"
+                    [cellClass]=""
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <span>
+                {{ row.orderItemFont }}
+                </span>
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!--    Image    -->
+            <ngx-datatable-column
+                    name="Image"
+                    prop="orderItemImageUrl"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <img [src]="row.orderItemImageUrl">
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!--    Quantity    -->
+            <ngx-datatable-column
+                    name="Quantity"
+                    prop="orderItemQuantity"
+                    [cellClass]="getQuantityClassCell"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <span>{{ row.orderItemQuantity }}</span>
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!--    Color/ Ring Size    -->
+            <ngx-datatable-column
+                    name="Color/ Ring Size"
+                    prop="product.productName"
+                    [cellClass]="getRingColorClassCell"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+              <span *ngIf="row.product?.productType === 'Nhẫn'">
+                  <strong>{{ row.product.productName }}</strong><br>
+                  {{ row.orderItemColor }} <br>
+                Ring Size: {{ row.orderItemRingSizeUS }} US
+                </span>
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!--    Color/ Necklace Size    -->
+            <ngx-datatable-column
+                    name="Color/ Necklace Size"
+                    prop="product.productName"
+                    [cellClass]="getNecklaceColorClassCell">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+              <span *ngIf="row.product?.productType !== 'Nhẫn'">
+                  <strong>{{ row.product?.productName }} </strong><br>
+                  {{ row.orderItemColor }} <br>
+                  <span *ngIf="row.orderItemLengthInch">Size: {{ row.orderItemLengthInch }} inches</span>
+                </span>
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!-- Customer -->
+            <ngx-datatable-column
+                    name="Customer"
+                    prop="customer"
+                    *ngIf="isDesktop"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <ion-button
+                            size=""
+                            [routerLink]="['/customers', row.customer.id]"
+                    >
+                        {{ row.customer.firstName }} <br>
+                        {{ row.customer.lastName }} <br>
+                    </ion-button>
+                </ng-template>
+            </ngx-datatable-column>
+        </ngx-datatable>
     </section>
 
+    <!--Cards-->
+    <section
+            *ngIf="isMobile"
+    >
+        <ion-grid fixed>
+            <ion-row>
+                <ion-col
+                        sizeXl="3"
+                        sizeLg="4"
+                        sizeMd="6"
+                        *ngFor="let orderItem of orderItemsFiltered$ | async"
+                >
+                    <ion-card class="ion-no-margin ion-no-padding">
+                        <section>
+                            <ion-img
+                                    *ngIf="orderItem.orderItemImageUrl"
+                                    [src]="orderItem.orderItemImageUrl"
+                            ></ion-img>
+
+                            <ion-card-header class="ion-no-padding ion-no-margin">
+                                <ion-card-title class="ion-text-center">
+                                    <ion-button
+                                            color="tertiary"
+                                            [routerLink]="['/orders', orderItem.order.id, 'orderItems', orderItem.id]"
+                                            class="ion-text-wrap"
+                                    >
+                                        <ion-icon name="pricetag-outline" class="ion-margin-end"></ion-icon>
+                                        {{ orderItem.orderItemCode }}
+                                    </ion-button>
+                                </ion-card-title>
+                            </ion-card-header>
+
+                            <ion-card-content class="ion-no-margin ion-no-padding">
+                                <ion-list>
+                                    <ion-item>
+                                        <ion-label color="primary">Comment</ion-label>
+                                        <ion-label slot="end"
+                                                   class="ion-text-wrap">{{ orderItem.orderItemComment }}</ion-label>
+                                    </ion-item>
+
+                                    <ion-item>
+                                        <ion-label color="primary">Order</ion-label>
+                                        <ion-label slot="end">
+                                            <ion-button
+                                                    color="primary"
+                                                    [routerLink]="['/orders', orderItem.order.id]"
+                                                    class="ion-text-wrap"
+                                                    size=""
+                                            >
+                                                {{ orderItem.order.orderCode }}
+                                            </ion-button>
+                                        </ion-label>
+                                    </ion-item>
+
+                                    <ion-item>
+                                        <ion-label color="primary">Product</ion-label>
+                                        <ion-label slot="end"
+                                                   [ngClass]="getColorClass(orderItem)"
+                                                   class="ion-text-wrap"
+                                        >
+                                            {{ orderItem.product.productName }}
+                                        </ion-label>
+                                    </ion-item>
+
+                                    <ion-item>
+                                        <ion-label color="primary">Word</ion-label>
+                                        <ion-text slot="end"
+                                                  [ngClass]="getFontClass(orderItem)"
+                                        >{{ orderItem.orderItemWord }}</ion-text>
+                                    </ion-item>
+
+                                    <ion-item>
+                                        <ion-label color="primary">Font</ion-label>
+                                        <ion-label slot="end">{{ orderItem.orderItemFont }}</ion-label>
+                                    </ion-item>
+
+                                    <ion-item>
+                                        <ion-label color="primary">Quantity</ion-label>
+                                        <ion-label slot="end">{{ orderItem.orderItemQuantity }}</ion-label>
+                                    </ion-item>
+
+                                    <ion-item>
+                                        <ion-label color="primary">Customer</ion-label>
+                                        <ion-label slot="end">
+                                            <ion-button
+                                                    size=""
+                                                    [routerLink]="['/customers', orderItem.customer.id]"
+                                            >
+                                                {{ orderItem.customer.firstName }} <br>
+                                                {{ orderItem.customer.lastName }} <br>
+                                            </ion-button>
+                                        </ion-label>
+                                    </ion-item>
+
+                                    <ion-item *ngIf="orderItem.orderItemRingSizeUS">
+                                        <ion-label color="primary">Ring Size US</ion-label>
+                                        <ion-label slot="end">{{ orderItem.orderItemRingSizeUS }}</ion-label>
+                                    </ion-item>
+
+                                    <ion-item *ngIf="orderItem.orderItemLengthInch">
+                                        <ion-label color="primary">Length Inch</ion-label>
+                                        <ion-label slot="end">{{ orderItem.orderItemLengthInch }}</ion-label>
+                                    </ion-item>
+                                </ion-list>
+                            </ion-card-content>
+                        </section>
+
+                        <section>
+                            <ion-item>
+                                <ion-button
+                                        [routerLink]="['/orders', orderItem.order.id, 'orderItems', orderItem.id, 'edit']"
+                                        color="secondary"
+                                >
+                                    <ion-icon name="settings-outline" class="ion-margin-end"></ion-icon>
+                                    Edit
+                                </ion-button>
+
+                                <ion-button
+                                        (click)="presentDeleteConfirm(orderItem)"
+                                        color="danger"
+                                        slot="end"
+                                >
+                                    <ion-icon name="trash-bin-outline" class="ion-margin-end"></ion-icon>
+                                    Delete
+                                </ion-button>
+                            </ion-item>
+                        </section>
+                    </ion-card>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+        <ion-footer style="height: 10vh" #footer>
+        </ion-footer>
+    </section>
 </ion-content>
+
+

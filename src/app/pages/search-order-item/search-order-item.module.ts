@@ -1,12 +1,15 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
-import { IonicModule } from '@ionic/angular';
+import {IonicModule} from '@ionic/angular';
 
-import { SearchOrderItemPageRoutingModule } from './search-order-item-routing.module';
+import {SearchOrderItemPageRoutingModule} from './search-order-item-routing.module';
 
-import { SearchOrderItemPage } from './search-order-item.page';
+import {SearchOrderItemPage} from './search-order-item.page';
+import {AgGridModule} from 'ag-grid-angular';
+import {HttpClientModule} from '@angular/common/http';
+import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 
 @NgModule({
     imports: [
@@ -14,8 +17,12 @@ import { SearchOrderItemPage } from './search-order-item.page';
         FormsModule,
         IonicModule,
         SearchOrderItemPageRoutingModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        AgGridModule,
+        HttpClientModule,
+        NgxDatatableModule
     ],
-  declarations: [SearchOrderItemPage]
+    declarations: [SearchOrderItemPage]
 })
-export class SearchOrderItemPageModule {}
+export class SearchOrderItemPageModule {
+}

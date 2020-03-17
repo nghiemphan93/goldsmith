@@ -18,6 +18,9 @@ import {HideHeaderBDirective} from './directives/hide-header-b.directive';
 import {AngularFireAuthModule} from '@angular/fire/auth';
 import {AngularFireAuthGuardModule} from '@angular/fire/auth-guard';
 import {AngularFireFunctionsModule} from '@angular/fire/functions';
+import {AgGridModule} from 'ag-grid-angular';
+import 'ag-grid-enterprise';
+
 
 @NgModule({
     declarations: [AppComponent],
@@ -33,7 +36,8 @@ import {AngularFireFunctionsModule} from '@angular/fire/functions';
         AngularFireAuthModule,
         AngularFireAuthGuardModule,
         ReactiveFormsModule,
-        AngularFireFunctionsModule
+        AngularFireFunctionsModule,
+        AgGridModule.withComponents([])
     ],
     providers: [
         StatusBar,
