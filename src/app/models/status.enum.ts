@@ -1,6 +1,6 @@
 export enum Status {
-    'PENDING',
-    'DESIGNED',
-    'LABELED',
-    'FINISHED'
+    PENDING = 'PENDING',
+    DESIGNED = 'DESIGNED',
+    LABELED = 'LABELED',
+    FINISHED = 'FINISHED'
 }

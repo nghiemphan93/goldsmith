@@ -176,7 +176,7 @@
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        (click)="presentDeleteConfirm(row)"
+                        (click)="alertService.presentDeleteConfirm(row)"
                         color="danger"
                 >
                     Delete
@@ -308,7 +308,7 @@
                             </ion-button>
 
                             <ion-button
-                                    (click)="presentDeleteConfirm(orderItem)"
+                                    (click)="alertService.presentDeleteConfirm(orderItem)"
                                     color="danger"
                                     slot="end"
                             >

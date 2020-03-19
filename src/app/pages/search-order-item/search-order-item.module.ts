@@ -10,6 +10,7 @@ import {SearchOrderItemPage} from './search-order-item.page';
 import {AgGridModule} from 'ag-grid-angular';
 import {HttpClientModule} from '@angular/common/http';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
+import {SharedModule} from '../../shared/shared.module';
 
 @NgModule({
     imports: [
@@ -20,7 +21,8 @@ import {NgxDatatableModule} from '@swimlane/ngx-datatable';
         ReactiveFormsModule,
         AgGridModule,
         HttpClientModule,
-        NgxDatatableModule
+        NgxDatatableModule,
+        SharedModule
     ],
     declarations: [SearchOrderItemPage]
 })

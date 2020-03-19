@@ -1,12 +1,13 @@
 import {Injectable} from '@angular/core';
 import {Color} from '../models/color.enum';
 import {IonSelect} from '@ionic/angular';
+import {Status} from '../models/status.enum';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ColorService {
-    colors: (string | Color)[] = Object.entries(Color).filter(e => !isNaN(e[0] as any)).map(e => e[1]);
+    colors: (string | Color)[] = Object.entries(Color).map(e => e[1]);
 
     constructor() {
         console.log('color service created...');

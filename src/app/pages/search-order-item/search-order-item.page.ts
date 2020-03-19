@@ -1,9 +1,9 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {BehaviorSubject, fromEvent, observable, Observable, of, Subscription} from 'rxjs';
 import {Order} from '../../models/order';
 import {OrderService} from '../../services/order.service';
-import {AlertController, Config, IonInput, Platform} from '@ionic/angular';
+import {AlertController, Config, IonInput, IonSelect, IonTextarea, Platform, ToastController} from '@ionic/angular';
 import {OrderItemCacheService} from '../../services/order-item-cache.service';
 import {OrderItem} from '../../models/orderitem';
 import {Product} from '../../models/product';
@@ -13,6 +13,10 @@ import {FontService} from '../../services/font.service';
 import {ColorService} from '../../services/color.service';
 import {OrderItemService} from '../../services/order-item.service';
 import {debounceTime, filter} from 'rxjs/operators';
+import * as _ from 'lodash';
+import {ToastService} from '../../services/toast.service';
+import {AlertService} from '../../services/alert.service';
+import {StatusService} from '../../services/status.service';
 
 @Component({
     selector: 'app-search-order-item',
@@ -32,17 +36,25 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
     subscription = new Subscription();
     fontNames: string[];
     selectedOrders: Order[] = [];
+    editingOrderItem = {};
+    statuses = this.statusService.getStatuses();
 
     orderItems$: Observable<OrderItem[]>[] = [];
     orderItems: OrderItem[] = [];
     orderItemsSubject = new BehaviorSubject<OrderItem[]>([]);
-    orderItemsTemp: OrderItem[] = [];
+    orderItemsFiltered: OrderItem[] = [];
     orderItemsFiltered$ = this.orderItemsSubject.asObservable();
+    orderItemsPaginated: OrderItem[] = [];
 
     allOrderItemsCache$: Observable<OrderItem[]>;
 
-    @ViewChild('searchInput')
-    searchInput: IonInput;
+    @ViewChild('searchInput') searchInput: IonInput;
+    @ViewChild('orderItemCommentInput') orderItemCommentInput: ElementRef;
+    toSearchText = '';
+
+    customActionSheetOptions: any = {
+        header: 'Colors',
+    };
 
     constructor(private orderService: OrderService,
                 private config: Config,
@@ -52,7 +64,10 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
                 private fontService: FontService,
                 private colorService: ColorService,
                 private orderItemService: OrderItemService,
-                private alertController: AlertController
+                private alertController: AlertController,
+                private toastService: ToastService,
+                public alertService: AlertService,
+                private statusService: StatusService
     ) {
     }
 
@@ -61,17 +76,22 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
         this.orders$ = this.orderService.getOrders();
         this.prepareFormValidation();
 
-        this.subscription.add(this.orderItemCacheService.getAllOrderItemsCache$().subscribe(moreOrderItems => {
-            this.addMoreOrderItems(moreOrderItems);
-            this.orderItemsTemp = this.orderItems; // Later for Filtering
-            this.orderItemsSubject.next(this.orderItems);
-        }));
+        // this.subscription.add(this.orderItemCacheService.getAllOrderItemsCache$().subscribe(moreOrderItems => {
+        //     this.addMoreOrderItems(moreOrderItems);
+        //     this.orderItemsFiltered = this.orderItems; // Later for Filtering
+        // }));
     }
 
-    ngAfterViewInit(): void {
+    async ngAfterViewInit() {
         // fromEvent(this.searchInput.debounce, 'keyup')
         //     .pipe(debounceTime(500))
         //     .subscribe((event) => this.searchHandler());
+    }
+
+    ionViewLoaded() {
+        setTimeout(() => {
+            this.searchInput.setFocus();
+        }, 150);
     }
 
     ngOnDestroy(): void {
@@ -102,48 +122,32 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
         });
     }
 
-    /**
-     * Helper to select data for <ion-select>
-     * @param o1: Object
-     * @param o2: Object
-     */
-    compareWithFn(o1, o2) {
-        return o1 && o2 ? o1.id === o2.id : o1 === o2;
-    }
-
-    testHandler() {
-        console.log(this.validationForm.value.order);
-    }
-
     onSelectOrder() {
         const selectedOrders = this.validationForm.value.orders;
         this.orderItemCacheService.setSelectedOrders(selectedOrders);
 
-        this.allOrderItemsCache$ = this.orderItemCacheService.getAllOrderItemsCache$();
-
-        this.orderItemCacheService.getAllOrderItemsCache$().subscribe(orderItems => {
-            this.addMoreOrderItems(orderItems);
-            this.orderItemsTemp = this.orderItems; // Later for Filtering
-            this.orderItemsSubject.next(this.orderItems);
+        this.orderItemCacheService.getAllOrderItemsCache$().subscribe(moreOrderItems => {
+            this.addMoreOrderItems(moreOrderItems);
+            console.log(this.toSearchText);
+            if (this.toSearchText === '') {
+                console.log('new...');
+                this.orderItemsFiltered = _.cloneDeep(this.orderItems); // Later for Filtering
+                this.orderItemsPaginated = [];
+                this.loadPaginatedData(null);
+            } else {
+                console.log('edited...');
+                for (let i = 0; i < this.orderItemsPaginated.length; i++) {
+                    for (const moreOrderItem of moreOrderItems) {
+                        if (this.orderItemsPaginated[i].id === moreOrderItem.id) {
+                            this.orderItemsPaginated[i] = moreOrderItem;
+                        }
+                    }
+                }
+                this.orderItemsPaginated = [...this.orderItemsPaginated];
+            }
         });
     }
 
-    searchHandler() {
-        const toSearchText = this.validationForm.value.toSearchText.toLowerCase();
-        console.log(toSearchText);
-
-        if (this.orderItems.length > 0 && toSearchText !== '') {
-            const filteredOrderItems = this.orderItems.filter(orderItem => JSON.stringify(orderItem).toLowerCase().includes(toSearchText));
-            // this.orderItemsSubject.next(temp);
-            this.orderItemsTemp = filteredOrderItems;
-        } else {
-            // this.orderItemsSubject.next(this.orderItems);
-            this.orderItemsTemp = this.orderItems;
-        }
-    }
-
-
-    //  region Utilities
     /**
      * Add new or updated OrderItems to this.orderItems based on the first orderItem's index
      * @param moreOrderItems: OrderItem[]
@@ -156,14 +160,96 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
                 let temp = [...this.orderItems];
                 temp = temp.filter(orderItem => orderItem.order.id !== moreOrderItems[0].order.id);
                 temp.splice(orderItemIndex, 0, ...moreOrderItems);
-                this.orderItems = [...temp];
+                this.orderItems = temp;
+                console.log(this.orderItems);
             } else {
                 console.log('added more Order Items');
-                let temp = [...this.orderItems];
-                temp = [...temp, ...moreOrderItems];
-                this.orderItems = [...temp];
+                let temp = [];
+                temp = [...this.orderItems, ...moreOrderItems];
+                this.orderItems = temp;
+                console.log(this.orderItems);
             }
         }
+    }
+
+    searchHandler() {
+        this.toSearchText = this.validationForm.value.toSearchText.toLowerCase();
+        console.log(this.toSearchText);
+
+        if (this.orderItems.length > 0 && this.toSearchText !== '') {
+            const filteredOrderItems = this.orderItems.filter(orderItem => JSON.stringify(orderItem).toLowerCase().includes(this.toSearchText));
+            this.orderItemsFiltered = _.cloneDeep(filteredOrderItems);
+            this.orderItemsPaginated = [];
+            this.loadPaginatedData(null);
+        } else {
+            this.orderItemsFiltered = _.cloneDeep(this.orderItems);
+            this.orderItemsPaginated = [];
+            this.loadPaginatedData(null);
+        }
+    }
+
+    /**
+     * Triggered when content being scrolled 100px above the page's bottom to load for more Order Items
+     * @param event: CustomerEvent
+     */
+    loadPaginatedData(event: any) {
+        if (this.orderItemsFiltered.length > 10) {
+            console.log('loaded more items');
+            console.log(this.orderItemsFiltered);
+            let orderItems = [...this.orderItemsPaginated];
+            orderItems = [...orderItems, ...this.orderItemsFiltered.splice(0, 10)];
+            this.orderItemsPaginated = [...orderItems];
+            console.log(this.orderItemsFiltered);
+        } else if (this.orderItemsFiltered.length > 0) {
+            console.log('last 10 items');
+            console.log(this.orderItemsFiltered);
+            let orderItems = [...this.orderItemsPaginated];
+            orderItems = [...orderItems, ...this.orderItemsFiltered.splice(0, this.orderItemsFiltered.length)];
+            this.orderItemsPaginated = [...orderItems];
+        }
+        if (event) {
+            event.target.complete();
+        }
+    }
+
+    //
+
+    async updateOrderItem(event: Event, attributeName: string, rowIndex) {
+        this.editingOrderItem[rowIndex + '-' + attributeName] = false;
+        const toUpdateOrderItem: OrderItem = _.cloneDeep(this.orderItemsPaginated[rowIndex]);
+        if (toUpdateOrderItem[attributeName] !== event.target.value) {
+            toUpdateOrderItem[attributeName] = event.target.value;
+            console.log(toUpdateOrderItem);
+            try {
+                const updateResult = await this.orderItemService.updateOrderItem(toUpdateOrderItem.order.id, toUpdateOrderItem);
+                await this.toastService.presentToastSuccess(`Successfully updated Order Item ${toUpdateOrderItem.orderItemCode} from Order ${toUpdateOrderItem.order.orderCode}`);
+            } catch (e) {
+                console.log(e);
+                await this.toastService.presentToastError(e.message);
+            }
+        }
+    }
+
+    startEditingInputText(inputElement: HTMLInputElement | HTMLTextAreaElement) {
+        inputElement.focus();
+    }
+
+    async startEditingIonInputText(inputElement: IonInput | IonTextarea) {
+        await inputElement.setFocus();
+    }
+
+    async startEditingInputSelect(selectElement: IonSelect) {
+        await selectElement.open();
+    }
+
+    //  region Utilities
+    /**
+     * Helper to select data for <ion-select>
+     * @param o1: Object
+     * @param o2: Object
+     */
+    compareWithFn(o1, o2) {
+        return o1 && o2 ? o1.id === o2.id : o1 === o2;
     }
 
     /**
@@ -178,6 +264,16 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
      */
     getFontClass(orderItem: OrderItem) {
         return this.fontService.getFontClass(orderItem.orderItemFont);
+    }
+
+    getColorClassCell({row, column, value}) {
+
+        const className = row.orderItemColor.replace(/\s/g, '');
+
+        const colorClass = {};
+        colorClass[className] = true;
+        return colorClass;
+
     }
 
     /**
@@ -248,46 +344,6 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
         return fontClass;
     }
 
-    /**
-     * Showing alert when clicking Delete Button
-     * @param toDeleteOrderItem: Customer
-     */
-    async presentDeleteConfirm(toDeleteOrderItem: OrderItem) {
-        const alert = await this.alertController.create({
-            header: 'Confirm!',
-            message: '<strong>Are you sure to delete?</strong>!!!',
-            buttons: [
-                {
-                    text: 'Cancel',
-                    role: 'cancel',
-                    cssClass: 'secondary',
-                    handler: (blah) => {
-                        console.log('canceled');
-                    }
-                }, {
-                    text: 'Okay',
-                    handler: () => {
-                        console.log('okay');
-                        this.deleteOrderItem(toDeleteOrderItem);
-                    }
-                }
-            ]
-        });
-        await alert.present();
-    }
-
-    /**
-     * Handler to delete an Order Item
-     * @param toDeleteOrderItem: OrderItem
-     */
-    async deleteOrderItem(toDeleteOrderItem: OrderItem) {
-        console.log(toDeleteOrderItem);
-        try {
-            await this.orderItemService.deleteOrderItem(toDeleteOrderItem.order.id, toDeleteOrderItem);
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
     //  endregion
+
 }

@@ -65,7 +65,7 @@
     <section *ngIf="isDesktop">
         <ngx-datatable
                 *ngIf="isDesktop"
-                [rows]="orderItemsTemp"
+                [rows]="orderItemsPaginated"
                 [rowHeight]="'auto'"
                 [headerHeight]="50"
                 [ngClass]="tableStyle"
@@ -81,6 +81,39 @@
                     [cellClass]="getCommentClassCell"
                     *ngIf="isDesktop"
             >
+                <ng-template let-row="row" let-value="value" let-rowIndex="rowIndex" ngx-datatable-cell-template
+                             class="ion-no-padding"
+                >
+                    <span
+                            *ngIf="!editingOrderItem[rowIndex + '-orderItemComment']"
+                            title="Double Click to edit"
+                            (dblclick)="editingOrderItem[rowIndex + '-orderItemComment'] = true"
+                    >
+                        {{ row.orderItemComment }}
+                    </span>
+
+                    <input
+                            *ngIf="editingOrderItem[rowIndex + '-orderItemComment']"
+                            type="text"
+                            (blur)="updateOrderItem($event, 'orderItemComment', rowIndex)"
+                            [value]="value"
+                            (mouseenter)="startEditingInputText(orderItemCommentInput)"
+                            (keyup.enter)="updateOrderItem($event, 'orderItemComment', rowIndex)"
+                            #orderItemCommentInput
+                    >
+
+                    <!--                    <ion-textarea-->
+                    <!--                            *ngIf="editingOrderItem[rowIndex + '-orderItemComment']"-->
+                    <!--                            type="text"-->
+                    <!--                            (ionBlur)="updateOrderItem($event, 'orderItemComment', rowIndex)"-->
+                    <!--                            [value]="value"-->
+                    <!--                            (mouseenter)="startEditingIonInputText(orderItemCommentInput)"-->
+                    <!--                            (keyup.enter)="updateOrderItem($event, 'orderItemComment', rowIndex)"-->
+                    <!--                            #orderItemCommentInput-->
+                    <!--                            style="background-color: white; height: 100%"-->
+                    <!--                            class="ion-no-margin ion-no-padding"-->
+                    <!--                    ></ion-textarea>-->
+                </ng-template>
             </ngx-datatable-column>
 
             <!--    Order    -->
@@ -91,7 +124,7 @@
             >
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                     <ion-button
-                            size=""
+                            color="dark"
                             [routerLink]="['/orders', row.order.id]"
                     >
                         {{ row.order.orderCode }}
@@ -161,52 +194,70 @@
                 </ng-template>
             </ngx-datatable-column>
 
-            <!--    Color/ Ring Size    -->
+            <!--    Product    -->
             <ngx-datatable-column
-                    name="Color/ Ring Size"
+                    name="Product"
                     prop="product.productName"
-                    [cellClass]="getRingColorClassCell"
-            >
+                    [cellClass]="getColorClassCell">
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-              <span *ngIf="row.product?.productType === 'Nhẫn'">
+                <span *ngIf="row.product?.productType !== 'Nhẫn'">
+                  <strong>{{ row.product?.productName }} </strong><br>
+                    {{ row.orderItemColor }} <br>
+                  <span *ngIf="row.orderItemLengthInch">Size: {{ row.orderItemLengthInch }} inches</span>
+                </span>
+
+                    <span *ngIf="row.product?.productType === 'Nhẫn'">
                   <strong>{{ row.product.productName }}</strong><br>
-                  {{ row.orderItemColor }} <br>
+                        {{ row.orderItemColor }} <br>
                 Ring Size: {{ row.orderItemRingSizeUS }} US
                 </span>
                 </ng-template>
             </ngx-datatable-column>
 
-            <!--    Color/ Necklace Size    -->
+            <!-- Status -->
             <ngx-datatable-column
-                    name="Color/ Necklace Size"
-                    prop="product.productName"
-                    [cellClass]="getNecklaceColorClassCell">
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-              <span *ngIf="row.product?.productType !== 'Nhẫn'">
-                  <strong>{{ row.product?.productName }} </strong><br>
-                  {{ row.orderItemColor }} <br>
-                  <span *ngIf="row.orderItemLengthInch">Size: {{ row.orderItemLengthInch }} inches</span>
-                </span>
-                </ng-template>
-            </ngx-datatable-column>
-
-            <!-- Customer -->
-            <ngx-datatable-column
-                    name="Customer"
-                    prop="customer"
-                    *ngIf="isDesktop"
+                    name="Status"
+                    prop="orderItemStatus"
             >
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                    <ion-button
-                            size=""
-                            [routerLink]="['/customers', row.customer.id]"
+                <ng-template let-row="row" let-value="value" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                    <span
+                            *ngIf="!editingOrderItem[rowIndex + '-orderItemStatus']"
+                            title="Double Click to edit"
+                            (dblclick)="editingOrderItem[rowIndex + '-orderItemStatus'] = true"
                     >
-                        {{ row.customer.firstName }} <br>
-                        {{ row.customer.lastName }} <br>
-                    </ion-button>
+                        {{ row.orderItemStatus }}
+                    </span>
+
+                    <ion-select
+                            [interfaceOptions]="customActionSheetOptions"
+                            interface="action-sheet"
+                            *ngIf="editingOrderItem[rowIndex + '-orderItemStatus']"
+                            (mouseenter)="startEditingInputSelect(orderItemStatus)"
+                            [value]="row.orderItemStatus"
+                            #orderItemStatus
+                            (ionChange)="updateOrderItem($event, 'orderItemStatus', rowIndex)"
+                            (ionCancel)="editingOrderItem[rowIndex + '-orderItemStatus'] = false"
+                    >
+                        <ion-select-option
+                                *ngFor="let status of statuses"
+                                [value]="status"
+                                #selectOption
+                        >
+                            {{ status }}
+                        </ion-select-option>
+                    </ion-select>
                 </ng-template>
             </ngx-datatable-column>
         </ngx-datatable>
+
+        <ion-infinite-scroll threshold="100px" (ionInfinite)="loadPaginatedData($event)">
+            <ion-infinite-scroll-content
+                    loadingSpinner="bubbles"
+                    loadingText="Loading more data...">
+            </ion-infinite-scroll-content>
+        </ion-infinite-scroll>
+        <ion-footer style="height: 10vh" #footer>
+        </ion-footer>
     </section>
 
     <!--Cards-->
@@ -219,7 +270,7 @@
                         sizeXl="3"
                         sizeLg="4"
                         sizeMd="6"
-                        *ngFor="let orderItem of orderItemsFiltered$ | async"
+                        *ngFor="let orderItem of orderItemsPaginated"
                 >
                     <ion-card class="ion-no-margin ion-no-padding">
                         <section>
@@ -327,7 +378,7 @@
                                 </ion-button>
 
                                 <ion-button
-                                        (click)="presentDeleteConfirm(orderItem)"
+                                        (click)="alertService.presentDeleteConfirm(orderItem)"
                                         color="danger"
                                         slot="end"
                                 >
@@ -340,6 +391,13 @@
                 </ion-col>
             </ion-row>
         </ion-grid>
+
+        <ion-infinite-scroll threshold="100px" (ionInfinite)="loadPaginatedData($event)">
+            <ion-infinite-scroll-content
+                    loadingSpinner="bubbles"
+                    loadingText="Loading more data...">
+            </ion-infinite-scroll-content>
+        </ion-infinite-scroll>
         <ion-footer style="height: 10vh" #footer>
         </ion-footer>
     </section>

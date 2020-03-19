@@ -20,6 +20,7 @@ import {AngularFireAuthGuardModule} from '@angular/fire/auth-guard';
 import {AngularFireFunctionsModule} from '@angular/fire/functions';
 import {AgGridModule} from 'ag-grid-angular';
 import 'ag-grid-enterprise';
+import {AutofocusDirective} from './directives/autofocus.directive';
 
 
 @NgModule({

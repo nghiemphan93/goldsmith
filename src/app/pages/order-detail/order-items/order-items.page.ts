@@ -11,6 +11,7 @@ import {ColorService} from '../../../services/color.service';
 import {take} from 'rxjs/operators';
 import {Customer} from '../../../models/customer';
 import {Product} from '../../../models/product';
+import {AlertService} from '../../../services/alert.service';
 
 
 @Component({
@@ -38,7 +39,8 @@ export class OrderItemsPage implements OnInit, OnDestroy {
                 private activatedRoute: ActivatedRoute,
                 private fontService: FontService,
                 private colorService: ColorService,
-                private alertController: AlertController
+                private alertController: AlertController,
+                public alertService: AlertService
     ) {
     }
 

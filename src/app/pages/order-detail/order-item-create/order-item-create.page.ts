@@ -18,6 +18,7 @@ import {ColorService} from '../../../services/color.service';
 import {StatusService} from '../../../services/status.service';
 import {CustomerCacheService} from '../../../services/customer-cache.service';
 import {ProductCacheService} from '../../../services/product-cache.service';
+import {ToastService} from '../../../services/toast.service';
 
 
 @Component({
@@ -54,7 +55,8 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
                 private colorService: ColorService,
                 private statusService: StatusService,
                 private customerCacheService: CustomerCacheService,
-                private productCacheService: ProductCacheService
+                private productCacheService: ProductCacheService,
+                private toastService: ToastService
     ) {
     }
 
@@ -67,6 +69,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
+        window.dispatchEvent(new Event('resize'));
     }
 
     /**
@@ -141,7 +144,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             orderItemQuantity: new FormControl(1, Validators.required),
             orderItemRingSizeUS: new FormControl(''),
             orderItemLengthInch: new FormControl(''),
-            orderItemColor: new FormControl(this.colors[0], Validators.required), // Color.SILVER
+            orderItemColor: new FormControl(Color.SILVER, Validators.required), // Color.SILVER
             orderItemImageUrl: new FormControl('')
         });
     }
@@ -245,12 +248,11 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
         try {
             if (this.isCreated) {
                 this.orderItem.createdAt = new Date();
-                const documentRef = await this.orderItemService.createOrderItem(this.orderId, this.orderItem);
-                console.log(documentRef);
+                await this.orderItemService.createOrderItem(this.orderId, this.orderItem);
+                await this.toastService.presentToastSuccess(`Successfully created Order Item ${this.orderItem.orderItemCode}`);
             } else {
-                const documentRef = await this.orderItemService.updateOrderItem(this.orderId, this.orderItem);
-                console.log(documentRef);
-                console.log(this.orderItem);
+                await this.orderItemService.updateOrderItem(this.orderId, this.orderItem);
+                await this.toastService.presentToastSuccess(`Successfully updated Order Item ${this.orderItem.orderItemCode}`);
             }
             this.validationForm.reset({
                 orderItemStatus: this.statuses[0],  // PENDING
@@ -262,6 +264,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             window.dispatchEvent(new Event('resize'));
         } catch (e) {
             console.log(e);
+            await this.toastService.presentToastError(e.message);
         }
     }
 

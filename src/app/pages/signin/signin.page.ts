@@ -29,10 +29,10 @@ export class SigninPage implements OnInit {
      */
     prepareFormValidation() {
         this.validationForm = this.formBuilder.group({
-            email: new FormControl('admin@goldsmith.com', Validators.compose([
+            email: new FormControl('vu@goldsmith.com', Validators.compose([
                 Validators.pattern(/^[a-zA-Z]{1,}[0-9]?([\.\_-]? [a-zA-Z0-9]+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/),
                 Validators.required])),
-            password: new FormControl('adminadmin', Validators.required)
+            password: new FormControl('designdesign', Validators.required)
         });
     }
 

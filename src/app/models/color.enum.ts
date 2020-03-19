@@ -1,6 +1,6 @@
 export enum Color {
-    'SILVER',
-    'PLATINUM',
-    'GOLD',
-    'ROSE GOLD'
+    SILVER = 'SILVER',
+    PLATINUM = 'PLATINUM',
+    GOLD = 'GOLD',
+    ROSEGOLD = 'ROSEGOLD'
 }
