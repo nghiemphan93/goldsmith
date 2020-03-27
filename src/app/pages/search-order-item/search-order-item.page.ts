@@ -17,13 +17,14 @@ import * as _ from 'lodash';
 import {ToastService} from '../../services/toast.service';
 import {AlertService} from '../../services/alert.service';
 import {StatusService} from '../../services/status.service';
+import {OrderCacheService} from '../../services/order-cache.service';
 
 @Component({
     selector: 'app-search-order-item',
     templateUrl: './search-order-item.page.html',
     styleUrls: ['./search-order-item.page.scss'],
 })
-export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
+export class SearchOrderItemPage implements OnInit, OnDestroy {
     tableStyle = 'material';
     validationForm: FormGroup;
     ordersDesktop$: Observable<Order[]>;
@@ -67,31 +68,15 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
                 private alertController: AlertController,
                 private toastService: ToastService,
                 public alertService: AlertService,
-                private statusService: StatusService
+                private statusService: StatusService,
+                private orderCacheService: OrderCacheService
     ) {
     }
 
     ngOnInit() {
         this.setup();
-        this.orders$ = this.orderService.getOrders();
+        this.orders$ = this.orderCacheService.getOrdersCache$();
         this.prepareFormValidation();
-
-        // this.subscription.add(this.orderItemCacheService.getAllOrderItemsCache$().subscribe(moreOrderItems => {
-        //     this.addMoreOrderItems(moreOrderItems);
-        //     this.orderItemsFiltered = this.orderItems; // Later for Filtering
-        // }));
-    }
-
-    async ngAfterViewInit() {
-        // fromEvent(this.searchInput.debounce, 'keyup')
-        //     .pipe(debounceTime(500))
-        //     .subscribe((event) => this.searchHandler());
-    }
-
-    ionViewLoaded() {
-        setTimeout(() => {
-            this.searchInput.setFocus();
-        }, 150);
     }
 
     ngOnDestroy(): void {
@@ -212,8 +197,6 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
         }
     }
 
-    //
-
     async updateOrderItem(event: Event, attributeName: string, rowIndex) {
         this.editingOrderItem[rowIndex + '-' + attributeName] = false;
         const toUpdateOrderItem: OrderItem = _.cloneDeep(this.orderItemsPaginated[rowIndex]);
@@ -242,7 +225,6 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
         await selectElement.open();
     }
 
-    //  region Utilities
     /**
      * Helper to select data for <ion-select>
      * @param o1: Object
@@ -343,7 +325,4 @@ export class SearchOrderItemPage implements OnInit, OnDestroy, AfterViewInit {
         fontClass[className] = true;
         return fontClass;
     }
-
-    //  endregion
-
 }

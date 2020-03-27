@@ -5,6 +5,7 @@ import {Order} from '../../models/order';
 import {OrderService} from '../../services/order.service';
 import {SelectionType} from '@swimlane/ngx-datatable';
 import {OrderItemCacheService} from '../../services/order-item-cache.service';
+import {OrderCacheService} from '../../services/order-cache.service';
 
 
 @Component({
@@ -27,14 +28,15 @@ export class OrdersPage implements OnInit, OnDestroy {
                 private config: Config,
                 private platform: Platform,
                 private alertController: AlertController,
-                private orderItemCacheService: OrderItemCacheService
+                private orderItemCacheService: OrderItemCacheService,
+                private orderCacheService: OrderCacheService
     ) {
     }
 
     ngOnInit() {
         this.preparePlatform();
         if (this.isDesktop) {
-            this.ordersDesktop$ = this.orderService.getOrders();
+            this.ordersDesktop$ = this.orderCacheService.getOrdersCache$();
         } else {
             this.ordersMobile$.push(this.orderService.getLimitedOrdersAfterStart());
         }
