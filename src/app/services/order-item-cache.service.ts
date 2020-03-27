@@ -44,7 +44,7 @@ export class OrderItemCacheService {
             });
             return this.orderItemsMapSubjects.get(order.id).asObservable();
         }
-    }au
+    }
 
     getOrderItemsCache$(): Observable<OrderItem[]>[] {
         const observables: Observable<OrderItem[]>[] = [];
