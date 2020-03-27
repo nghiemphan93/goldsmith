@@ -21,7 +21,7 @@
                 <form
                         class="ion-margin-top"
                         [formGroup]="validationForm"
-                        (keydown.enter)="validationForm.valid ? signInHandler() : null"
+                        (keydown.enter)="validationForm.valid ? signInHandler(submitButton) : null"
                 >
                     <ion-item-divider>
                         <ion-label>Sign In</ion-label>
@@ -55,9 +55,10 @@
                     <ion-button
                             [disabled]="!validationForm.valid"
                             class="ion-margin-top"
-                            (click)="signInHandler()"
+                            (click)="signInHandler(submitButton)"
                             type="submit"
                             expand="block"
+                            #submitButton
                     >
                         Sign In
                     </ion-button>

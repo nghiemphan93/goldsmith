@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 
 import {Platform} from '@ionic/angular';
 import {SplashScreen} from '@ionic-native/splash-screen/ngx';
@@ -14,7 +14,7 @@ import {OrderItemCacheService} from './services/order-item-cache.service';
     templateUrl: 'app.component.html',
     styleUrls: ['app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
     isAuth$ = this.authService.getIsAuth$();
     user$ = this.authService.getCurentUser$();
 
@@ -63,6 +63,11 @@ export class AppComponent {
 
     initServices() {
         this.orderItemCacheService.init();
+    }
+
+    async ngOnDestroy() {
+        await this.authService.signOut();
+        console.log('signing out...');
     }
 
     async signOutHandler() {

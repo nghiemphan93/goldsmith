@@ -9,6 +9,8 @@ import {OrderService} from './order.service';
 import {CustomerService} from './customer.service';
 import {ProductService} from './product.service';
 import {ToastService} from './toast.service';
+import {User} from 'firebase';
+import {AuthService} from './auth.service';
 
 @Injectable({
     providedIn: 'root'
@@ -20,11 +22,12 @@ export class AlertService {
                 private orderService: OrderService,
                 private customerService: CustomerService,
                 private productService: ProductService,
-                private toastService: ToastService
+                private toastService: ToastService,
+                private authService: AuthService
     ) {
     }
 
-    async presentDeleteConfirm(toDeleteObject: OrderItem | Order | Customer | Product) {
+    async presentDeleteConfirm(toDeleteObject: OrderItem | Order | Customer | Product | User) {
         const alert = await this.alertController.create({
             header: 'Confirm!',
             message: '<strong>Are you sure to delete?</strong>!!!',
@@ -48,9 +51,12 @@ export class AlertService {
         await alert.present();
     }
 
-    private async deleteObjectHelper(toDeleteObject: OrderItem | Order | Customer | Product) {
+    private async deleteObjectHelper(toDeleteObject: OrderItem | Order | Customer | Product | User) {
+        console.log('inside');
+        console.log(toDeleteObject);
         try {
-            if (toDeleteObject instanceof OrderItem) {
+            if (toDeleteObject.hasOwnProperty('orderItemCode')) {
+                console.log('clgt');
                 const toDeleteOrderItem = toDeleteObject as OrderItem;
                 await this.orderItemService.deleteOrderItem(toDeleteOrderItem.order.id, toDeleteOrderItem);
                 await this.toastService.presentToastSuccess(`Successfully deleted Order Item ${toDeleteOrderItem.orderItemCode} from Order ${toDeleteOrderItem.order.orderCode}`);
@@ -60,7 +66,7 @@ export class AlertService {
                 await this.orderService.deleteOrder(toDeleteOrder);
                 await this.toastService.presentToastSuccess(`Successfully deleted Order ${toDeleteOrder.orderCode}`);
             }
-            if (toDeleteObject instanceof Customer) {
+            if (toDeleteObject.hasOwnProperty('firstName')) {
                 const toDeleteCustomer = toDeleteObject as Customer;
                 await this.customerService.deleteCustomer(toDeleteCustomer);
                 await this.toastService.presentToastSuccess(`Successfully deleted Customer ${toDeleteCustomer.firstName} ${toDeleteCustomer.lastName}`);
@@ -69,6 +75,12 @@ export class AlertService {
                 const toDeleteProduct = toDeleteObject as Product;
                 await this.productService.deleteProduct(toDeleteProduct);
                 await this.toastService.presentToastSuccess(`Successfully deleted Product ${toDeleteProduct.productName}`);
+            }
+            if ('email' in toDeleteObject) {
+                const toDeleteUser = toDeleteObject as User;
+                await this.authService.deleteUserByAdmin(toDeleteUser.email);
+                console.log(toDeleteUser);
+                await this.toastService.presentToastSuccess(`Successfully deleted User ${toDeleteUser.email}`);
             }
         } catch (e) {
             console.log(e);

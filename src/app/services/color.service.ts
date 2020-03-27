@@ -29,5 +29,6 @@ export class ColorService {
         const colorClass = {};
         colorClass[className] = true;
         return colorClass;
+        // 0234 910 1577
     }
 }

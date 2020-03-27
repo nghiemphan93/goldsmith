@@ -16,6 +16,10 @@ export enum Claim {
     DESIGNER = 'DESIGNER'
 }
 
+/**
+ * Convert Claim Enum value -> Boolean value
+ * @param claim: Claim
+ */
 export const claimEnumToBoolean = (claim: Claim) => {
     switch (claim) {
         case Claim.DEV:
@@ -33,7 +37,7 @@ export const claimEnumToBoolean = (claim: Claim) => {
     }
 };
 
-// @ts-ignore
+
 export const claimBooleanToEnum = (user: any | UserRecord) => {
     if (user.customClaims.DEV === true) {
         return Claim.DEV;
@@ -42,11 +46,12 @@ export const claimBooleanToEnum = (user: any | UserRecord) => {
         return Claim.ADMIN;
     }
     if (user.customClaims.MODERATOR === true) {
-        return Claim.DESIGNER;
+        return Claim.MODERATOR;
     }
     if (user.customClaims.DESIGNER === true) {
         return Claim.DESIGNER;
     }
+    throw new HttpsError('cancelled', 'Not a valid Claim. Must be ADMIN, MODERATOR oder DESIGNER');
 };
 
 /**
@@ -54,7 +59,7 @@ export const claimBooleanToEnum = (user: any | UserRecord) => {
  * @param email: string
  * @param claim: Claim
  */
-export const makeClaim = async (email: string, claim: Claim) => {
+export const makeClaimHelper = async (email: string, claim: Claim) => {
     const user = await admin.auth().getUserByEmail(email);
     const customClaim = {};
     // @ts-ignore
@@ -63,8 +68,7 @@ export const makeClaim = async (email: string, claim: Claim) => {
 };
 
 /**
- * Helper to set claim to user
- * @param email: string
+ * Helper to set claim directly to User
  * @param claim: Claim
  */
 export const makeClaimToUser = async (user: any | UserRecord) => {
@@ -83,8 +87,12 @@ export const makeClaimToUser = async (user: any | UserRecord) => {
  */
 export const makeDev = functions.https.onCall(async (data: any, context: CallableContext) => {
     try {
-        await makeClaim(data.email, Claim.DEV);
-        return `User ${data.email} has been claimed DEV`;
+        if (context.auth?.token.DEV === true) {
+            await makeClaimHelper(data.email, Claim.DEV);
+            return `User ${data.email} has been claimed DEV`;
+        } else {
+            throw new HttpsError('permission-denied', `${data.email} doesn't have claim DEV`);
+        }
     } catch (e) {
         console.log(e);
         throw e;
@@ -98,7 +106,7 @@ export const makeDev = functions.https.onCall(async (data: any, context: Callabl
 export const makeAdmin = functions.https.onCall(async (data: any, context: CallableContext) => {
     try {
         if (context.auth?.token.DEV === true) {
-            await makeClaim(data.email, Claim.ADMIN);
+            await makeClaimHelper(data.email, Claim.ADMIN);
             return `User ${data.email} has been claimed ADMIN`;
         } else if (context.auth) {
             const currentUser = await admin.auth().getUser(context.auth?.uid);
@@ -119,7 +127,7 @@ export const makeAdmin = functions.https.onCall(async (data: any, context: Calla
 export const makeModerator = functions.https.onCall(async (data: any, context: CallableContext) => {
     try {
         if (context.auth?.token.DEV === true || context.auth?.token.ADMIN === true) {
-            await makeClaim(data.email, Claim.MODERATOR);
+            await makeClaimHelper(data.email, Claim.MODERATOR);
             return `User ${data.email} has been claimed MODERATOR`;
         } else if (context.auth) {
             const currentUser = await admin.auth().getUser(context.auth?.uid);
@@ -140,7 +148,7 @@ export const makeModerator = functions.https.onCall(async (data: any, context: C
 export const makeDesigner = functions.https.onCall(async (data: any, context: CallableContext) => {
     try {
         if (context.auth?.token.DEV === true || context.auth?.token.ADMIN === true) {
-            await makeClaim(data.email, Claim.DESIGNER);
+            await makeClaimHelper(data.email, Claim.DESIGNER);
             return `User ${data.email} has been claimed DESIGNER`;
         } else if (context.auth) {
             const currentUser = await admin.auth().getUser(context.auth?.uid);
@@ -154,6 +162,24 @@ export const makeDesigner = functions.https.onCall(async (data: any, context: Ca
     }
 });
 
+export const createUserHelper = async (user: any) => {
+    const createdUser = await admin.auth().createUser({
+        displayName: user.displayName,
+        email: user.email,
+        password: user.password,
+    });
+    user.uid = createdUser.uid;
+    await makeClaimToUser(user);
+
+    const createdUserDoc = {
+        customClaims: user.customClaims,
+        displayName: user.displayName,
+        email: user.email,
+    };
+    await admin.firestore().doc(`users/${user.uid}`).create(createdUserDoc);
+    return `User ${createdUser.email} with Claim ${claimBooleanToEnum(user)} has been created...`;
+};
+
 /**
  * Create a new User
  * Executed by Admin or Dev
@@ -162,23 +188,26 @@ export const createUser = functions.https.onCall(async (data: any, context: Call
     try {
         const user = data.user;
         if (context.auth?.token.DEV === true || context.auth?.token.ADMIN === true) {
-            const userRecord: UserRecord = await admin.auth().createUser({
-                displayName: user.displayName,
-                email: user.email,
-                password: user.password,
-            });
-
-            user.uid = userRecord.uid;
-            await makeClaimToUser(user);
-
-            const toCreateUserDoc = {
-                customClaims: user.customClaims,
-                displayName: user.displayName,
-                email: user.email,
-            };
-            const docRef = await admin.firestore().doc(`users/${user.uid}`).create(toCreateUserDoc);
-            console.log(docRef);
-            return `User ${userRecord.email} with Claim ${claimBooleanToEnum(user.customClaims)} has been created...`;
+            const claim = claimBooleanToEnum(user);
+            switch (claim) {
+                case Claim.DEV:
+                    throw new HttpsError('permission-denied', `not allowed to create DEV`);
+                    break;
+                case Claim.ADMIN:
+                    if (context.auth?.token.ADMIN === true) {
+                        throw new HttpsError('permission-denied', `ADMIN is not allowed to create other ADMIN`);
+                    } else {
+                        return createUserHelper(user);
+                    }
+                    break;
+                case Claim.MODERATOR:
+                    return createUserHelper(user);
+                    break;
+                case Claim.DESIGNER:
+                    return createUserHelper(user);
+                    break;
+            }
+            throw new HttpsError('invalid-argument', 'not accepted Role: must be ADMIN, MODERATOR or DESIGNER');
         } else {
             if (context.auth) {
                 const currentUser = await admin.auth().getUser(context.auth?.uid);
@@ -218,6 +247,10 @@ export const updateUserByAdmin = functions.https.onCall(async (data: any, contex
             console.log(docRef);
             return `User ${user.email} has been updated successfully`;
         } else {
+            if (context.auth?.token.ADMIN === true && user.customClaims.DEV === true) {
+                const currentUser = await admin.auth().getUser(context.auth?.uid);
+                throw new HttpsError('permission-denied', `${currentUser.email} doesn't have claim DEV`);
+            }
             if (context.auth) {
                 const currentUser = await admin.auth().getUser(context.auth?.uid);
                 throw new HttpsError('permission-denied', `${currentUser.email} doesn't have claim DEV or ADMIN`);
@@ -347,7 +380,7 @@ export const getUserById = functions.https.onCall(async (data: any, context: Cal
  */
 export const deleteUserByAdmin = functions.https.onCall(async (data: any, context: CallableContext) => {
     try {
-        if (context.auth?.token.DEV === true || context.auth?.token.ADMIN === true) {
+        if (context.auth?.token.DEV === true || (context.auth?.token.ADMIN === true && data.customClaims.DEV === undefined)) {
             const user = await admin.auth().getUserByEmail(data.email);
             await admin.auth().deleteUser(user.uid);
             const message = `User ${user.email} has been deleted...`;

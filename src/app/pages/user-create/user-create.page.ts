@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
 import {Product} from '../../models/product';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
@@ -11,6 +11,8 @@ import {ClaimService} from '../../services/claim.service';
 import {startWith} from 'rxjs/operators';
 import {Claim} from '../../models/claim.enum';
 import {UserService} from '../../services/user.service';
+import {IonButton} from '@ionic/angular';
+import {ToastService} from '../../services/toast.service';
 
 @Component({
     selector: 'app-user-create',
@@ -28,12 +30,15 @@ export class UserCreatePage implements OnInit, OnDestroy {
     error: string;
     currentUser$: Observable<User | any>;
 
+    @ViewChild('submitButton') submitButton: ElementRef;
+
     constructor(private authService: AuthService,
                 private formBuilder: FormBuilder,
                 private router: Router,
                 private activatedRoute: ActivatedRoute,
                 public claimService: ClaimService,
-                private userService: UserService
+                private userService: UserService,
+                private toastService: ToastService
     ) {
     }
 
@@ -45,6 +50,7 @@ export class UserCreatePage implements OnInit, OnDestroy {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
+        window.dispatchEvent(new Event('resize'));
     }
 
     /**
@@ -122,6 +128,7 @@ export class UserCreatePage implements OnInit, OnDestroy {
      * Handler Submit button
      */
     async submitHandler() {
+        console.log(this.submitButton.nativeElement);
         this.user.displayName = this.validationForm.value.displayName;
         this.user.email = this.validationForm.value.email;
         this.user.password = this.validationForm.value.password;
@@ -130,18 +137,20 @@ export class UserCreatePage implements OnInit, OnDestroy {
         try {
             if (this.isCreated) {
                 const result = await this.authService.createUserByAdmin(this.user);
-                console.log(result);
+                await this.toastService.presentToastSuccess(`${this.user.email} successfully created`);
             } else {
                 const result = await this.authService.updateUserByAdmin(this.user);
-                console.log(result);
+                await this.toastService.presentToastSuccess(`${this.user.email} successfully updated`);
             }
 
             this.validationForm.reset();
             await this.router.navigate(['users']);
             window.dispatchEvent(new Event('resize'));
-        } catch (error) {
-            console.log(error);
-            this.error = error.message;
+        } catch (e) {
+            console.log(e);
+            this.error = e.message;
+            await this.toastService.presentToastError(e.message);
+            window.dispatchEvent(new Event('resize'));
         }
     }
 

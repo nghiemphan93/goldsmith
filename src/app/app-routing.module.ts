@@ -78,12 +78,6 @@ const routes: Routes = [
         canActivate: [AngularFireAuthGuard]
     },
     {
-        path: 'signup',
-        loadChildren: () => import('./pages/signup/signup.module').then(m => m.SignupPageModule),
-        canActivate: [AngularFireAuthGuard],
-        data: {authGuardPipe: devOnly}
-    },
-    {
         path: 'signin',
         loadChildren: () => import('./pages/signin/signin.module').then(m => m.SigninPageModule),
         canActivate: [AngularFireAuthGuard],
@@ -120,7 +114,7 @@ const routes: Routes = [
         path: 'search/customer',
         loadChildren: () => import('./pages/search-customer/search-customer.module').then(m => m.SearchCustomerPageModule),
         canActivate: [AngularFireAuthGuard]
-    }
+    },
 
 
 ];

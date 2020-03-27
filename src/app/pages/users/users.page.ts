@@ -8,6 +8,7 @@ import {Product} from '../../models/product';
 import {User} from 'firebase';
 import {UserService} from '../../services/user.service';
 import {ClaimService} from '../../services/claim.service';
+import {AlertService} from '../../services/alert.service';
 
 @Component({
     selector: 'app-users',
@@ -27,7 +28,8 @@ export class UsersPage implements OnInit, OnDestroy {
                 private platform: Platform,
                 private alertController: AlertController,
                 private userService: UserService,
-                public claimService: ClaimService
+                public claimService: ClaimService,
+                public alertService: AlertService
     ) {
     }
 

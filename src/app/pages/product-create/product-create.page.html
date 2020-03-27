@@ -36,6 +36,7 @@
                 <form
                         [formGroup]="validationForm"
                         *ngIf="product"
+                        (keydown.enter)="validationForm.valid ? submitHandler(submitButton) : null"
                 >
                     <ion-item-divider>
                         <ion-label *ngIf="isDetailed">Please fill in information for the product</ion-label>
@@ -115,16 +116,27 @@
                     </ion-item-group>
 
                     <!--  Submit Button  -->
-                    <ion-button
-                            [disabled]="!validationForm.valid"
-                            class="ion-margin-top"
-                            (click)="submitHandler()"
-                            type="submit"
-                            expand="block"
-                            *ngIf="!isDetailed"
-                    >
-                        Submit
-                    </ion-button>
+                    <ng-container>
+                        <ion-button
+                                [disabled]="!validationForm.valid"
+                                [hidden]="true"
+                                #submitButton
+                        >
+                            Submit
+                        </ion-button>
+
+                        <ion-button
+                                *ngIf="!isDetailed"
+                                [disabled]="!validationForm.valid"
+                                class="ion-margin-top"
+                                (click)="submitHandler(submitButton)"
+                                type="submit"
+                                expand="block"
+                                #submitButton
+                        >
+                            Submit
+                        </ion-button>
+                    </ng-container>
                 </form>
             </ion-col>
         </ion-row>

@@ -1,9 +1,12 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Customer} from '../../models/customer';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {CustomerService} from '../../services/customer.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
+import {AlertService} from '../../services/alert.service';
+import {ToastService} from '../../services/toast.service';
+import {IonButton} from '@ionic/angular';
 
 @Component({
     selector: 'app-customer-create',
@@ -17,11 +20,14 @@ export class CustomerCreatePage implements OnInit, OnDestroy {
     isUpdated: boolean;
     isDetailed: boolean;
     customer: Customer;
+    @ViewChild('submitButton') submitButton: ElementRef;
 
     constructor(private customerService: CustomerService,
                 private formBuilder: FormBuilder,
                 private activatedRoute: ActivatedRoute,
-                private router: Router
+                private router: Router,
+                private alertService: AlertService,
+                private toastService: ToastService
     ) {
     }
 
@@ -30,9 +36,12 @@ export class CustomerCreatePage implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        console.log('bye bye CustomerCreatePage...');
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
+
+        window.dispatchEvent(new Event('resize'));
     }
 
     /**
@@ -127,7 +136,9 @@ export class CustomerCreatePage implements OnInit, OnDestroy {
     /**
      * Handler Submit button
      */
-    async submitHandler() {
+    async submitHandler(submitButton: IonButton) {
+        submitButton.disabled = true;
+
         this.customer.firstName = this.toTitleCase(this.validationForm.value.firstName);
         this.customer.lastName = this.toTitleCase(this.validationForm.value.lastName);
         this.customer.nick = this.toTitleCase(this.validationForm.value.nick);
@@ -142,11 +153,11 @@ export class CustomerCreatePage implements OnInit, OnDestroy {
         try {
             if (this.isCreated) {
                 this.customer.createdAt = new Date();
-                const documentRef = await this.customerService.createCustomer(this.customer);
-                console.log(documentRef);
+                await this.customerService.createCustomer(this.customer);
+                await this.toastService.presentToastSuccess(`Created ${this.customer.firstName} ${this.customer.lastName} successfully`);
             } else {
-                const documentRef = await this.customerService.updateCustomer(this.customer);
-                console.log(documentRef);
+                await this.customerService.updateCustomer(this.customer);
+                await this.toastService.presentToastSuccess(`Updated ${this.customer.firstName} ${this.customer.lastName} successfully`);
             }
             this.validationForm.reset({
                 country: 'United States'
@@ -155,6 +166,7 @@ export class CustomerCreatePage implements OnInit, OnDestroy {
             window.dispatchEvent(new Event('resize'));
         } catch (e) {
             console.log(e);
+            await this.toastService.presentToastError(e.message);
         }
     }
 }

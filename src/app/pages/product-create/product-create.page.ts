@@ -10,6 +10,8 @@ import {ImageUploadService} from '../../services/image-upload.service';
 import {tryCatch} from 'rxjs/internal-compatibility';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Customer} from '../../models/customer';
+import {IonButton} from '@ionic/angular';
+import {ToastService} from '../../services/toast.service';
 
 @Component({
     selector: 'app-product-create',
@@ -29,7 +31,8 @@ export class ProductCreatePage implements OnInit, OnDestroy {
                 private formBuilder: FormBuilder,
                 private imageUploadService: ImageUploadService,
                 private router: Router,
-                private activatedRoute: ActivatedRoute
+                private activatedRoute: ActivatedRoute,
+                private toastService: ToastService
     ) {
     }
 
@@ -45,6 +48,8 @@ export class ProductCreatePage implements OnInit, OnDestroy {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
+
+        window.dispatchEvent(new Event('resize'));
     }
 
     /**
@@ -131,7 +136,9 @@ export class ProductCreatePage implements OnInit, OnDestroy {
     /**
      * Handler Submit button
      */
-    async submitHandler() {
+    async submitHandler(submitButton: IonButton) {
+        submitButton.disabled = true;
+
         this.product.productName = this.validationForm.value.productName;
         this.product.productType = this.validationForm.value.productType;
         this.product.cutOrEngraved = this.validationForm.value.cutOrEngraved;
@@ -140,12 +147,13 @@ export class ProductCreatePage implements OnInit, OnDestroy {
             if (this.isCreated) {
                 this.product.createdAt = new Date();
                 this.oldImageUrl = this.product.imageUrl;
-                const documentRef = await this.productService.createProduct(this.product);
-                console.log(documentRef);
+                await this.productService.createProduct(this.product);
+                await this.toastService.presentToastSuccess(`Created ${this.product.productName} successfully`);
+
             } else {
                 this.oldImageUrl = this.product.imageUrl;
-                const documentRef = await this.productService.updateProduct(this.product);
-                console.log(documentRef);
+                await this.productService.updateProduct(this.product);
+                await this.toastService.presentToastSuccess(`Updated ${this.product.productName} successfully`);
             }
 
             this.validationForm.reset({
@@ -154,8 +162,9 @@ export class ProductCreatePage implements OnInit, OnDestroy {
             });
             await this.router.navigate(['products']);
             window.dispatchEvent(new Event('resize'));
-        } catch (error) {
-            console.log(error);
+        } catch (e) {
+            console.log(e);
+            await this.toastService.presentToastError(e.message);
         }
     }
 }

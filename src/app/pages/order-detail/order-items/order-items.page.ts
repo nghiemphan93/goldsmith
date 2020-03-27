@@ -164,6 +164,10 @@ export class OrderItemsPage implements OnInit, OnDestroy {
         }
     }
 
+    presentDeleteOrderItem(orderItem: OrderItem){
+
+    }
+
     /**
      * Return css Color Class given Oder Item's color
      */

@@ -3,6 +3,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {Router} from '@angular/router';
 import {AngularFirestore} from '@angular/fire/firestore';
+import {ToastService} from '../../services/toast.service';
 
 @Component({
     selector: 'app-signup',
@@ -15,7 +16,7 @@ export class SignupPage implements OnInit {
     constructor(private formBuilder: FormBuilder,
                 private authService: AuthService,
                 private router: Router,
-                private afs: AngularFirestore
+                private toastService: ToastService
     ) {
     }
 
@@ -45,8 +46,10 @@ export class SignupPage implements OnInit {
         try {
             const userCredential = await this.authService.signUp(email, password);
             await this.router.navigate(['orders']);
+            await this.toastService.presentToastSuccess(`${userCredential.user.email} successfully created`);
         } catch (e) {
             console.log(e);
+            await this.toastService.presentToastError(e.message);
         }
 
     }

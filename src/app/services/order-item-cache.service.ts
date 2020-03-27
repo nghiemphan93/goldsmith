@@ -24,7 +24,7 @@ export class OrderItemCacheService {
     }
 
     init() {
-        console.log('initing cache order item...');
+        console.log('initializing cache order item...');
     }
 
     setSelectedOrders(selectedOrders: Order[]) {
@@ -44,7 +44,7 @@ export class OrderItemCacheService {
             });
             return this.orderItemsMapSubjects.get(order.id).asObservable();
         }
-    }
+    }au
 
     getOrderItemsCache$(): Observable<OrderItem[]>[] {
         const observables: Observable<OrderItem[]>[] = [];

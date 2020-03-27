@@ -44,7 +44,7 @@ export class ClaimService {
             return Claim.ADMIN;
         }
         if (user.customClaims.MODERATOR === true) {
-            return Claim.DESIGNER;
+            return Claim.MODERATOR;
         }
         if (user.customClaims.DESIGNER === true) {
             return Claim.DESIGNER;

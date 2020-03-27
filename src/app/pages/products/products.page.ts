@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {ProductService} from '../../services/product.service';
 import {AngularFireUploadTask} from '@angular/fire/storage';
 import {forkJoin, Observable, of, pipe, range, Subscription} from 'rxjs';
@@ -6,13 +6,14 @@ import {AngularFirestoreCollection} from '@angular/fire/firestore';
 import {Product} from '../../models/product';
 import {AlertController, Config, Platform} from '@ionic/angular';
 import {ImageUploadService} from '../../services/image-upload.service';
+import {AlertService} from '../../services/alert.service';
 
 @Component({
     selector: 'app-products',
     templateUrl: './products.page.html',
     styleUrls: ['./products.page.scss'],
 })
-export class ProductsPage implements OnInit, OnDestroy {
+export class ProductsPage implements OnInit, OnDestroy, OnChanges {
     subscription = new Subscription();
     productsDesktop$: Observable<Product[]>[] = [];
     productsMobile$: Observable<Product[]>[] = [];
@@ -26,17 +27,27 @@ export class ProductsPage implements OnInit, OnDestroy {
                 private imageUploadService: ImageUploadService,
                 private config: Config,
                 private platform: Platform,
-                private alertController: AlertController
+                private alertController: AlertController,
+                public alertService: AlertService
     ) {
     }
 
     ngOnInit() {
         this.preparePlatform();
         if (this.isDesktop) {
+            // this.productsDesktop$.push(this.productService.getLimitedProductsAfterStart());
+
             this.productsDesktop$.push(this.productService.getLimitedProductsAfterStart());
             this.subscription.add(this.productsDesktop$[0].subscribe(moreProducts => {
                 this.addPaginatedProducts(moreProducts);
             }));
+
+            // this.productsDesktop$.push(this.productService.getLimitedProductsAfterStart());
+            // this.productsDesktop$.forEach(products$ => {
+            //     this.subscription.add(products$.subscribe(moreProducts => {
+            //         console.log(moreProducts);
+            //     }));
+            // });
         } else {
             this.productsMobile$.push(this.productService.getLimitedProductsAfterStart());
         }
@@ -50,6 +61,10 @@ export class ProductsPage implements OnInit, OnDestroy {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        console.log(changes);
     }
 
     /**
@@ -118,6 +133,17 @@ export class ProductsPage implements OnInit, OnDestroy {
                     this.addPaginatedProducts(moreProducts);
                     event.target.complete();
                 }));
+
+                // this.productsDesktop$.push(this.productService.getLimitedProductsAfterLastDoc());
+                // event.target.complete();
+
+                // this.productsDesktop$.push(this.productService.getLimitedProductsAfterLastDoc());
+                // this.productsDesktop$.forEach(products$ => {
+                //     this.subscription.add(products$.subscribe(moreProducts => {
+                //         console.log(moreProducts);
+                //         event.target.complete();
+                //     }));
+                // });
             }
         }
     }

@@ -116,12 +116,13 @@
 
                     <!--  Submit Button  -->
                     <ion-button
+                            *ngIf="!isDetailed"
                             [disabled]="!validationForm.valid"
                             class="ion-margin-top"
                             (click)="submitHandler()"
                             type="submit"
                             expand="block"
-                            *ngIf="!isDetailed"
+                            #submitButton
                     >
                         Submit
                     </ion-button>

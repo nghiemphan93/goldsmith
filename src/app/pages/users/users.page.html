@@ -82,7 +82,7 @@
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        (click)="presentDeleteConfirm(row)"
+                        (click)="alertService.presentDeleteConfirm(row)"
                         color="danger"
                         [disabled]="row.customClaims.DEV === true && (currentUser$ | async)?.customClaims?.DEV === undefined"
                 >
@@ -167,7 +167,7 @@
                             </ion-button>
 
                             <ion-button
-                                    (click)="presentDeleteConfirm(user)"
+                                    (click)="alertService.presentDeleteConfirm(user)"
                                     color="danger"
                                     slot="end"
                             >

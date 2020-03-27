@@ -136,7 +136,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             order: new FormControl(Validators.required),
             orderItemCode: new FormControl('', Validators.required),
             orderItemStatus: new FormControl(this.statuses[0]), // PENDING
-            customer: new FormControl(Validators.required),
+            customer: new FormControl('', Validators.required),
             product: new FormControl('', Validators.required),
             orderItemComment: new FormControl(''),
             orderItemFont: new FormControl(this.fontNames[4]),  // Font Arial

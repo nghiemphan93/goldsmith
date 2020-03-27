@@ -39,6 +39,7 @@ export class AuthService {
                 this.isAuthSubject.next(true);
                 console.log('user logged in: ' + this.user.email);
                 console.log(this.user);
+                console.log(idTokenResult);
             } else {
                 this.user = null;
                 this.userSubject.next(this.user);

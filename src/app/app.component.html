@@ -39,15 +39,6 @@
 
                         <ion-item
                                 [routerDirection]="'root'"
-                                routerLink="/signup"
-                                *ngIf="(user$ | async) && (user$ | async).customClaims.DEV"
-                        >
-                            <ion-icon slot="start" name="person-add-outline"></ion-icon>
-                            <ion-label>Sign Up</ion-label>
-                        </ion-item>
-
-                        <ion-item
-                                [routerDirection]="'root'"
                                 routerLink="/users"
                                 *ngIf="(user$ | async) && ((user$ | async).customClaims.DEV || (user$ | async).customClaims.ADMIN)"
                         >

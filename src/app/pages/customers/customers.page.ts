@@ -1,10 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
+import {concat, merge, Observable, Subscription} from 'rxjs';
 import {AlertController, Config, Platform} from '@ionic/angular';
 import {Customer} from '../../models/customer';
 import {CustomerService} from '../../services/customer.service';
 import {Router} from '@angular/router';
 import {take} from 'rxjs/operators';
+import {AlertService} from '../../services/alert.service';
 
 @Component({
     selector: 'app-customers',
@@ -15,6 +16,7 @@ export class CustomersPage implements OnInit, OnDestroy {
     subscription: Subscription = new Subscription();
     customersMobile$: Observable<Customer[]>[] = [];
     customersDesktop$: Observable<Customer[]>[] = [];
+    customers$: Observable<Customer[]>;
     customers: Customer[] = [];
     tableStyle = 'material';
     isDesktop: boolean;
@@ -24,13 +26,16 @@ export class CustomersPage implements OnInit, OnDestroy {
     constructor(private customerService: CustomerService,
                 private config: Config,
                 private platform: Platform,
-                private alertController: AlertController
+                private alertController: AlertController,
+                public alertService: AlertService
     ) {
     }
 
     ngOnInit() {
         this.preparePlatform();
         if (this.isDesktop) {
+            // this.customersDesktop$.push(this.customerService.getLimitedCustomersAfterStart());
+
             this.customersDesktop$.push(this.customerService.getLimitedCustomersAfterStart());
             this.subscription.add(this.customersDesktop$[0].subscribe(moreCustomers => {
                 this.addPaginatedCustomers(moreCustomers);
@@ -114,6 +119,9 @@ export class CustomersPage implements OnInit, OnDestroy {
                     this.addPaginatedCustomers(moreCustomers);
                     event.target.complete();
                 }));
+
+                // this.customersDesktop$.push(this.customerService.getLimitedCustomersAfterLastDoc());
+                // event.target.complete();
             }
         }
     }
@@ -127,15 +135,11 @@ export class CustomersPage implements OnInit, OnDestroy {
             const customerIndex = this.customers.findIndex(customer => customer.id === moreCustomers[0].id);
             if (customerIndex >= 0) {
                 console.log('edited customer from block: ' + customerIndex);
-            } else {
-                console.log('loaded more customers');
-            }
-
-            if (customerIndex >= 0) {
                 const customers = [...this.customers];
                 customers.splice(customerIndex, moreCustomers.length, ...moreCustomers);
                 this.customers = customers;
             } else {
+                console.log('loaded more customers');
                 let customers = [...this.customers];
                 customers = [...customers, ...moreCustomers];
                 this.customers = [...customers];

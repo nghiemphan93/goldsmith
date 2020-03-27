@@ -7,7 +7,7 @@
     </ion-toolbar>
 </ion-header>
 
-<!--  Main Table Content for Desktop  -->
+<!--Main Table Content for Desktop-->
 <ion-content *ngIf="isDesktop && (productsDesktop$[0] | async)">
     <ion-item-group class="ion-margin">
         <ion-button routerLink="/products/create">
@@ -26,6 +26,26 @@
             [footerHeight]="50"
             class="ion-text-wrap"
     >
+
+        <!--<ion-content *ngIf="isDesktop && (productsDesktop$[0] | async)">-->
+        <!--    <ion-item-group class="ion-margin">-->
+        <!--        <ion-button routerLink="/products/create">-->
+        <!--            <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>-->
+        <!--            <p>Create New Product</p>-->
+        <!--        </ion-button>-->
+        <!--    </ion-item-group>-->
+
+        <!--    <ng-container *ngFor="let prod of productsDesktop$">-->
+        <!--        <ngx-datatable-->
+
+        <!--                [rows]="prod | async"-->
+        <!--                [rowHeight]="'auto'"-->
+        <!--                [headerHeight]="50"-->
+        <!--                [ngClass]="tableStyle"-->
+        <!--                [columnMode]="'force'"-->
+        <!--                [footerHeight]="50"-->
+        <!--                class="ion-text-wrap"-->
+        <!--        >-->
         <!--    Image    -->
         <ngx-datatable-column name="Image">
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
@@ -94,6 +114,7 @@
             </ng-template>
         </ngx-datatable-column>
     </ngx-datatable>
+    <!--    </ng-container>-->
 
     <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
         <ion-infinite-scroll-content
