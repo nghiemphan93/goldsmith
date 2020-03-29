@@ -1,4 +1,4 @@
-import {Component, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
+import {Component, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {ProductService} from '../../services/product.service';
 import {AngularFireUploadTask} from '@angular/fire/storage';
 import {forkJoin, Observable, of, pipe, range, Subscription} from 'rxjs';
@@ -7,47 +7,50 @@ import {Product} from '../../models/product';
 import {AlertController, Config, Platform} from '@ionic/angular';
 import {ImageUploadService} from '../../services/image-upload.service';
 import {AlertService} from '../../services/alert.service';
+import {ProductCacheService} from '../../services/product-cache.service';
+import {DatatableComponent} from '@swimlane/ngx-datatable';
+import {ToastService} from '../../services/toast.service';
 
 @Component({
     selector: 'app-products',
     templateUrl: './products.page.html',
     styleUrls: ['./products.page.scss'],
 })
-export class ProductsPage implements OnInit, OnDestroy, OnChanges {
+export class ProductsPage implements OnInit, OnDestroy {
     subscription = new Subscription();
-    productsDesktop$: Observable<Product[]>[] = [];
+    productsDesktop$: Observable<Product[]>;
     productsMobile$: Observable<Product[]>[] = [];
     products: Product[] = [];
     tableStyle = 'material';
     isDesktop: boolean;
     isMobile: boolean;
     skeletons = [1, 2];
+    @ViewChild('table') table: DatatableComponent;
 
     constructor(private productService: ProductService,
                 private imageUploadService: ImageUploadService,
                 private config: Config,
                 private platform: Platform,
                 private alertController: AlertController,
-                public alertService: AlertService
+                public alertService: AlertService,
+                private productCacheService: ProductCacheService,
+                private toastService: ToastService,
     ) {
     }
 
     ngOnInit() {
         this.preparePlatform();
+        setTimeout(async () => {
+            if (this.table.rowCount === 0) {
+                this.table.rowCount = -1;
+                await this.toastService.presentToastError('No data or Network error. Please add more data or refresh the page');
+            }
+        }, 4000);
+    }
+
+    ionViewDidEnter() {
         if (this.isDesktop) {
-            // this.productsDesktop$.push(this.productService.getLimitedProductsAfterStart());
-
-            this.productsDesktop$.push(this.productService.getLimitedProductsAfterStart());
-            this.subscription.add(this.productsDesktop$[0].subscribe(moreProducts => {
-                this.addPaginatedProducts(moreProducts);
-            }));
-
-            // this.productsDesktop$.push(this.productService.getLimitedProductsAfterStart());
-            // this.productsDesktop$.forEach(products$ => {
-            //     this.subscription.add(products$.subscribe(moreProducts => {
-            //         console.log(moreProducts);
-            //     }));
-            // });
+            this.productsDesktop$ = this.productCacheService.getProductsCache$();
         } else {
             this.productsMobile$.push(this.productService.getLimitedProductsAfterStart());
         }
@@ -61,10 +64,6 @@ export class ProductsPage implements OnInit, OnDestroy, OnChanges {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
-    }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        console.log(changes);
     }
 
     /**
@@ -128,11 +127,11 @@ export class ProductsPage implements OnInit, OnDestroy, OnChanges {
                 this.productsMobile$.push(this.productService.getLimitedProductsAfterLastDoc());
                 event.target.complete();
             } else {
-                this.productsDesktop$.push(this.productService.getLimitedProductsAfterLastDoc());
-                this.subscription.add(this.productsDesktop$[this.productsDesktop$.length - 1].subscribe(moreProducts => {
-                    this.addPaginatedProducts(moreProducts);
-                    event.target.complete();
-                }));
+                // this.productsDesktop$.push(this.productService.getLimitedProductsAfterLastDoc());
+                // this.subscription.add(this.productsDesktop$[this.productsDesktop$.length - 1].subscribe(moreProducts => {
+                //     this.addPaginatedProducts(moreProducts);
+                //     event.target.complete();
+                // }));
 
                 // this.productsDesktop$.push(this.productService.getLimitedProductsAfterLastDoc());
                 // event.target.complete();

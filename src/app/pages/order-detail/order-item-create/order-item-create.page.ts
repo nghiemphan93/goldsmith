@@ -19,6 +19,7 @@ import {StatusService} from '../../../services/status.service';
 import {CustomerCacheService} from '../../../services/customer-cache.service';
 import {ProductCacheService} from '../../../services/product-cache.service';
 import {ToastService} from '../../../services/toast.service';
+import {IonButton} from '@ionic/angular';
 
 
 @Component({
@@ -32,6 +33,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     validationForm: FormGroup;
     orderId: string;
     order$: Observable<Order>;
+    order: Order;
     customers$: Observable<Customer[]>;
     products$: Observable<Product[]>;
     oldImageUrl: string;
@@ -60,9 +62,9 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     ) {
     }
 
-    ngOnInit() {
+    async ngOnInit() {
         this.prepareAttributes();
-        this.preparePageContent();
+        await this.preparePageContent();
     }
 
     ngOnDestroy(): void {
@@ -90,7 +92,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
      * Identify what purpose of the page should be.
      * Create, Edit or Showing Detail of an Order Item
      */
-    preparePageContent() {
+    async preparePageContent() {
         const orderId = this.activatedRoute.snapshot.params.orderId;
         const orderItemId = this.activatedRoute.snapshot.params.orderItemId;
         const url = this.router.url.split('/');
@@ -100,8 +102,17 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
         switch (url[url.length - 1]) {
             case 'create':
                 this.isCreated = true;
-                this.orderItem = new OrderItem();
-                this.prepareFormValidationCreate();
+                try {
+                    this.order$.subscribe(orderFromServer => {
+                        this.order = orderFromServer;
+                        this.orderItem = new OrderItem();
+                        this.prepareFormValidationCreate();
+                    });
+                } catch (e) {
+                    console.log(e);
+                    await this.toastService.presentToastError(e.message);
+                }
+
                 break;
             case 'edit':
                 try {
@@ -133,9 +144,9 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
      */
     prepareFormValidationCreate() {
         this.validationForm = this.formBuilder.group({
-            order: new FormControl(Validators.required),
+            order: new FormControl(this.order, Validators.required),
             orderItemCode: new FormControl('', Validators.required),
-            orderItemStatus: new FormControl(this.statuses[0]), // PENDING
+            orderItemStatus: new FormControl(Status.PENDING), // PENDING
             customer: new FormControl('', Validators.required),
             product: new FormControl('', Validators.required),
             orderItemComment: new FormControl(''),
@@ -242,29 +253,32 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     /**
      * Handler Submit button
      */
-    async submitHandler() {
-        this.transferDataFromFormToObject();
+    async submitHandler(submitButton: IonButton) {
+        submitButton.disabled = true;
 
+        this.transferDataFromFormToObject();
         try {
             if (this.isCreated) {
                 this.orderItem.createdAt = new Date();
-                await this.orderItemService.createOrderItem(this.orderId, this.orderItem);
+                const result = await this.orderItemService.createOrderItem(this.orderId, this.orderItem);
+                this.orderItem.id = result.id;
                 await this.toastService.presentToastSuccess(`Successfully created Order Item ${this.orderItem.orderItemCode}`);
             } else {
                 await this.orderItemService.updateOrderItem(this.orderId, this.orderItem);
                 await this.toastService.presentToastSuccess(`Successfully updated Order Item ${this.orderItem.orderItemCode}`);
             }
             this.validationForm.reset({
-                orderItemStatus: this.statuses[0],  // PENDING
+                orderItemStatus: Status.PENDING,  // PENDING
                 orderItemFont: this.fontNames[4],   // ARIAL
                 orderItemQuantity: 1,               // 1
-                orderItemColor: this.colors[0]      // SILVER
+                orderItemColor: Color.SILVER      // SILVER
             });
-            await this.router.navigate(['orders', this.orderId, 'orderItems']);
+            await this.router.navigate(['orders', this.orderId, 'orderItems', this.orderItem.id]);
             window.dispatchEvent(new Event('resize'));
         } catch (e) {
             console.log(e);
             await this.toastService.presentToastError(e.message);
+            submitButton.disabled = false;
         }
     }
 

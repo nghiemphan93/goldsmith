@@ -52,16 +52,13 @@ export class AlertService {
     }
 
     private async deleteObjectHelper(toDeleteObject: OrderItem | Order | Customer | Product | User) {
-        console.log('inside');
-        console.log(toDeleteObject);
         try {
             if (toDeleteObject.hasOwnProperty('orderItemCode')) {
-                console.log('clgt');
                 const toDeleteOrderItem = toDeleteObject as OrderItem;
-                await this.orderItemService.deleteOrderItem(toDeleteOrderItem.order.id, toDeleteOrderItem);
+                const result = await this.orderItemService.deleteOrderItem(toDeleteOrderItem.order.id, toDeleteOrderItem);
                 await this.toastService.presentToastSuccess(`Successfully deleted Order Item ${toDeleteOrderItem.orderItemCode} from Order ${toDeleteOrderItem.order.orderCode}`);
             }
-            if (toDeleteObject instanceof Order) {
+            if (toDeleteObject.hasOwnProperty('orderCode')) {
                 const toDeleteOrder = toDeleteObject as Order;
                 await this.orderService.deleteOrder(toDeleteOrder);
                 await this.toastService.presentToastSuccess(`Successfully deleted Order ${toDeleteOrder.orderCode}`);
@@ -71,7 +68,7 @@ export class AlertService {
                 await this.customerService.deleteCustomer(toDeleteCustomer);
                 await this.toastService.presentToastSuccess(`Successfully deleted Customer ${toDeleteCustomer.firstName} ${toDeleteCustomer.lastName}`);
             }
-            if (toDeleteObject instanceof Product) {
+            if (toDeleteObject.hasOwnProperty('productName')) {
                 const toDeleteProduct = toDeleteObject as Product;
                 await this.productService.deleteProduct(toDeleteProduct);
                 await this.toastService.presentToastSuccess(`Successfully deleted Product ${toDeleteProduct.productName}`);

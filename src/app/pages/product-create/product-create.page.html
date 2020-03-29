@@ -34,9 +34,10 @@
 
                 <!--        Reactive Form        -->
                 <form
-                        [formGroup]="validationForm"
-                        *ngIf="product"
-                        (keydown.enter)="validationForm.valid ? submitHandler(submitButton) : null"
+                    #form
+                    [formGroup]="validationForm"
+                    *ngIf="product"
+                    (keydown.enter)="!submitButton.disabled ? submitHandler(submitButton) : null"
                 >
                     <ion-item-divider>
                         <ion-label *ngIf="isDetailed">Please fill in information for the product</ion-label>
@@ -118,15 +119,7 @@
                     <!--  Submit Button  -->
                     <ng-container>
                         <ion-button
-                                [disabled]="!validationForm.valid"
-                                [hidden]="true"
-                                #submitButton
-                        >
-                            Submit
-                        </ion-button>
-
-                        <ion-button
-                                *ngIf="!isDetailed"
+                                [hidden]="isDetailed"
                                 [disabled]="!validationForm.valid"
                                 class="ion-margin-top"
                                 (click)="submitHandler(submitButton)"

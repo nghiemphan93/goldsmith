@@ -38,7 +38,7 @@ export class UserCreatePage implements OnInit, OnDestroy {
                 private activatedRoute: ActivatedRoute,
                 public claimService: ClaimService,
                 private userService: UserService,
-                private toastService: ToastService
+                private toastService: ToastService,
     ) {
     }
 

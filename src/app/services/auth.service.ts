@@ -33,13 +33,10 @@ export class AuthService {
             if (user) {
                 this.user = user;
                 const idTokenResult = await this.user.getIdTokenResult();
-                // @ts-ignore
                 this.user.customClaims = idTokenResult.claims;
                 this.userSubject.next(this.user);
                 this.isAuthSubject.next(true);
                 console.log('user logged in: ' + this.user.email);
-                console.log(this.user);
-                console.log(idTokenResult);
             } else {
                 this.user = null;
                 this.userSubject.next(this.user);

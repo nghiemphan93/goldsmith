@@ -58,7 +58,10 @@
                     </ion-item-group>
 
                     <ion-item-divider class="ion-margin-top">
-                        <ion-label>Tips: Double click to each cell of Comment or Status to Edit</ion-label>
+                        <ion-label>Tips: <br>
+                            <p>Double click each cell of Comment or Status to Edit</p>
+                            <p>Click Column's Header to sort</p>
+                        </ion-label>
                     </ion-item-divider>
                 </form>
             </ion-col>
@@ -68,7 +71,6 @@
 
     <section *ngIf="isDesktop">
         <ngx-datatable
-                *ngIf="isDesktop"
                 [rows]="orderItemsPaginated"
                 [rowHeight]="'auto'"
                 [headerHeight]="50"
@@ -77,7 +79,43 @@
                 [footerHeight]="50"
                 class="ion-text-wrap"
                 style="overflow: hidden"
+                #table
         >
+            <!-- Status -->
+            <ngx-datatable-column
+                    name="Status"
+                    prop="orderItemStatus"
+            >
+                <ng-template let-row="row" let-value="value" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                    <span
+                            *ngIf="!editingOrderItem[rowIndex + '-orderItemStatus']"
+                            title="Double Click to edit"
+                            (dblclick)="editingOrderItem[rowIndex + '-orderItemStatus'] = true"
+                    >
+                        {{ row.orderItemStatus }}
+                    </span>
+
+                    <ion-select
+                            [interfaceOptions]="customActionSheetOptions"
+                            interface="action-sheet"
+                            *ngIf="editingOrderItem[rowIndex + '-orderItemStatus']"
+                            (mouseenter)="startEditingInputSelect(orderItemStatus)"
+                            [value]="row.orderItemStatus"
+                            #orderItemStatus
+                            (ionChange)="updateOrderItem($event, 'orderItemStatus', rowIndex, row)"
+                            (ionCancel)="editingOrderItem[rowIndex + '-orderItemStatus'] = false"
+                    >
+                        <ion-select-option
+                                *ngFor="let status of statuses"
+                                [value]="status"
+                                #selectOption
+                        >
+                            {{ status }}
+                        </ion-select-option>
+                    </ion-select>
+                </ng-template>
+            </ngx-datatable-column>
+
             <!--    Comment    -->
             <ngx-datatable-column
                     name="Comment"
@@ -99,24 +137,12 @@
                     <input
                             *ngIf="editingOrderItem[rowIndex + '-orderItemComment']"
                             type="text"
-                            (blur)="updateOrderItem($event, 'orderItemComment', rowIndex)"
+                            (blur)="updateOrderItem($event,'orderItemComment',rowIndex,row)"
                             [value]="value"
                             (mouseenter)="startEditingInputText(orderItemCommentInput)"
-                            (keyup.enter)="updateOrderItem($event, 'orderItemComment', rowIndex)"
+                            (keyup.enter)="updateOrderItem($event,'orderItemComment',rowIndex,row)"
                             #orderItemCommentInput
                     >
-
-                    <!--                    <ion-textarea-->
-                    <!--                            *ngIf="editingOrderItem[rowIndex + '-orderItemComment']"-->
-                    <!--                            type="text"-->
-                    <!--                            (ionBlur)="updateOrderItem($event, 'orderItemComment', rowIndex)"-->
-                    <!--                            [value]="value"-->
-                    <!--                            (mouseenter)="startEditingIonInputText(orderItemCommentInput)"-->
-                    <!--                            (keyup.enter)="updateOrderItem($event, 'orderItemComment', rowIndex)"-->
-                    <!--                            #orderItemCommentInput-->
-                    <!--                            style="background-color: white; height: 100%"-->
-                    <!--                            class="ion-no-margin ion-no-padding"-->
-                    <!--                    ></ion-textarea>-->
                 </ng-template>
             </ngx-datatable-column>
 
@@ -215,41 +241,6 @@
                         {{ row.orderItemColor }} <br>
                 Ring Size: {{ row.orderItemRingSizeUS }} US
                 </span>
-                </ng-template>
-            </ngx-datatable-column>
-
-            <!-- Status -->
-            <ngx-datatable-column
-                    name="Status"
-                    prop="orderItemStatus"
-            >
-                <ng-template let-row="row" let-value="value" let-rowIndex="rowIndex" ngx-datatable-cell-template>
-                    <span
-                            *ngIf="!editingOrderItem[rowIndex + '-orderItemStatus']"
-                            title="Double Click to edit"
-                            (dblclick)="editingOrderItem[rowIndex + '-orderItemStatus'] = true"
-                    >
-                        {{ row.orderItemStatus }}
-                    </span>
-
-                    <ion-select
-                            [interfaceOptions]="customActionSheetOptions"
-                            interface="action-sheet"
-                            *ngIf="editingOrderItem[rowIndex + '-orderItemStatus']"
-                            (mouseenter)="startEditingInputSelect(orderItemStatus)"
-                            [value]="row.orderItemStatus"
-                            #orderItemStatus
-                            (ionChange)="updateOrderItem($event, 'orderItemStatus', rowIndex)"
-                            (ionCancel)="editingOrderItem[rowIndex + '-orderItemStatus'] = false"
-                    >
-                        <ion-select-option
-                                *ngFor="let status of statuses"
-                                [value]="status"
-                                #selectOption
-                        >
-                            {{ status }}
-                        </ion-select-option>
-                    </ion-select>
                 </ng-template>
             </ngx-datatable-column>
         </ngx-datatable>

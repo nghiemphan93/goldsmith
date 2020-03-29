@@ -8,7 +8,7 @@
 </ion-header>
 
 <!--Main Table Content for Desktop-->
-<ion-content *ngIf="isDesktop && (productsDesktop$[0] | async)">
+<ion-content *ngIf="isDesktop">
     <ion-item-group class="ion-margin">
         <ion-button routerLink="/products/create">
             <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
@@ -17,35 +17,15 @@
     </ion-item-group>
 
     <ngx-datatable
-            *ngIf="(productsDesktop$[0] | async) && isDesktop"
-            [rows]="products"
-            [rowHeight]="'auto'"
-            [headerHeight]="50"
-            [ngClass]="tableStyle"
-            [columnMode]="'force'"
-            [footerHeight]="50"
-            class="ion-text-wrap"
+        #table
+        [rows]="productsDesktop$ | async"
+        [rowHeight]="'auto'"
+        [headerHeight]="50"
+        [ngClass]="tableStyle"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        class="ion-text-wrap"
     >
-
-        <!--<ion-content *ngIf="isDesktop && (productsDesktop$[0] | async)">-->
-        <!--    <ion-item-group class="ion-margin">-->
-        <!--        <ion-button routerLink="/products/create">-->
-        <!--            <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>-->
-        <!--            <p>Create New Product</p>-->
-        <!--        </ion-button>-->
-        <!--    </ion-item-group>-->
-
-        <!--    <ng-container *ngFor="let prod of productsDesktop$">-->
-        <!--        <ngx-datatable-->
-
-        <!--                [rows]="prod | async"-->
-        <!--                [rowHeight]="'auto'"-->
-        <!--                [headerHeight]="50"-->
-        <!--                [ngClass]="tableStyle"-->
-        <!--                [columnMode]="'force'"-->
-        <!--                [footerHeight]="50"-->
-        <!--                class="ion-text-wrap"-->
-        <!--        >-->
         <!--    Image    -->
         <ngx-datatable-column name="Image">
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
@@ -73,7 +53,7 @@
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        color="secondary"
+                        color="dark"
                         [routerLink]="['/products', row.id]"
                 >
                     Details
@@ -89,7 +69,7 @@
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        color="tertiary"
+                        color="dark"
                         [routerLink]="['/products', row.id, 'edit']"
                 >
                     Edit
@@ -105,10 +85,10 @@
             <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <ion-button
                         size="small"
-                        (click)="presentDeleteConfirm(row)"
+                        (click)="alertService.presentDeleteConfirm(row)"
                         color="danger"
                 >
-                    <ion-icon name="trash-bin-outline"></ion-icon>
+                    <ion-icon name="trash-outline"></ion-icon>
                     Delete
                 </ion-button>
             </ng-template>
@@ -116,21 +96,17 @@
     </ngx-datatable>
     <!--    </ng-container>-->
 
-    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
-        <ion-infinite-scroll-content
-                loadingSpinner="bubbles"
-                loadingText="Loading more data...">
-        </ion-infinite-scroll-content>
-    </ion-infinite-scroll>
+    <ion-col
+            *ngIf="table.rowCount === 0"
+            size="6"
+            offset="5"
+    >
+        <ion-spinner class="spinner-loading"></ion-spinner>
+    </ion-col>
 </ion-content>
 
-<!--&lt;!&ndash;Cards&ndash;&gt;-->
-<!--&lt;!&ndash;<ion-content&ndash;&gt;-->
-<!--&lt;!&ndash;        *ngIf="isMobile && (products | async)"&ndash;&gt;-->
-<!--&lt;!&ndash;        scrollEvents="true"&ndash;&gt;-->
-<!--&lt;!&ndash;        [header]="header"&ndash;&gt;-->
-<!--&lt;!&ndash;        appHideHeader&ndash;&gt;-->
-<!--&lt;!&ndash;&gt;&ndash;&gt;-->
+
+<!-- Cards Mobile -->
 <ion-content
         *ngIf="isMobile && (productsMobile$[0] | async)"
 >
@@ -230,7 +206,7 @@
 </ion-content>
 
 <!-- Skeleton screen -->
-<ion-content *ngIf="!(productsMobile$[0] | async) && !(productsDesktop$[0] | async)">
+<ion-content *ngIf="isMobile && !(productsMobile$[0] | async)">
     <ion-card *ngFor="let skeleton of skeletons">
         <ion-card-header>
             <ion-card-subtitle>

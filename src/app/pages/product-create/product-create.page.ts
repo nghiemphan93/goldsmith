@@ -139,7 +139,7 @@ export class ProductCreatePage implements OnInit, OnDestroy {
     async submitHandler(submitButton: IonButton) {
         submitButton.disabled = true;
 
-        this.product.productName = this.validationForm.value.productName;
+        this.product.productName = this.toTitleCase(this.validationForm.value.productName);
         this.product.productType = this.validationForm.value.productType;
         this.product.cutOrEngraved = this.validationForm.value.cutOrEngraved;
 
@@ -165,6 +165,20 @@ export class ProductCreatePage implements OnInit, OnDestroy {
         } catch (e) {
             console.log(e);
             await this.toastService.presentToastError(e.message);
+            submitButton.disabled = false;
         }
+    }
+
+    /**
+     * Helper function to transform a string to title case
+     * @param s: any string
+     */
+    toTitleCase(s: string) {
+        if (typeof s !== 'string') {
+            return '';
+        }
+        return s.toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
 }

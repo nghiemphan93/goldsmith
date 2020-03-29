@@ -8,7 +8,7 @@ export class OrderItem {
     id: string;
 
     order: Order;
-    customer: Customer;
+    customer: string;
     product: Product;
 
     orderItemComment: string;

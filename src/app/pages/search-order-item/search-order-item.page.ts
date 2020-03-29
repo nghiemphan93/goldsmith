@@ -18,6 +18,7 @@ import {ToastService} from '../../services/toast.service';
 import {AlertService} from '../../services/alert.service';
 import {StatusService} from '../../services/status.service';
 import {OrderCacheService} from '../../services/order-cache.service';
+import {DatatableComponent} from '@swimlane/ngx-datatable';
 
 @Component({
     selector: 'app-search-order-item',
@@ -51,6 +52,7 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
 
     @ViewChild('searchInput') searchInput: IonInput;
     @ViewChild('orderItemCommentInput') orderItemCommentInput: ElementRef;
+    @ViewChild('table') table: DatatableComponent;
     toSearchText = '';
 
     customActionSheetOptions: any = {
@@ -110,6 +112,27 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
     onSelectOrder() {
         const selectedOrders = this.validationForm.value.orders;
         this.orderItemCacheService.setSelectedOrders(selectedOrders);
+
+        // this.orderItemCacheService.getAllOrderItemsCache$().subscribe(orderItems => {
+        //     orderItems.forEach(async orderItem => {
+        //         const customer: any = orderItem.customer;
+        //         const customerDetail = `${customer.firstName} ${customer.lastName}\n${customer.number} ${customer.street} \n${customer.city}, ${customer.state} ${customer.postal} \n${customer.country}`;
+        //
+        //         // console.log(customerDetail);
+        //         // @ts-ignore
+        //         orderItem.customer = customerDetail;
+        //         console.log(orderItem);
+        //
+        //         // try {
+        //         //     await this.orderItemService.updateOrderItem(orderItem.order.id, orderItem);
+        //         //     await this.toastService.presentToastSuccess('Updated Order Item successfully...');
+        //         // } catch (e) {
+        //         //     console.log(e);
+        //         //     await this.toastService.presentToastError(e.message);
+        //         // }
+        //
+        //     });
+        // });
 
         this.orderItemCacheService.getAllOrderItemsCache$().subscribe(moreOrderItems => {
             this.addMoreOrderItems(moreOrderItems);
@@ -197,12 +220,10 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
         }
     }
 
-    async updateOrderItem(event: Event, attributeName: string, rowIndex) {
+    async updateOrderItem(event: Event, attributeName: string, rowIndex: number, toUpdateOrderItem: OrderItem) {
         this.editingOrderItem[rowIndex + '-' + attributeName] = false;
-        const toUpdateOrderItem: OrderItem = _.cloneDeep(this.orderItemsPaginated[rowIndex]);
         if (toUpdateOrderItem[attributeName] !== event.target.value) {
             toUpdateOrderItem[attributeName] = event.target.value;
-            console.log(toUpdateOrderItem);
             try {
                 const updateResult = await this.orderItemService.updateOrderItem(toUpdateOrderItem.order.id, toUpdateOrderItem);
                 await this.toastService.presentToastSuccess(`Successfully updated Order Item ${toUpdateOrderItem.orderItemCode} from Order ${toUpdateOrderItem.order.orderCode}`);
@@ -215,10 +236,6 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
 
     startEditingInputText(inputElement: HTMLInputElement | HTMLTextAreaElement) {
         inputElement.focus();
-    }
-
-    async startEditingIonInputText(inputElement: IonInput | IonTextarea) {
-        await inputElement.setFocus();
     }
 
     async startEditingInputSelect(selectElement: IonSelect) {
@@ -249,13 +266,10 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
     }
 
     getColorClassCell({row, column, value}) {
-
         const className = row.orderItemColor.replace(/\s/g, '');
-
         const colorClass = {};
         colorClass[className] = true;
         return colorClass;
-
     }
 
     /**
