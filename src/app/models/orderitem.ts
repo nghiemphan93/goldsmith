@@ -11,18 +11,22 @@ export class OrderItem {
     customer: string;
     product: Product;
 
+    orderItemStatus: Status;
     orderItemComment: string;
-    orderItemCode: string;
-    orderItemWord: string;
-    orderItemImageUrl: string;
-    orderItemQuantity: number;
     orderItemFont: string;
+    orderItemWord: string;
+    orderItemWords: string[];
+    orderItemFonts: string[];
+    orderItemCode: string;
+    orderItemImageUrl: string;
+    orderItemImageUrls: string[];
+    orderItemQuantity: number;
     orderItemColor: Color;
     orderItemRingSizeUS: number;
     orderItemRingSizeVN: number;
     orderItemLengthInch: number;
     orderItemLengthCm: number;
-    orderItemStatus: Status;
+
 
     createdAt: Date;
 }

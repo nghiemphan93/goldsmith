@@ -1,4 +1,5 @@
 export enum Status {
+    RESERVED = 'RESERVED',
     PENDING = 'PENDING',
     DESIGNED = 'DESIGNED',
     LABELED = 'LABELED',

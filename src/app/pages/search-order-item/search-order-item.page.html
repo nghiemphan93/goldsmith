@@ -339,13 +339,7 @@
                                     <ion-item>
                                         <ion-label color="primary">Customer</ion-label>
                                         <ion-label slot="end">
-                                            <ion-button
-                                                    size=""
-                                                    [routerLink]="['/customers', orderItem.customer.id]"
-                                            >
-                                                {{ orderItem.customer.firstName }} <br>
-                                                {{ orderItem.customer.lastName }} <br>
-                                            </ion-button>
+                                            {{ orderItem.customer }}
                                         </ion-label>
                                     </ion-item>
 

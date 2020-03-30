@@ -78,7 +78,7 @@
                                     [compareWith]="compareWithFn"
                             >
                                 <ion-select-option [value]="orderItem.order">
-                                    {{ orderItem.order.orderCode }}
+                                    {{ orderItem?.order?.orderCode }}
                                 </ion-select-option>
                             </ion-select>
 
@@ -202,28 +202,6 @@
                         </ion-item>
                     </ion-item-group>
 
-                    <!--    Font   -->
-                    <ion-item-group>
-                        <ion-item>
-                            <ion-label>Font</ion-label>
-                            <ion-select
-                                    interface="action-sheet"
-                                    formControlName="orderItemFont"
-                                    *ngIf="!isDetailed"
-                            >
-                                <ion-select-option
-                                        *ngFor="let font of fontNames"
-                                        [value]="font"
-                                >{{ font }}</ion-select-option>
-                            </ion-select>
-
-                            <ion-label
-                                    *ngIf="isDetailed"
-                            >{{ orderItem.orderItemFont }}
-                            </ion-label>
-                        </ion-item>
-                    </ion-item-group>
-
                     <!--    Word   -->
                     <ion-item-group>
                         <ion-item>
@@ -246,6 +224,29 @@
                             </ion-input>
                         </ion-item>
                     </ion-item-group>
+
+                    <!--    Font   -->
+                    <ion-item-group>
+                        <ion-item>
+                            <ion-label>Font</ion-label>
+                            <ion-select
+                                    interface="action-sheet"
+                                    formControlName="orderItemFont"
+                                    *ngIf="!isDetailed"
+                            >
+                                <ion-select-option
+                                        *ngFor="let font of fontNames"
+                                        [value]="font"
+                                >{{ font }}</ion-select-option>
+                            </ion-select>
+
+                            <ion-label
+                                    *ngIf="isDetailed"
+                            >{{ orderItem.orderItemFont }}
+                            </ion-label>
+                        </ion-item>
+                    </ion-item-group>
+
 
                     <!--    Quantity   -->
                     <ion-item-group>

@@ -25,11 +25,6 @@ export class AppComponent implements OnDestroy {
             icon: 'pricetag-outline'
         },
         {
-            title: 'Customers',
-            url: '/customers',
-            icon: 'people-outline'
-        },
-        {
             title: 'Orders',
             url: '/orders',
             icon: 'receipt-outline'

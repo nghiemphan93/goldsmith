@@ -52,6 +52,7 @@
         [footerHeight]="50"
         class="ion-text-wrap"
         style="overflow: hidden"
+        [rowClass]="getRowClass"
     >
         <!-- Status -->
         <ngx-datatable-column
@@ -203,6 +204,17 @@
                     {{ row.orderItemColor }} <br>
                 Ring Size: {{ row.orderItemRingSizeUS }} US
                 </span>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <!--    Customer    -->
+        <ngx-datatable-column
+                name="Customer"
+                prop="customer"
+                *ngIf="!(user$ | async).customClaims.DESIGNER"
+        >
+            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <span>{{ row.customer }}</span>
             </ng-template>
         </ngx-datatable-column>
 

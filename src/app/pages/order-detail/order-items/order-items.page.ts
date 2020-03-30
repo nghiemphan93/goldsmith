@@ -18,6 +18,7 @@ import {ToastService} from '../../../services/toast.service';
 import {StatusService} from '../../../services/status.service';
 import {DatatableComponent} from '@swimlane/ngx-datatable';
 import {AuthService} from '../../../services/auth.service';
+import {Status} from '../../../models/status.enum';
 
 
 @Component({
@@ -266,5 +267,12 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
         const fontClass = {};
         fontClass[className] = true;
         return fontClass;
+    }
+
+    getRowClass(row: OrderItem) {
+        const statusName = row.orderItemStatus;
+        const statusClass = {};
+        statusClass[statusName] = true;
+        return statusClass;
     }
 }
