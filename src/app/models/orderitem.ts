@@ -15,11 +15,11 @@ export class OrderItem {
     orderItemComment: string;
     orderItemFont: string;
     orderItemWord: string;
-    orderItemWords: string[];
-    orderItemFonts: string[];
+    orderItemWords: string[] = [];
+    orderItemFonts: string[] = [];
     orderItemCode: string;
     orderItemImageUrl: string;
-    orderItemImageUrls: string[];
+    orderItemImageUrls: string[] = [];
     orderItemQuantity: number;
     orderItemColor: Color;
     orderItemRingSizeUS: number;

@@ -113,27 +113,6 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
         const selectedOrders = this.validationForm.value.orders;
         this.orderItemCacheService.setSelectedOrders(selectedOrders);
 
-        // this.orderItemCacheService.getAllOrderItemsCache$().subscribe(orderItems => {
-        //     orderItems.forEach(async orderItem => {
-        //         const customer: any = orderItem.customer;
-        //         const customerDetail = `${customer.firstName} ${customer.lastName}\n${customer.number} ${customer.street} \n${customer.city}, ${customer.state} ${customer.postal} \n${customer.country}`;
-        //
-        //         // console.log(customerDetail);
-        //         // @ts-ignore
-        //         orderItem.customer = customerDetail;
-        //         console.log(orderItem);
-        //
-        //         // try {
-        //         //     await this.orderItemService.updateOrderItem(orderItem.order.id, orderItem);
-        //         //     await this.toastService.presentToastSuccess('Updated Order Item successfully...');
-        //         // } catch (e) {
-        //         //     console.log(e);
-        //         //     await this.toastService.presentToastError(e.message);
-        //         // }
-        //
-        //     });
-        // });
-
         this.orderItemCacheService.getAllOrderItemsCache$().subscribe(moreOrderItems => {
             this.addMoreOrderItems(moreOrderItems);
             console.log(this.toSearchText);
