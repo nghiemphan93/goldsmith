@@ -318,4 +318,12 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
         fontClass[className] = true;
         return fontClass;
     }
+
+    getFontClassCellSpan(row: OrderItem, fontIndex: number): any {
+        let className = row.orderItemFonts[fontIndex].replace(/\s/g, '');
+        className = className.replace('.', '');
+        const fontClass = {};
+        fontClass[className] = true;
+        return fontClass;
+    }
 }

@@ -275,4 +275,12 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
         statusClass[statusName] = true;
         return statusClass;
     }
+
+    getFontClassCellSpan(row: OrderItem, fontIndex: number): any {
+        let className = row.orderItemFonts[fontIndex].replace(/\s/g, '');
+        className = className.replace('.', '');
+        const fontClass = {};
+        fontClass[className] = true;
+        return fontClass;
+    }
 }

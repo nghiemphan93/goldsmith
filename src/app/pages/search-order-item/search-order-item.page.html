@@ -181,11 +181,12 @@
             <ngx-datatable-column
                     name="Word"
                     prop="orderItemWord"
-                    [cellClass]="getFontClassCell"
             >
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-              <span>
-                {{ row.orderItemWord }}
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template style="overflow: hidden">
+                <span *ngFor="let word of row.orderItemWords; let fontIndex = index"
+                      [ngClass]="getFontClassCellSpan(row, fontIndex)"
+                >
+                        {{ word }}
                 </span>
                 </ng-template>
             </ngx-datatable-column>
@@ -194,11 +195,11 @@
             <ngx-datatable-column
                     name="Font"
                     prop="orderItemFont"
-                    [cellClass]=""
             >
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <span>
-                {{ row.orderItemFont }}
+                <span *ngFor="let font of row.orderItemFonts; let fontIndex = index"
+                >
+                        {{ font }}
                 </span>
                 </ng-template>
             </ngx-datatable-column>
@@ -208,8 +209,11 @@
                     name="Image"
                     prop="orderItemImageUrl"
             >
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                    <img [src]="row.orderItemImageUrl">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template style="overflow: hidden">
+                    <img
+                            *ngFor="let imageUrl of row.orderItemImageUrls; let imageIndex = index"
+                            [src]="imageUrl"
+                    >
                 </ng-template>
             </ngx-datatable-column>
 

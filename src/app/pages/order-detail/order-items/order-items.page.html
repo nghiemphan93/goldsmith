@@ -12,60 +12,59 @@
 </ion-header>
 
 <!--  Main Table Content for Desktop  -->
-<ion-content *ngIf="isDesktop">
-    <ion-item-group class="ion-margin">
+<ion-content
+        *ngIf="isDesktop"
+>
+    <section class="container">
         <ion-button
                 [routerLink]="['/orders', orderId, 'orderItems', 'create']"
         >
             <ion-icon name="add-circle-outline"></ion-icon>
             New Order Item
         </ion-button>
-    </ion-item-group>
 
-    <ion-grid fixed>
-        <ion-row>
-            <ion-col
-                    sizeXl="6"
-                    offsetXl="3"
-                    sizeLg="6"
-                    offsetLg="3"
-                    sizeMd="8"
-                    offsetMd="2"
-            >
-                <ion-item-divider class="ion-margin-top">
+        <ion-grid fixed>
+            <ion-row>
+                <ion-col
+                        sizeXl="6"
+                        offsetXl="3"
+                        sizeLg="6"
+                        offsetLg="3"
+                        sizeMd="8"
+                        offsetMd="2"
+                >
                     <ion-label>Tips: <br>
                         <p>Double click each cell of Comment or Status to Edit</p>
                         <p>Click Column's Header to sort</p>
                     </ion-label>
-                </ion-item-divider>
-            </ion-col>
-        </ion-row>
-    </ion-grid>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
 
-    <ngx-datatable
-        #table
-        [rows]="orderItemsDesktop$ | async"
-        [rowHeight]="'auto'"
-        [headerHeight]="50"
-        [ngClass]="tableStyle"
-        [columnMode]="'force'"
-        [footerHeight]="50"
-        class="ion-text-wrap"
-        style="overflow: hidden"
-        [rowClass]="getRowClass"
-    >
-        <!-- Status -->
-        <ngx-datatable-column
-                name="Status"
-                prop="orderItemStatus"
+        <ngx-datatable
+            #table
+            [rows]="orderItemsDesktop$ | async"
+            [rowHeight]="'auto'"
+            [headerHeight]="50"
+            [ngClass]="tableStyle"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            class="ion-text-wrap"
+            style="overflow: hidden"
+            [rowClass]="getRowClass"
         >
-            <ng-template
-                    let-row="row"
-                    let-value="value"
-                    let-rowIndex="rowIndex"
-                    ngx-datatable-cell-template
-
+            <!-- Status -->
+            <ngx-datatable-column
+                    name="Status"
+                    prop="orderItemStatus"
             >
+                <ng-template
+                        let-row="row"
+                        let-value="value"
+                        let-rowIndex="rowIndex"
+                        ngx-datatable-cell-template
+
+                >
                     <span
                             *ngIf="!editingOrderItem[rowIndex + '-orderItemStatus']"
                             title="Double Click to edit"
@@ -74,37 +73,37 @@
                         {{ row.orderItemStatus }}
                     </span>
 
-                <ion-select
-                        class="ion-no-margin ion-no-padding"
-                        interface="action-sheet"
-                        *ngIf="editingOrderItem[rowIndex + '-orderItemStatus']"
-                        (mouseenter)="startEditingInputSelect(orderItemStatus)"
-                        [value]="row.orderItemStatus"
-                        #orderItemStatus
-                        (ionChange)="updateOrderItem($event, 'orderItemStatus', rowIndex, row)"
-                        (ionCancel)="editingOrderItem[rowIndex + '-orderItemStatus'] = false"
-                >
-                    <ion-select-option
-                            *ngFor="let status of statuses"
-                            [value]="status"
-                            #selectOption
+                    <ion-select
+                            class="ion-no-margin ion-no-padding"
+                            interface="action-sheet"
+                            *ngIf="editingOrderItem[rowIndex + '-orderItemStatus']"
+                            (mouseenter)="startEditingInputSelect(orderItemStatus)"
+                            [value]="row.orderItemStatus"
+                            #orderItemStatus
+                            (ionChange)="updateOrderItem($event, 'orderItemStatus', rowIndex, row)"
+                            (ionCancel)="editingOrderItem[rowIndex + '-orderItemStatus'] = false"
                     >
-                        {{ status }}
-                    </ion-select-option>
-                </ion-select>
-            </ng-template>
-        </ngx-datatable-column>
+                        <ion-select-option
+                                *ngFor="let status of statuses"
+                                [value]="status"
+                                #selectOption
+                        >
+                            {{ status }}
+                        </ion-select-option>
+                    </ion-select>
+                </ng-template>
+            </ngx-datatable-column>
 
-        <!--    Comment    -->
-        <ngx-datatable-column
-                name="Comment"
-                prop="orderItemComment"
-                [cellClass]="getCommentClassCell"
-                *ngIf="isDesktop"
-        >
-            <ng-template let-row="row" let-value="value" let-rowIndex="rowIndex" ngx-datatable-cell-template
-                         class="ion-no-padding"
+            <!--    Comment    -->
+            <ngx-datatable-column
+                    name="Comment"
+                    prop="orderItemComment"
+                    [cellClass]="getCommentClassCell"
+                    *ngIf="isDesktop"
             >
+                <ng-template let-row="row" let-value="value" let-rowIndex="rowIndex" ngx-datatable-cell-template
+                             class="ion-no-padding"
+                >
                     <span
                             *ngIf="!editingOrderItem[rowIndex + '-orderItemComment']"
                             title="Double Click to edit"
@@ -113,147 +112,153 @@
                         {{ row.orderItemComment }}
                     </span>
 
-                <input
-                        *ngIf="editingOrderItem[rowIndex + '-orderItemComment']"
-                        type="text"
-                        (blur)="updateOrderItem($event,'orderItemComment',rowIndex,row)"
-                        [value]="value"
-                        (mouseenter)="startEditingInputText(orderItemCommentInput)"
-                        (keyup.enter)="updateOrderItem($event,'orderItemComment',rowIndex,row)"
-                        #orderItemCommentInput
+                    <input
+                            *ngIf="editingOrderItem[rowIndex + '-orderItemComment']"
+                            type="text"
+                            (blur)="updateOrderItem($event,'orderItemComment',rowIndex,row)"
+                            [value]="value"
+                            (mouseenter)="startEditingInputText(orderItemCommentInput)"
+                            (keyup.enter)="updateOrderItem($event,'orderItemComment',rowIndex,row)"
+                            #orderItemCommentInput
+                    >
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!--    Code    -->
+            <ngx-datatable-column
+                    name="Code"
+                    prop="orderItemCode"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <ion-button
+                            color="dark"
+                            [routerLink]="['/orders', orderId, 'orderItems', row.id]"
+                    >
+                        {{ row.orderItemCode }}
+                    </ion-button>
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!--    Word    -->
+            <ngx-datatable-column
+                    name="Word"
+                    prop="orderItemWord"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template style="overflow: hidden">
+                <span *ngFor="let word of row.orderItemWords; let fontIndex = index"
+                      [ngClass]="getFontClassCellSpan(row, fontIndex)"
                 >
-            </ng-template>
-        </ngx-datatable-column>
+                        {{ word }}
+                </span>
+                </ng-template>
+            </ngx-datatable-column>
 
-        <!--    Code    -->
-        <ngx-datatable-column
-                name="Code"
-                prop="orderItemCode"
-        >
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <ion-button
-                        color="dark"
-                        [routerLink]="['/orders', orderId, 'orderItems', row.id]"
+            <!--    Font    -->
+            <ngx-datatable-column
+                    name="Font"
+                    prop="orderItemFont"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                <span *ngFor="let font of row.orderItemFonts; let fontIndex = index"
                 >
-                    {{ row.orderItemCode }}
-                </ion-button>
-            </ng-template>
-        </ngx-datatable-column>
-
-        <!--    Word    -->
-        <ngx-datatable-column
-                name="Word"
-                prop="orderItemWord"
-                [cellClass]="getFontClassCell"
-        >
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-              <span>
-                {{ row.orderItemWord }}
+                        {{ font }}
                 </span>
-            </ng-template>
-        </ngx-datatable-column>
+                </ng-template>
+            </ngx-datatable-column>
 
-        <!--    Font    -->
-        <ngx-datatable-column
-                name="Font"
-                prop="orderItemFont"
-                [cellClass]=""
-        >
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <span>
-                {{ row.orderItemFont }}
-                </span>
-            </ng-template>
-        </ngx-datatable-column>
+            <!--    Image    -->
+            <ngx-datatable-column
+                    name="Image"
+                    prop="orderItemImageUrl"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template style="overflow: hidden">
+                    <img
+                            *ngFor="let imageUrl of row.orderItemImageUrls; let imageIndex = index"
+                            [src]="imageUrl"
+                    >
+                </ng-template>
+            </ngx-datatable-column>
 
-        <!--    Image    -->
-        <ngx-datatable-column
-                name="Image"
-                prop="orderItemImageUrl"
-        >
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <img [src]="row.orderItemImageUrl">
-            </ng-template>
-        </ngx-datatable-column>
+            <!--    Quantity    -->
+            <ngx-datatable-column
+                    name="Quantity"
+                    prop="orderItemQuantity"
+                    [cellClass]="getQuantityClassCell"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <span>{{ row.orderItemQuantity }}</span>
+                </ng-template>
+            </ngx-datatable-column>
 
-        <!--    Quantity    -->
-        <ngx-datatable-column
-                name="Quantity"
-                prop="orderItemQuantity"
-                [cellClass]="getQuantityClassCell"
-        >
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <span>{{ row.orderItemQuantity }}</span>
-            </ng-template>
-        </ngx-datatable-column>
-
-        <!--    Product    -->
-        <ngx-datatable-column
-                name="Product"
-                prop="product.productName"
-                [cellClass]="getColorClassCell">
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+            <!--    Product    -->
+            <ngx-datatable-column
+                    name="Product"
+                    prop="product.productName"
+                    [cellClass]="getColorClassCell">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <span *ngIf="row.product?.productType !== 'Nhẫn'">
                   <strong>{{ row.product?.productName }} </strong><br>
                     {{ row.orderItemColor }} <br>
                   <span *ngIf="row.orderItemLengthInch">Size: {{ row.orderItemLengthInch }} inches</span>
                 </span>
 
-                <span *ngIf="row.product?.productType === 'Nhẫn'">
+                    <span *ngIf="row.product?.productType === 'Nhẫn'">
                   <strong>{{ row.product.productName }}</strong><br>
-                    {{ row.orderItemColor }} <br>
+                        {{ row.orderItemColor }} <br>
                 Ring Size: {{ row.orderItemRingSizeUS }} US
                 </span>
-            </ng-template>
-        </ngx-datatable-column>
+                </ng-template>
+            </ngx-datatable-column>
 
-        <!--    Customer    -->
-        <ngx-datatable-column
-                name="Customer"
-                prop="customer"
-                *ngIf="!(user$ | async).customClaims.DESIGNER"
+            <!--    Customer    -->
+            <ngx-datatable-column
+                    name="Customer"
+                    prop="customer"
+                    *ngIf="!(user$ | async).customClaims.DESIGNER"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <span>{{ row.customer }}</span>
+                </ng-template>
+            </ngx-datatable-column>
+
+            <!--    Delete    -->
+            <ngx-datatable-column
+                    name="Delete"
+                    [sortable]="false"
+                    *ngIf="!(user$ | async).customClaims.DESIGNER"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <ion-button
+                            size="small"
+                            (click)="alertService.presentDeleteConfirm(row)"
+                            color="danger"
+                    >
+                        <ion-icon name="trash-outline"></ion-icon>
+                    </ion-button>
+                </ng-template>
+            </ngx-datatable-column>
+        </ngx-datatable>
+
+        <ion-item-group
+                class="ion-margin"
         >
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <span>{{ row.customer }}</span>
-            </ng-template>
-        </ngx-datatable-column>
+            <ion-button
+                    [routerLink]="['/orders', orderId, 'orderItems', 'create']"
+            >
+                <ion-icon name="add-circle-outline"></ion-icon>
+                New Order Item
+            </ion-button>
+        </ion-item-group>
 
-        <!--    Delete    -->
-        <ngx-datatable-column
-                name="Delete"
-                [sortable]="false"
-                *ngIf="!(user$ | async).customClaims.DESIGNER"
+        <ion-col
+                *ngIf="table.rowCount === 0"
+                size="6"
+                offset="5"
         >
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <ion-button
-                        size="small"
-                        (click)="alertService.presentDeleteConfirm(row)"
-                        color="danger"
-                >
-                    <ion-icon name="trash-outline"></ion-icon>
-                </ion-button>
-            </ng-template>
-        </ngx-datatable-column>
-    </ngx-datatable>
+            <ion-spinner class="spinner-loading"></ion-spinner>
+        </ion-col>
 
-    <ion-item-group
-            class="ion-margin"
-    >
-        <ion-button
-                [routerLink]="['/orders', orderId, 'orderItems', 'create']"
-        >
-            <ion-icon name="add-circle-outline"></ion-icon>
-            New Order Item
-        </ion-button>
-    </ion-item-group>
-
-    <ion-col
-            *ngIf="table.rowCount === 0"
-            size="6"
-            offset="5"
-    >
-        <ion-spinner class="spinner-loading"></ion-spinner>
-    </ion-col>
+    </section>
 </ion-content>
 
 

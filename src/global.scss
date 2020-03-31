@@ -78,3 +78,45 @@
   height: 100px;
   margin: 5rem auto;
 }
+
+
+.datatable-body-cell {
+  padding: 0px !important;
+  padding-left: 5px !important;
+  padding-top: 5px !important;
+
+  .datatable-body-cell-label {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 1rem auto;
+}
+
+.ngx-datatable.material {
+  .datatable-header {
+    .datatable-header-cell {
+      background: var(--ion-color-dark-tint);
+      color: var(--ion-color-dark-contrast);
+      text-align: center;
+      font-size: 0.9rem;
+      padding-top: 15px;
+
+      &:hover {
+        background: var(--ion-color-dark);
+        color: yellow;
+      }
+    }
+  }
+}
+
+
+.ngx-datatable.bootstrap:not(.cell-selection) .datatable-body-row:hover,
+.ngx-datatable.material:not(.cell-selection) .datatable-body-row:hover .datatable-row-group {
+  background: #ccd5d5;
+}
