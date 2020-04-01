@@ -5,7 +5,7 @@ import {AngularFirestore, AngularFirestoreCollection} from '@angular/fire/firest
 import {finalize, tap} from 'rxjs/operators';
 import {ProductService} from '../../services/product.service';
 import {Product} from '../../models/product';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ImageUploadService} from '../../services/image-upload.service';
 import {tryCatch} from 'rxjs/internal-compatibility';
 import {ActivatedRoute, Router} from '@angular/router';

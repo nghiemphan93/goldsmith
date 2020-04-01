@@ -81,7 +81,7 @@ const routes: Routes = [
         path: 'signin',
         loadChildren: () => import('./pages/signin/signin.module').then(m => m.SigninPageModule),
         canActivate: [AngularFireAuthGuard],
-        data: {authGuardPipe: redirectLoggedInToCustomers}
+        data: {authGuardPipe: redirectLoggedInToOrders}
     },
     {
         path: 'users',

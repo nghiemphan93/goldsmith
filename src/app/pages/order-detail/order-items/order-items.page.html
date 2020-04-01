@@ -144,9 +144,10 @@
                     name="Word"
                     prop="orderItemWord"
             >
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template style="overflow: hidden">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                 <span *ngFor="let word of row.orderItemWords; let fontIndex = index"
                       [ngClass]="getFontClassCellSpan(row, fontIndex)"
+                      class="span-text-center"
                 >
                         {{ word }}
                 </span>

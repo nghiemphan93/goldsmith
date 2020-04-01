@@ -202,51 +202,49 @@
                         </ion-item>
                     </ion-item-group>
 
-                    <!--    Word   -->
-                    <ion-item-group>
-                        <ion-item>
-                            <ion-label>Word</ion-label>
-                            <ion-input
-                                    type="text"
-                                    formControlName="orderItemWord"
-                                    [ngClass]="getFontClass()"
-                                    slot="end"
-                                    *ngIf="!isDetailed"
-                            ></ion-input>
+                    <!--        Words and Fonts            -->
+                    <ion-button
+                            (click)="addWordAndFontFormControl()"
+                            size="small"
+                    >
+                        <ion-icon name="add-circle-outline"></ion-icon>
+                        Add Word and Font
+                    </ion-button>
 
-                            <ion-input
-                                    [readonly]="isDetailed"
-                                    slot="end"
-                                    type="text"
-                                    *ngIf="isDetailed"
-                                    [ngClass]="getFontClass()"
-                            >{{ orderItem.orderItemWord }}
-                            </ion-input>
-                        </ion-item>
-                    </ion-item-group>
+                    <section
+                            formArrayName="orderItemWords"
+                            *ngFor="let _ of orderItemWords.controls; index as i"
+                            class="ion-margin-bottom"
+                    >
+                        <!--    Word   -->
+                        <ion-item-group class="ion-margin-start">
+                            <ion-item>
+                                <ion-label>Word {{ i + 1 }}</ion-label>
+                                <ion-input
+                                        type="text"
+                                        [ngClass]="getFontClassFormArray(validationForm.value.orderItemFonts[i])"
+                                        slot="end"
+                                        *ngIf="!isDetailed"
+                                        placeholder="word"
+                                        [formControl]="orderItemWords.controls[i]"
+                                ></ion-input>
+                            </ion-item>
 
-                    <!--    Font   -->
-                    <ion-item-group>
-                        <ion-item>
-                            <ion-label>Font</ion-label>
-                            <ion-select
-                                    interface="action-sheet"
-                                    formControlName="orderItemFont"
-                                    *ngIf="!isDetailed"
-                            >
-                                <ion-select-option
-                                        *ngFor="let font of fontNames"
-                                        [value]="font"
-                                >{{ font }}</ion-select-option>
-                            </ion-select>
-
-                            <ion-label
-                                    *ngIf="isDetailed"
-                            >{{ orderItem.orderItemFont }}
-                            </ion-label>
-                        </ion-item>
-                    </ion-item-group>
-
+                            <ion-item>
+                                <ion-label>Font {{ i + 1 }}</ion-label>
+                                <ion-select
+                                        interface="action-sheet"
+                                        *ngIf="!isDetailed"
+                                        [formControl]="orderItemFonts.controls[i]"
+                                >
+                                    <ion-select-option
+                                            *ngFor="let font of fontNames"
+                                            [value]="font"
+                                    >{{ font }}</ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                        </ion-item-group>
+                    </section>
 
                     <!--    Quantity   -->
                     <ion-item-group>
@@ -323,33 +321,46 @@
                         </ion-item>
                     </ion-item-group>
 
-                    <!--    Image Upload    -->
-                    <ion-item-group>
-                        <ion-item>
-                            <ion-label slot="start">Image</ion-label>
-                            <ion-img
-                                    *ngIf="orderItem?.orderItemImageUrl"
-                                    [src]="orderItem.orderItemImageUrl"
-                                    slot="end"
-                            ></ion-img>
-                        </ion-item>
-                    </ion-item-group>
-                    <ion-item-group *ngIf="!isDetailed">
-                        <ion-item>
-                            <ion-label>Choose Image</ion-label>
-                            <ion-input
-                                    type="file"
-                                    slot="end"
-                                    (change)="uploadOrderItemImage($event.target.files)"
-                            ></ion-input>
-                        </ion-item>
-                    </ion-item-group>
+                    <!--        Words and Fonts            -->
+                    <ion-button
+                            (click)="addImageUrlFormControl()"
+                            size="small"
+                    >
+                        <ion-icon name="add-circle-outline"></ion-icon>
+                        Add Image
+                    </ion-button>
+
+                    <section
+                            formArrayName="orderItemImageUrls"
+                            *ngFor="let _ of orderItemImageUrls.controls; index as i"
+                            class="ion-margin-bottom"
+                    >
+                        <!--    Image   -->
+                        <ion-item-group class="ion-margin-start">
+                            <ion-item *ngIf="validationForm.value.orderItemImageUrls[i]">
+                                <ion-label>Image {{ i + 1 }}</ion-label>
+                                <ion-img
+                                        [src]="validationForm.value.orderItemImageUrls[i]"
+                                        slot="end"
+                                        class="img-size-medium"
+                                ></ion-img>
+                            </ion-item>
+                            <ion-item *ngIf="!isDetailed">
+                                <ion-label>Choose Image {{ i + 1 }}</ion-label>
+                                <ion-input
+                                        #imageInput
+                                        type="file"
+                                        slot="end"
+                                        (change)="previewLocalImg($event.target.files, i)"
+                                ></ion-input>
+                            </ion-item>
+                        </ion-item-group>
+                    </section>
 
                     <!--    Submit    -->
                     <ng-container>
                         <ion-button
                                 [hidden]="isDetailed"
-                                [disabled]="!validationForm.valid"
                                 class="ion-margin-top"
                                 (click)="submitHandler(submitButton)"
                                 type="submit"

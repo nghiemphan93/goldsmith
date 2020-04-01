@@ -1,6 +1,6 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChildren} from '@angular/core';
 import {Order} from '../../../models/order';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {OrderService} from '../../../services/order.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {OrderItem} from '../../../models/orderitem';
@@ -19,7 +19,7 @@ import {StatusService} from '../../../services/status.service';
 import {CustomerCacheService} from '../../../services/customer-cache.service';
 import {ProductCacheService} from '../../../services/product-cache.service';
 import {ToastService} from '../../../services/toast.service';
-import {IonButton} from '@ionic/angular';
+import {IonButton, IonInput} from '@ionic/angular';
 
 
 @Component({
@@ -44,6 +44,10 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     isCreated: boolean;
     isUpdated: boolean;
     isDetailed: boolean;
+    orderItemWords: FormArray;
+    orderItemFonts: FormArray;
+    orderItemImageUrls: FormArray;
+    imgFilesLists: FileList[] = [];
 
     constructor(private orderService: OrderService,
                 private orderItemService: OrderItemService,
@@ -52,7 +56,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
                 private formBuilder: FormBuilder,
                 private activatedRoute: ActivatedRoute,
                 private router: Router,
-                private imageUploadService: ImageUploadService,
+                public imageUploadService: ImageUploadService,
                 private fontService: FontService,
                 private colorService: ColorService,
                 private statusService: StatusService,
@@ -156,8 +160,51 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             orderItemRingSizeUS: new FormControl(''),
             orderItemLengthInch: new FormControl(''),
             orderItemColor: new FormControl(Color.SILVER, Validators.required), // Color.SILVER
-            orderItemImageUrl: new FormControl('')
+            orderItemImageUrl: new FormControl(''),
+            orderItemFonts: new FormArray([new FormControl(this.fontNames[4], Validators.required)]),
+            orderItemWords: new FormArray([new FormControl('', Validators.required)]),
+            orderItemImageUrls: new FormArray([new FormControl('', Validators.required)])
         });
+
+        this.orderItemFonts = this.validationForm.get('orderItemFonts') as FormArray;
+        this.orderItemWords = this.validationForm.get('orderItemWords') as FormArray;
+        this.orderItemImageUrls = this.validationForm.get('orderItemImageUrls') as FormArray;
+    }
+
+    addWordAndFontFormControl() {
+        this.orderItemFonts.push(new FormControl(this.fontNames[4], Validators.required));
+        this.orderItemWords.push(new FormControl('', Validators.required));
+    }
+
+    addImageUrlFormControl() {
+        this.orderItemImageUrls.push(new FormControl('', Validators.required));
+    }
+
+    previewLocalImg(files: FileList, imageIndex: number) {
+        if (files.length === 0) {
+            return;
+        }
+
+        const mimeType = files[0].type;
+        if (mimeType.match(/image\/*/) == null) {
+            return this.toastService.presentToastError('Only images are supported.');
+        }
+
+        if (this.imgFilesLists.length > imageIndex) {
+            this.imgFilesLists[imageIndex] = files;
+        } else {
+            this.imgFilesLists.push(files);
+        }
+
+        const reader = new FileReader();
+
+        reader.readAsDataURL(files[0]);
+        reader.onload = (progressEvent: ProgressEvent<FileReader>) => {
+            const newImage = reader.result as string;
+            const formImages = this.validationForm.value.orderItemImageUrls;
+            formImages[imageIndex] = newImage;
+            this.validationForm.patchValue({orderItemImageUrls: formImages});
+        };
     }
 
     /**
@@ -248,6 +295,12 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             this.orderItem.orderItemLengthCm = Number((this.orderItem.orderItemLengthInch * 2.54).toFixed(2));
         }
         this.orderItem.orderItemColor = this.validationForm.value.orderItemColor;
+        this.orderItemWords = this.validationForm.value.orderItemWords;
+        this.orderItemFonts = this.validationForm.value.orderItemFonts;
+        this.imgFilesLists.forEach(async filesList => {
+            const imgUrl = await this.imageUploadService.uploadOrderItemImage(filesList);
+            this.orderItem.orderItemImageUrls.push(imgUrl);
+        });
     }
 
     /**
@@ -304,4 +357,10 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     getFontClass() {
         return this.fontService.getFontClass(this.validationForm.value.orderItemFont);
     }
+
+    getFontClassFormArray(fontName: string) {
+        return this.fontService.getFontClass(fontName);
+    }
+
+
 }

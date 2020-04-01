@@ -7,6 +7,7 @@
     font-family: Amsterdam One;
     font-size: 1.35rem !important;
     overflow: hidden;
+    padding: 10px 0;
 }
 
 .Angelface {
@@ -228,6 +229,7 @@
     font-family: Scriptina;
     font-size: 2rem !important;
     overflow: hidden;
+    padding-bottom: 20px;
 }
 
 .Sofia {
@@ -242,5 +244,5 @@
 
 .Wildmoon {
     font-family: WildMoon;
-    font-size: 2rem !important;
+    font-size: 3rem !important;
 }

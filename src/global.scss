@@ -89,7 +89,6 @@
     overflow: hidden;
     height: 100%;
     width: 100%;
-    text-align: center;
   }
 }
 
@@ -101,11 +100,12 @@
 .ngx-datatable.material {
   .datatable-header {
     .datatable-header-cell {
-      background: var(--ion-color-dark-tint);
+      background: #4f555d;
       color: var(--ion-color-dark-contrast);
-      text-align: center;
+      text-align: left;
       font-size: 0.9rem;
       padding-top: 15px;
+      transition: all ease-in 0.15s;
 
       &:hover {
         background: var(--ion-color-dark);
@@ -119,4 +119,16 @@
 .ngx-datatable.bootstrap:not(.cell-selection) .datatable-body-row:hover,
 .ngx-datatable.material:not(.cell-selection) .datatable-body-row:hover .datatable-row-group {
   background: #ccd5d5;
+}
+
+.span-text-center {
+  width: 100%;
+  height: 100%;
+  display: block;
+  text-align: center;
+}
+
+.img-size-medium {
+  height: 150px;
+  width: auto;
 }

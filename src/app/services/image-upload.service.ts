@@ -3,6 +3,7 @@ import {AngularFireStorage} from '@angular/fire/storage';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {ProductService} from './product.service';
 import {FormBuilder} from '@angular/forms';
+import {ToastService} from './toast.service';
 
 
 @Injectable({
@@ -11,6 +12,7 @@ import {FormBuilder} from '@angular/forms';
 export class ImageUploadService {
 
     constructor(private angularFireStorage: AngularFireStorage,
+                private toastService: ToastService
     ) {
         console.log('image upload service created...');
     }
@@ -54,15 +56,15 @@ export class ImageUploadService {
 
     /**
      * Upload Order Item's Image to Firebase Storage
-     * @param event: File List
+     * @param files: File List
      */
-    async uploadOrderItemImage(event: FileList) {
-        if (event.length <= 0) {
+    async uploadOrderItemImage(files: FileList) {
+        if (files.length <= 0) {
             return null;
         }
 
         // The File object
-        const file = event.item(0);
+        const file = files.item(0);
 
         // Validation for Images Only
         if (file.type.split('/')[0] !== 'image') {
@@ -81,9 +83,11 @@ export class ImageUploadService {
         try {
             const uploadTask = await fileRef.put(file, {customMetadata});
             const imageUrl = await fileRef.getDownloadURL().toPromise();
+            await this.toastService.presentToastSuccess(`Uploaded image ${file.name} successfully...`);
             return imageUrl;
-        } catch (error) {
-            console.log(error);
+        } catch (e) {
+            console.log(e);
+            await this.toastService.presentToastError(e.message);
         }
     }
 
