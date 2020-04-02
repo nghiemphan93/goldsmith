@@ -10,6 +10,7 @@ import {AlertService} from '../../services/alert.service';
 import {ProductCacheService} from '../../services/product-cache.service';
 import {DatatableComponent} from '@swimlane/ngx-datatable';
 import {ToastService} from '../../services/toast.service';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
     selector: 'app-products',
@@ -26,6 +27,8 @@ export class ProductsPage implements OnInit, OnDestroy {
     isMobile: boolean;
     skeletons = [1, 2];
     @ViewChild('table') table: DatatableComponent;
+    user$ = this.authService.getCurentUser$();
+    isAuth$ = this.authService.getIsAuth$();
 
     constructor(private productService: ProductService,
                 private imageUploadService: ImageUploadService,
@@ -35,6 +38,7 @@ export class ProductsPage implements OnInit, OnDestroy {
                 public alertService: AlertService,
                 private productCacheService: ProductCacheService,
                 private toastService: ToastService,
+                private authService: AuthService
     ) {
     }
 

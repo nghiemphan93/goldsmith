@@ -10,7 +10,10 @@
 <!--Main Table Content for Desktop-->
 <ion-content *ngIf="isDesktop">
     <ion-item-group class="ion-margin">
-        <ion-button routerLink="/products/create">
+        <ion-button
+                routerLink="/products/create"
+                *ngIf="(isAuth$ | async) &&!(user$ | async).customClaims.DESIGNER"
+        >
             <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
             <p>Create New Product</p>
         </ion-button>

@@ -4,10 +4,11 @@ import {AngularFireAuthGuard, customClaims, redirectLoggedInTo} from '@angular/f
 import {pipe} from 'rxjs';
 import {map} from 'rxjs/operators';
 
-const redirectLoggedInToOrders = () => redirectLoggedInTo(['orders']);
-const redirectLoggedInToCustomers = () => redirectLoggedInTo(['customers']);
-const devOnly = () => pipe(customClaims, map(claims => claims.DEV === true));
-const devOrAdminOnly = () => pipe(customClaims, map(claims => (claims.DEV === true) || (claims.ADMIN === true)));
+export const redirectLoggedInToOrders = () => redirectLoggedInTo(['orders']);
+export const redirectLoggedInToCustomers = () => redirectLoggedInTo(['customers']);
+export const devOnly = () => pipe(customClaims, map(claims => claims.DEV === true));
+export const devOrAdminOnly = () => pipe(customClaims, map(claims => (claims.DEV === true) || (claims.ADMIN === true)));
+export const devOrAdminOrModOnly = () => pipe(customClaims, map(claims => (claims.DEV === true) || (claims.ADMIN === true) || (claims.MODERATOR === true)));
 
 
 const routes: Routes = [
@@ -24,39 +25,40 @@ const routes: Routes = [
     {
         path: 'products/create',
         loadChildren: () => import('./pages/product-create/product-create.module').then(m => m.ProductCreatePageModule),
-        canActivate: [AngularFireAuthGuard]
+        canActivate: [AngularFireAuthGuard],
+        data: {authGuardPipe: devOrAdminOrModOnly}
     },
     {
         path: 'products/:productId',
         loadChildren: () => import('./pages/product-detail/product-detail.module').then(m => m.ProductDetailPageModule),
-        canActivate: [AngularFireAuthGuard]
+        canActivate: [AngularFireAuthGuard],
     },
     {
         path: 'products/:productId/edit',
         loadChildren: () => import('./pages/product-detail-edit/product-detail-edit.module').then(m => m.ProductDetailEditPageModule),
-        canActivate: [AngularFireAuthGuard]
+        canActivate: [AngularFireAuthGuard],
+        data: {authGuardPipe: devOrAdminOrModOnly}
     },
-
-    {
-        path: 'customers',
-        loadChildren: () => import('./pages/customers/customers.module').then(m => m.CustomersPageModule),
-        canActivate: [AngularFireAuthGuard]
-    },
-    {
-        path: 'customers/create',
-        loadChildren: () => import('./pages/customer-create/customer-create.module').then(m => m.CustomerCreatePageModule),
-        canActivate: [AngularFireAuthGuard]
-    },
-    {
-        path: 'customers/:customerId',
-        loadChildren: () => import('./pages/customer-detail/customer-detail.module').then(m => m.CustomerDetailPageModule),
-        canActivate: [AngularFireAuthGuard]
-    },
-    {
-        path: 'customers/:customerId/edit',
-        loadChildren: () => import('./pages/customer-detail-edit/customer-detail-edit.module').then(m => m.CustomerDetailEditPageModule),
-        canActivate: [AngularFireAuthGuard]
-    },
+    // {
+    //     path: 'customers',
+    //     loadChildren: () => import('./pages/customers/customers.module').then(m => m.CustomersPageModule),
+    //     canActivate: [AngularFireAuthGuard]
+    // },
+    // {
+    //     path: 'customers/create',
+    //     loadChildren: () => import('./pages/customer-create/customer-create.module').then(m => m.CustomerCreatePageModule),
+    //     canActivate: [AngularFireAuthGuard]
+    // },
+    // {
+    //     path: 'customers/:customerId',
+    //     loadChildren: () => import('./pages/customer-detail/customer-detail.module').then(m => m.CustomerDetailPageModule),
+    //     canActivate: [AngularFireAuthGuard]
+    // },
+    // {
+    //     path: 'customers/:customerId/edit',
+    //     loadChildren: () => import('./pages/customer-detail-edit/customer-detail-edit.module').then(m => m.CustomerDetailEditPageModule),
+    //     canActivate: [AngularFireAuthGuard]
+    // },
     {
         path: 'orders',
         loadChildren: () => import('./pages/orders/orders.module').then(m => m.OrdersPageModule),
@@ -65,12 +67,14 @@ const routes: Routes = [
     {
         path: 'orders/create',
         loadChildren: () => import('./pages/order-create/order-create.module').then(m => m.OrderCreatePageModule),
-        canActivate: [AngularFireAuthGuard]
+        canActivate: [AngularFireAuthGuard],
+        data: {authGuardPipe: devOrAdminOrModOnly}
     },
     {
         path: 'orders/:orderId/edit',
         loadChildren: () => import('./pages/order-detail-edit/order-detail-edit.module').then(m => m.OrderDetailEditPageModule),
-        canActivate: [AngularFireAuthGuard]
+        canActivate: [AngularFireAuthGuard],
+        data: {authGuardPipe: devOrAdminOrModOnly}
     },
     {
         path: 'orders/:orderId',

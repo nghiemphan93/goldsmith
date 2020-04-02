@@ -45,6 +45,7 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
     statuses = this.statusService.getStatuses();
     @ViewChild('table') table: DatatableComponent;
     user$ = this.authService.getCurentUser$();
+    isAuth$ = this.authService.getIsAuth$();
 
     constructor(private orderItemService: OrderItemService,
                 private orderService: OrderService,

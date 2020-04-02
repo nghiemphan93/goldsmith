@@ -2,6 +2,8 @@ import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 
 import {OrderDetailPage} from './order-detail.page';
+import {AngularFireAuthGuard} from '@angular/fire/auth-guard';
+import {devOrAdminOrModOnly} from '../../app-routing.module';
 
 const routes: Routes = [
     {
@@ -15,7 +17,9 @@ const routes: Routes = [
     },
     {
         path: 'orderItems/create',
-        loadChildren: () => import('./order-item-create/order-item-create.module').then(m => m.OrderItemCreatePageModule)
+        loadChildren: () => import('./order-item-create/order-item-create.module').then(m => m.OrderItemCreatePageModule),
+        canActivate: [AngularFireAuthGuard],
+        data: {authGuardPipe: devOrAdminOrModOnly}
     },
     {
         path: 'orderItems/:orderItemId',
@@ -23,7 +27,9 @@ const routes: Routes = [
     },
     {
         path: 'orderItems/:orderItemId/edit',
-        loadChildren: () => import('./order-item-detail-edit/order-item-detail-edit.module').then(m => m.OrderItemDetailEditPageModule)
+        loadChildren: () => import('./order-item-detail-edit/order-item-detail-edit.module').then(m => m.OrderItemDetailEditPageModule),
+        canActivate: [AngularFireAuthGuard],
+        data: {authGuardPipe: devOrAdminOrModOnly}
     }
 ];
 

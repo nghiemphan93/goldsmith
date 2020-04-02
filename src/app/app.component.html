@@ -40,7 +40,7 @@
                         <ion-item
                                 [routerDirection]="'root'"
                                 routerLink="/users"
-                                *ngIf="(user$ | async) && ((user$ | async).customClaims.DEV || (user$ | async).customClaims.ADMIN)"
+                                *ngIf="(isAuth$ | async) && ((user$ | async).customClaims.DEV || (user$ | async).customClaims.ADMIN)"
                         >
                             <ion-icon slot="start" name="people-outline"></ion-icon>
                             <ion-label>Manage Users</ion-label>

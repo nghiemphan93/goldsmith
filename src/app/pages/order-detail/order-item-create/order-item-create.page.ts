@@ -162,7 +162,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             orderItemColor: new FormControl(Color.SILVER, Validators.required), // Color.SILVER
             orderItemImageUrl: new FormControl(''),
             orderItemFonts: new FormArray([new FormControl(this.fontNames[4], Validators.required)]),
-            orderItemWords: new FormArray([new FormControl('', Validators.required)]),
+            orderItemWords: new FormArray([new FormControl('')]),
             orderItemImageUrls: new FormArray([new FormControl('', Validators.required)])
         });
 
@@ -173,7 +173,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
 
     addWordAndFontFormControl() {
         this.orderItemFonts.push(new FormControl(this.fontNames[4], Validators.required));
-        this.orderItemWords.push(new FormControl('', Validators.required));
+        this.orderItemWords.push(new FormControl(''));
     }
 
     addImageUrlFormControl() {
@@ -295,8 +295,17 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             this.orderItem.orderItemLengthCm = Number((this.orderItem.orderItemLengthInch * 2.54).toFixed(2));
         }
         this.orderItem.orderItemColor = this.validationForm.value.orderItemColor;
-        this.orderItemWords = this.validationForm.value.orderItemWords;
-        this.orderItemFonts = this.validationForm.value.orderItemFonts;
+
+        const words: string[] = this.validationForm.value.orderItemWords;
+        const fonts = this.validationForm.value.orderItemFonts;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < words.length; i++) {
+            if (words[i].trim() !== '') {
+                this.orderItem.orderItemWords.push(words[i]);
+                this.orderItem.orderItemFonts.push(fonts[i]);
+            }
+        }
+
         this.imgFilesLists.forEach(async filesList => {
             const imgUrl = await this.imageUploadService.uploadOrderItemImage(filesList);
             this.orderItem.orderItemImageUrls.push(imgUrl);

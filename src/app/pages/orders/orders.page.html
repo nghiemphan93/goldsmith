@@ -12,7 +12,10 @@
         *ngIf="isDesktop && (ordersDesktop$ | async)"
 >
     <ion-item-group class="ion-margin">
-        <ion-button routerLink="/orders/create">
+        <ion-button
+                routerLink="/orders/create"
+                *ngIf="!(user$ | async).customClaims?.DESIGNER"
+        >
             <ion-icon name="add-circle-outline"></ion-icon>
             New Order
         </ion-button>

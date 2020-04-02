@@ -18,6 +18,7 @@
     <section class="container">
         <ion-button
                 [routerLink]="['/orders', orderId, 'orderItems', 'create']"
+                *ngIf="(isAuth$ | async) &&!(user$ | async).customClaims.DESIGNER"
         >
             <ion-icon name="add-circle-outline"></ion-icon>
             New Order Item
@@ -215,7 +216,7 @@
             <ngx-datatable-column
                     name="Customer"
                     prop="customer"
-                    *ngIf="!(user$ | async).customClaims.DESIGNER"
+                    *ngIf="(isAuth$ | async) &&!(user$ | async).customClaims.DESIGNER"
             >
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                     <span>{{ row.customer }}</span>
@@ -226,7 +227,7 @@
             <ngx-datatable-column
                     name="Delete"
                     [sortable]="false"
-                    *ngIf="!(user$ | async).customClaims.DESIGNER"
+                    *ngIf="(isAuth$ | async) &&!(user$ | async).customClaims.DESIGNER"
             >
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                     <ion-button
@@ -245,6 +246,7 @@
         >
             <ion-button
                     [routerLink]="['/orders', orderId, 'orderItems', 'create']"
+                    *ngIf="(isAuth$ | async) &&!(user$ | async).customClaims.DESIGNER"
             >
                 <ion-icon name="add-circle-outline"></ion-icon>
                 New Order Item

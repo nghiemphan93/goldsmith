@@ -6,6 +6,7 @@ import {OrderService} from '../../services/order.service';
 import {SelectionType} from '@swimlane/ngx-datatable';
 import {OrderItemCacheService} from '../../services/order-item-cache.service';
 import {OrderCacheService} from '../../services/order-cache.service';
+import {AuthService} from '../../services/auth.service';
 
 
 @Component({
@@ -22,6 +23,7 @@ export class OrdersPage implements OnInit, OnDestroy {
     skeletons = [1, 2];
     orders: Order[] = [];
     subscription = new Subscription();
+    user$ = this.authService.getCurentUser$();
 
 
     constructor(private orderService: OrderService,
@@ -29,7 +31,8 @@ export class OrdersPage implements OnInit, OnDestroy {
                 private platform: Platform,
                 private alertController: AlertController,
                 private orderItemCacheService: OrderItemCacheService,
-                private orderCacheService: OrderCacheService
+                private orderCacheService: OrderCacheService,
+                private authService: AuthService
     ) {
     }
 
