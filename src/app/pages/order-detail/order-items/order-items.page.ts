@@ -181,13 +181,6 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
         await this.alertService.presentDeleteConfirm(orderItem);
     }
 
-    getColorClassCell({row, column, value}) {
-        const className = row.orderItemColor.replace(/\s/g, '');
-        const colorClass = {};
-        colorClass[className] = true;
-        return colorClass;
-    }
-
     /**
      * Return css Color Class given Oder Item's color
      */
@@ -200,38 +193,6 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
      */
     getFontClass(orderItem: OrderItem) {
         // return this.fontService.getFontClass(orderItem.orderItemFont);
-    }
-
-    /**
-     * Return css Ring Color Class for Table Cell
-     * @param row: OrderItem
-     * @param column: Column
-     * @param value: string
-     */
-    getRingColorClassCell({row, column, value}) {
-        if (row.orderItemRingSizeUS) {
-            const className = row.orderItemColor.replace(/\s/g, '');
-
-            const colorClass = {};
-            colorClass[className] = true;
-            return colorClass;
-        }
-    }
-
-    /**
-     * Return css Necklace Color Class for Table Cell
-     * @param row: OrderItem
-     * @param column: Column
-     * @param value: string
-     */
-    getNecklaceColorClassCell({row, column, value}) {
-        if (row.orderItemLengthInch) {
-            const className = row.orderItemColor.replace(/\s/g, '');
-
-            const colorClass = {};
-            colorClass[className] = true;
-            return colorClass;
-        }
     }
 
     /**
@@ -256,20 +217,6 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
         return {commentClass: true};
     }
 
-    /**
-     * Return css Font Class for Table Cell
-     * @param row: OrderItem
-     * @param column: Column
-     * @param value: string
-     */
-    getFontClassCell({row, column, value}): any {
-        let className = row.orderItemFont.replace(/\s/g, '');
-        className = className.replace('.', '');
-        const fontClass = {};
-        fontClass[className] = true;
-        return fontClass;
-    }
-
     getRowClass(row: OrderItem) {
         const statusName = row.orderItemStatus;
         const statusClass = {};
@@ -283,5 +230,12 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
         const fontClass = {};
         fontClass[className] = true;
         return fontClass;
+    }
+
+    getColorClassCell({row, column, value}) {
+        const className = row.orderItemColor.replace(/\s/g, '');
+        const colorClass = {};
+        colorClass[className] = true;
+        return colorClass;
     }
 }

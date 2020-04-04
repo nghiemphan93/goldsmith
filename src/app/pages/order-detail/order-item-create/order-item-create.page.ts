@@ -44,9 +44,9 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     colors: (string | Color)[];
     fontNames: string[];
     ringSizeUStoVNMapper: Map<number, number>;
-    isCreated: boolean = false;
-    isUpdated: boolean = false;
-    isDetailed: boolean = false;
+    isCreated = false;
+    isUpdated = false;
+    isDetailed = false;
     orderItemWords: FormArray;
     orderItemFonts: FormArray;
     orderItemImageUrls: FormArray;
@@ -151,6 +151,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
      * Prepare a Reactive Form for Creating an Order Item
      */
     prepareFormValidationCreate() {
+        this.imgFilesLists = [];
         this.validationForm = this.formBuilder.group({
             order: new FormControl(this.order, Validators.required),
             orderItemCode: new FormControl('', Validators.required),
@@ -212,6 +213,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
      * Prepare a Reactive Form for Updating or Showing Detail of an Order Item
      */
     prepareFormValidationUpdateOrDetail() {
+        this.imgFilesLists = [];
         this.validationForm = this.formBuilder.group({
             order: new FormControl(this.orderItem.order, Validators.required),
             orderItemCode: new FormControl(this.orderItem.orderItemCode, Validators.required),
@@ -246,7 +248,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
         }
 
         const imageUrls: string[] = this.orderItem.orderItemImageUrls;
-        if (imageUrls.length === 0) {
+        if (imageUrls === undefined || imageUrls.length === 0) {
             this.addImageUrlFormControl();
         } else {
             imageUrls.forEach(imageUrl => {
@@ -254,9 +256,6 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
                 this.imgFilesLists.push(undefined);
             });
         }
-
-        console.log(this.orderItem);
-        console.log(this.imgFilesLists);
     }
 
     configRingOrNecklace(product: Product) {
@@ -356,9 +355,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
         }
         this.orderItem.orderItemColor = this.validationForm.value.orderItemColor;
 
-        console.log(this.imgFilesLists);
-
-        const oldImageUrls: string[] = this.validationForm.value.orderItemImageUrls;
+        const oldImageUrls: string[] = this.orderItem.orderItemImageUrls;
         // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < this.imgFilesLists.length; i++) {
             switch (this.isCreated) {
@@ -446,13 +443,6 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
      */
     getColorClass() {
         return this.colorService.getColorClass(this.validationForm.value.orderItemColor);
-    }
-
-    /**
-     * Return css font class given Oder Item's font
-     */
-    getFontClass() {
-        return this.fontService.getFontClass(this.validationForm.value.orderItemFont);
     }
 
     getFontClassFormArray(fontName: string) {

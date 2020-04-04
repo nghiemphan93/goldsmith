@@ -79,6 +79,15 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
         this.setup();
         this.orders$ = this.orderCacheService.getOrdersCache$();
         this.prepareFormValidation();
+
+        // const list = [2, 3, 1, 6, 6, 8, 3, 4543, 13, 5, 6];
+        // const toFiltered = [2, 6, 5];
+        // console.log(list);
+        // console.log(list.filter(numb => {
+        //     if (toFiltered.includes(numb)) {
+        //         return numb;
+        //     }
+        // }));
     }
 
     ngOnDestroy(): void {
@@ -110,12 +119,18 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
     }
 
     onSelectOrder() {
-        const selectedOrders = this.validationForm.value.orders;
-        this.orderItemCacheService.setSelectedOrders(selectedOrders);
+        this.selectedOrders = this.validationForm.value.orders;
+        this.orderItemCacheService.setSelectedOrders(this.selectedOrders);
 
-        this.orderItemCacheService.getAllOrderItemsCache$().subscribe(moreOrderItems => {
+
+        this.orderItemCacheService.getAllOrderItemsCache$().subscribe(async moreOrderItems => {
             this.addMoreOrderItems(moreOrderItems);
-            console.log(this.toSearchText);
+            const selectedOrderIds = this.selectedOrders.map(selectedOrder => selectedOrder.id);
+            this.orderItems = this.orderItems.filter(oldOrderItem => {
+                if (selectedOrderIds.includes(oldOrderItem.order.id)) {
+                    return oldOrderItem;
+                }
+            });
             if (this.toSearchText === '') {
                 console.log('new...');
                 this.orderItemsFiltered = _.cloneDeep(this.orderItems); // Later for Filtering
@@ -148,20 +163,17 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
                 temp = temp.filter(orderItem => orderItem.order.id !== moreOrderItems[0].order.id);
                 temp.splice(orderItemIndex, 0, ...moreOrderItems);
                 this.orderItems = temp;
-                console.log(this.orderItems);
             } else {
                 console.log('added more Order Items');
                 let temp = [];
                 temp = [...this.orderItems, ...moreOrderItems];
                 this.orderItems = temp;
-                console.log(this.orderItems);
             }
         }
     }
 
     searchHandler() {
         this.toSearchText = this.validationForm.value.toSearchText.toLowerCase();
-        console.log(this.toSearchText);
 
         if (this.orderItems.length > 0 && this.toSearchText !== '') {
             const filteredOrderItems = this.orderItems.filter(orderItem => JSON.stringify(orderItem).toLowerCase().includes(this.toSearchText));
@@ -182,14 +194,11 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
     loadPaginatedData(event: any) {
         if (this.orderItemsFiltered.length > 10) {
             console.log('loaded more items');
-            console.log(this.orderItemsFiltered);
             let orderItems = [...this.orderItemsPaginated];
             orderItems = [...orderItems, ...this.orderItemsFiltered.splice(0, 10)];
             this.orderItemsPaginated = [...orderItems];
-            console.log(this.orderItemsFiltered);
         } else if (this.orderItemsFiltered.length > 0) {
             console.log('last 10 items');
-            console.log(this.orderItemsFiltered);
             let orderItems = [...this.orderItemsPaginated];
             orderItems = [...orderItems, ...this.orderItemsFiltered.splice(0, this.orderItemsFiltered.length)];
             this.orderItemsPaginated = [...orderItems];
@@ -244,45 +253,6 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
         // return this.fontService.getFontClass(orderItem.orderItemFont);
     }
 
-    getColorClassCell({row, column, value}) {
-        const className = row.orderItemColor.replace(/\s/g, '');
-        const colorClass = {};
-        colorClass[className] = true;
-        return colorClass;
-    }
-
-    /**
-     * Return css Ring Color Class for Table Cell
-     * @param row: OrderItem
-     * @param column: Column
-     * @param value: string
-     */
-    getRingColorClassCell({row, column, value}) {
-        if (row.orderItemRingSizeUS) {
-            const className = row.orderItemColor.replace(/\s/g, '');
-
-            const colorClass = {};
-            colorClass[className] = true;
-            return colorClass;
-        }
-    }
-
-    /**
-     * Return css Necklace Color Class for Table Cell
-     * @param row: OrderItem
-     * @param column: Column
-     * @param value: string
-     */
-    getNecklaceColorClassCell({row, column, value}) {
-        if (row.orderItemLengthInch) {
-            const className = row.orderItemColor.replace(/\s/g, '');
-
-            const colorClass = {};
-            colorClass[className] = true;
-            return colorClass;
-        }
-    }
-
     /**
      * Return css Quantity Class for Table Cell
      * @param row: OrderItem
@@ -305,18 +275,11 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
         return {commentClass: true};
     }
 
-    /**
-     * Return css Font Class for Table Cell
-     * @param row: OrderItem
-     * @param column: Column
-     * @param value: string
-     */
-    getFontClassCell({row, column, value}): any {
-        let className = row.orderItemFont.replace(/\s/g, '');
-        className = className.replace('.', '');
-        const fontClass = {};
-        fontClass[className] = true;
-        return fontClass;
+    getRowClass(row: OrderItem) {
+        const statusName = row.orderItemStatus;
+        const statusClass = {};
+        statusClass[statusName] = true;
+        return statusClass;
     }
 
     getFontClassCellSpan(row: OrderItem, fontIndex: number): any {
@@ -325,5 +288,12 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
         const fontClass = {};
         fontClass[className] = true;
         return fontClass;
+    }
+
+    getColorClassCell({row, column, value}) {
+        const className = row.orderItemColor.replace(/\s/g, '');
+        const colorClass = {};
+        colorClass[className] = true;
+        return colorClass;
     }
 }

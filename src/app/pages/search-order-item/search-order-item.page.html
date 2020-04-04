@@ -71,15 +71,16 @@
 
     <section *ngIf="isDesktop">
         <ngx-datatable
-                [rows]="orderItemsPaginated"
-                [rowHeight]="'auto'"
-                [headerHeight]="50"
-                [ngClass]="tableStyle"
-                [columnMode]="'force'"
-                [footerHeight]="50"
-                class="ion-text-wrap"
-                style="overflow: hidden"
-                #table
+            #table
+            [rows]="orderItemsPaginated"
+            [rowHeight]="'auto'"
+            [headerHeight]="50"
+            [ngClass]="tableStyle"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            class="ion-text-wrap"
+            style="overflow: hidden"
+            [rowClass]="getRowClass"
         >
             <!-- Status -->
             <ngx-datatable-column
@@ -162,7 +163,7 @@
                 </ng-template>
             </ngx-datatable-column>
 
-            <!--    Code    -->
+            <!--    Order Item Code    -->
             <ngx-datatable-column
                     name="Code"
                     prop="orderItemCode"
@@ -177,30 +178,39 @@
                 </ng-template>
             </ngx-datatable-column>
 
-            <!--    Word    -->
+            <!--    Words    -->
             <ngx-datatable-column
                     name="Word"
                     prop="orderItemWord"
             >
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template style="overflow: hidden">
-                <span *ngFor="let word of row.orderItemWords; let fontIndex = index"
-                      [ngClass]="getFontClassCellSpan(row, fontIndex)"
-                >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <span *ngFor="let word of row.orderItemWords; let fontIndex = index"
+                          [ngClass]="getFontClassCellSpan(row, fontIndex)"
+                          class="span-text-center"
+                    >
                         {{ word }}
-                </span>
+                    </span>
                 </ng-template>
             </ngx-datatable-column>
 
-            <!--    Font    -->
+            <!--    Fonts    -->
             <ngx-datatable-column
                     name="Font"
                     prop="orderItemFont"
             >
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <span *ngFor="let font of row.orderItemFonts; let fontIndex = index"
-                >
-                        {{ font }}
-                </span>
+                    <ng-container *ngIf="row.orderItemFonts?.length > 1">
+                        <p *ngFor="let font of row.orderItemFonts; let fontIndex = index">
+                            Font {{ fontIndex + 1 }}: {{ font }}
+                        </p>
+                    </ng-container>
+
+                    <ng-container *ngIf="row.orderItemFonts?.length <= 1">
+                        <p>
+                            {{ row.orderItemFonts[0] }}
+                        </p>
+                    </ng-container>
+
                 </ng-template>
             </ngx-datatable-column>
 

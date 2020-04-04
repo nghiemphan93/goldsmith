@@ -98,8 +98,10 @@ export class ImageUploadService {
     async deleteImageFromUrl(imageUrl: string) {
         try {
             return await this.angularFireStorage.storage.refFromURL(imageUrl).delete();
+            await this.toastService.presentToastSuccess('Deleted image successfully...');
         } catch (e) {
             console.log(e);
+            await this.toastService.presentToastError(e.message);
         }
     }
 }
