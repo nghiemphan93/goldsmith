@@ -85,12 +85,11 @@ export class OrderItemService {
      * @param orderItem: OrderItem
      */
     async createOrderItem(orderId: string, orderItem: OrderItem): Promise<DocumentReference> {
-        const data = JSON.parse(JSON.stringify(orderItem));
         return await this.afs
             .collection<Order>('orders')
             .doc<Order>(orderId)
             .collection<OrderItem>('orderItems')
-            .add(data);
+            .add({...orderItem});
     }
 
     /**

@@ -18,7 +18,7 @@
     <section class="container">
         <ion-button
                 [routerLink]="['/orders', orderId, 'orderItems', 'create']"
-                *ngIf="(isAuth$ | async) &&!(user$ | async).customClaims.DESIGNER"
+                *ngIf="(isAuth$ | async) && !(user$ | async).customClaims.DESIGNER"
         >
             <ion-icon name="add-circle-outline"></ion-icon>
             New Order Item
@@ -146,12 +146,12 @@
                     prop="orderItemWord"
             >
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <span *ngFor="let word of row.orderItemWords; let fontIndex = index"
-                      [ngClass]="getFontClassCellSpan(row, fontIndex)"
-                      class="span-text-center"
-                >
+                    <span *ngFor="let word of row.orderItemWords; let fontIndex = index"
+                          [ngClass]="getFontClassCellSpan(row, fontIndex)"
+                          class="span-text-center"
+                    >
                         {{ word }}
-                </span>
+                    </span>
                 </ng-template>
             </ngx-datatable-column>
 
@@ -161,10 +161,18 @@
                     prop="orderItemFont"
             >
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <span *ngFor="let font of row.orderItemFonts; let fontIndex = index"
-                >
-                        {{ font }}
-                </span>
+                    <ng-container *ngIf="row.orderItemFonts?.length > 1">
+                        <p *ngFor="let font of row.orderItemFonts; let fontIndex = index">
+                            Font {{ fontIndex + 1 }}: {{ font }}
+                        </p>
+                    </ng-container>
+
+                    <ng-container *ngIf="row.orderItemFonts?.length <= 1">
+                        <p>
+                            {{ row.orderItemFonts[0] }}
+                        </p>
+                    </ng-container>
+
                 </ng-template>
             </ngx-datatable-column>
 

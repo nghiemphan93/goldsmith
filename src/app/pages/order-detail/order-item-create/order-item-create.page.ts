@@ -1,13 +1,13 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChildren} from '@angular/core';
 import {Order} from '../../../models/order';
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {OrderService} from '../../../services/order.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {OrderItem} from '../../../models/orderitem';
 import {OrderItemService} from '../../../services/order-item.service';
 import {CustomerService} from '../../../services/customer.service';
 import {ProductService} from '../../../services/product.service';
-import {Observable, of, Subscription} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subscription, zip} from 'rxjs';
 import {Customer} from '../../../models/customer';
 import {Product} from '../../../models/product';
 import {ImageUploadService} from '../../../services/image-upload.service';
@@ -20,6 +20,9 @@ import {CustomerCacheService} from '../../../services/customer-cache.service';
 import {ProductCacheService} from '../../../services/product-cache.service';
 import {ToastService} from '../../../services/toast.service';
 import {IonButton, IonInput} from '@ionic/angular';
+import {ProductType} from '../../../models/product-type';
+import {LoadingService} from '../../../services/loading.service';
+import * as _ from 'lodash';
 
 
 @Component({
@@ -48,6 +51,8 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     orderItemFonts: FormArray;
     orderItemImageUrls: FormArray;
     imgFilesLists: FileList[] = [];
+    isRingSubject = new BehaviorSubject<boolean>(false);
+    isRing$: Observable<boolean> = this.isRingSubject.asObservable();
 
     constructor(private orderService: OrderService,
                 private orderItemService: OrderItemService,
@@ -62,7 +67,8 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
                 private statusService: StatusService,
                 private customerCacheService: CustomerCacheService,
                 private productCacheService: ProductCacheService,
-                private toastService: ToastService
+                private toastService: ToastService,
+                private loadingService: LoadingService
     ) {
     }
 
@@ -154,16 +160,13 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             customer: new FormControl('', Validators.required),
             product: new FormControl('', Validators.required),
             orderItemComment: new FormControl(''),
-            orderItemFont: new FormControl(this.fontNames[4]),  // Font Arial
-            orderItemWord: new FormControl(''),
             orderItemQuantity: new FormControl(1, Validators.required),
-            orderItemRingSizeUS: new FormControl(''),
-            orderItemLengthInch: new FormControl(''),
+            orderItemRingSizeUS: new FormControl({value: '', disabled: true}, [Validators.min(2), Validators.max(13)]),
+            orderItemLengthInch: new FormControl({value: '', disabled: true}),
             orderItemColor: new FormControl(Color.SILVER, Validators.required), // Color.SILVER
-            orderItemImageUrl: new FormControl(''),
-            orderItemFonts: new FormArray([new FormControl(this.fontNames[4], Validators.required)]),
+            orderItemFonts: new FormArray([new FormControl(this.fontNames[4], Validators.required)]), // Font Arial
             orderItemWords: new FormArray([new FormControl('')]),
-            orderItemImageUrls: new FormArray([new FormControl('', Validators.required)])
+            orderItemImageUrls: new FormArray([new FormControl('')])
         });
 
         this.orderItemFonts = this.validationForm.get('orderItemFonts') as FormArray;
@@ -177,7 +180,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     }
 
     addImageUrlFormControl() {
-        this.orderItemImageUrls.push(new FormControl('', Validators.required));
+        this.orderItemImageUrls.push(new FormControl(''));
     }
 
     previewLocalImg(files: FileList, imageIndex: number) {
@@ -218,28 +221,55 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             customer: new FormControl(this.orderItem.customer, Validators.required),
             product: new FormControl(this.orderItem.product, Validators.required),
             orderItemComment: new FormControl(this.orderItem.orderItemComment),
-            orderItemFont: new FormControl(this.orderItem.orderItemFont),
-            orderItemWord: new FormControl(this.orderItem.orderItemWord),
             orderItemQuantity: new FormControl(this.orderItem.orderItemQuantity, Validators.required),
             orderItemRingSizeUS: new FormControl(this.orderItem.orderItemRingSizeUS),
             orderItemLengthInch: new FormControl(this.orderItem.orderItemLengthInch),
             orderItemColor: new FormControl(this.orderItem.orderItemColor, Validators.required),
-            orderItemImageUrl: new FormControl(this.orderItem.orderItemImageUrl)
         });
     }
 
-    /**
-     * Helper to upload Order Item's Image
-     * @param event: FileList
-     */
-    async uploadOrderItemImage(event: FileList) {
-        try {
-            this.orderItem.orderItemImageUrl = await this.imageUploadService.uploadOrderItemImage(event);
-            await this.imageUploadService.deleteImageFromUrl(this.oldImageUrl);
-            this.oldImageUrl = this.orderItem.orderItemImageUrl;
-        } catch (e) {
-            console.log(e);
+    configRingOrNecklace(product: Product) {
+        if (product !== undefined) {
+            const ringSizeUSInput = this.validationForm.get('orderItemRingSizeUS');
+            const lengthInchInput = this.validationForm.get('orderItemLengthInch');
+
+            switch (product.productType?.toUpperCase()) {
+                case ProductType.NHAN:
+                    this.enableRingDisableNecklace(ringSizeUSInput, lengthInchInput);
+                    break;
+                case ProductType.DAY:
+                case ProductType.VONG:
+                    this.enableNecklaceDisableRing(lengthInchInput, ringSizeUSInput);
+                    break;
+                default:
+                    this.disableNecklaceAndRing(ringSizeUSInput, lengthInchInput);
+                    break;
+            }
         }
+    }
+
+
+    private disableNecklaceAndRing(ringSizeUSInput: AbstractControl, lengthInchInput: AbstractControl) {
+        ringSizeUSInput.reset();
+        ringSizeUSInput.disable();
+
+        lengthInchInput.reset();
+        lengthInchInput.disable();
+    }
+
+    private enableNecklaceDisableRing(lengthInchInput: AbstractControl, ringSizeUSInput: AbstractControl) {
+        lengthInchInput.enable();
+
+        ringSizeUSInput.reset();
+        ringSizeUSInput.disable();
+    }
+
+    private enableRingDisableNecklace(ringSizeUSInput: AbstractControl, lengthInchInput: AbstractControl) {
+        ringSizeUSInput.enable();
+        ringSizeUSInput.setValidators([Validators.min(2), Validators.max(13)]);
+
+        lengthInchInput.reset();
+        lengthInchInput.disable();
     }
 
     /**
@@ -276,15 +306,13 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     /**
      * Transfer data from Reactive From to Order Item Object
      */
-    transferDataFromFormToObject() {
+    async transferDataFromFormToObject() {
         this.orderItem.order = this.validationForm.value.order;
         this.orderItem.orderItemCode = this.validationForm.value.orderItemCode;
         this.orderItem.orderItemStatus = this.validationForm.value.orderItemStatus;
         this.orderItem.customer = this.validationForm.value.customer;
         this.orderItem.product = this.validationForm.value.product;
         this.orderItem.orderItemComment = this.validationForm.value.orderItemComment;
-        this.orderItem.orderItemFont = this.validationForm.value.orderItemFont;
-        this.orderItem.orderItemWord = this.validationForm.value.orderItemWord;
         this.orderItem.orderItemQuantity = this.validationForm.value.orderItemQuantity;
         if (this.validationForm.value.orderItemRingSizeUS) {
             this.orderItem.orderItemRingSizeUS = this.validationForm.value.orderItemRingSizeUS;
@@ -296,29 +324,28 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
         }
         this.orderItem.orderItemColor = this.validationForm.value.orderItemColor;
 
+        for (const filesList of this.imgFilesLists) {
+            const imgUrl = await this.imageUploadService.uploadOrderItemImage(filesList);
+            this.orderItem.orderItemImageUrls.push(imgUrl);
+        }
+
         const words: string[] = this.validationForm.value.orderItemWords;
-        const fonts = this.validationForm.value.orderItemFonts;
-        // tslint:disable-next-line:prefer-for-of
+        const fonts: string[] = this.validationForm.value.orderItemFonts;
         for (let i = 0; i < words.length; i++) {
             if (words[i].trim() !== '') {
                 this.orderItem.orderItemWords.push(words[i]);
                 this.orderItem.orderItemFonts.push(fonts[i]);
             }
         }
-
-        this.imgFilesLists.forEach(async filesList => {
-            const imgUrl = await this.imageUploadService.uploadOrderItemImage(filesList);
-            this.orderItem.orderItemImageUrls.push(imgUrl);
-        });
     }
 
     /**
      * Handler Submit button
      */
     async submitHandler(submitButton: IonButton) {
+        await this.loadingService.presentLoading();
         submitButton.disabled = true;
-
-        this.transferDataFromFormToObject();
+        await this.transferDataFromFormToObject();
         try {
             if (this.isCreated) {
                 this.orderItem.createdAt = new Date();
@@ -329,16 +356,15 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
                 await this.orderItemService.updateOrderItem(this.orderId, this.orderItem);
                 await this.toastService.presentToastSuccess(`Successfully updated Order Item ${this.orderItem.orderItemCode}`);
             }
-            this.validationForm.reset({
-                orderItemStatus: Status.PENDING,  // PENDING
-                orderItemFont: this.fontNames[4],   // ARIAL
-                orderItemQuantity: 1,               // 1
-                orderItemColor: Color.SILVER      // SILVER
-            });
-            await this.router.navigate(['orders', this.orderId, 'orderItems', this.orderItem.id]);
+
+            this.prepareFormValidationCreate();
+            await this.loadingService.dismissLoading();
+            await this.router.navigate(['orders', this.orderId, 'orderItems']);
+            submitButton.disabled = false;
             window.dispatchEvent(new Event('resize'));
         } catch (e) {
             console.log(e);
+            await this.loadingService.dismissLoading();
             await this.toastService.presentToastError(e.message);
             submitButton.disabled = false;
         }

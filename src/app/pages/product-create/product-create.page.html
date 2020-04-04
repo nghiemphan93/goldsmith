@@ -67,11 +67,12 @@
                                     formControlName="productType"
                                     *ngIf="!isDetailed"
                             >
-                                <ion-select-option>Dây</ion-select-option>
-                                <ion-select-option>Nhẫn</ion-select-option>
-                                <ion-select-option>Bông tai</ion-select-option>
-                                <ion-select-option>Vòng</ion-select-option>
-                                <ion-select-option>Kẹp cài áo</ion-select-option>
+                                <ion-select-option
+                                        *ngFor="let productType of productTypes"
+                                        [value]="productType"
+                                >
+                                    {{ productType }}
+                                </ion-select-option>
                             </ion-select>
 
                             <ion-label *ngIf="isDetailed">{{ product.productType }}</ion-label>

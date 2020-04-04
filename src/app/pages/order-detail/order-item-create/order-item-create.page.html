@@ -153,10 +153,12 @@
                             <ion-label>Product</ion-label>
                             <!--            Create                -->
                             <ion-select
-                                    interface="action-sheet"
-                                    formControlName="product"
-                                    *ngIf="isCreated"
-                                    [compareWith]="compareWithFn"
+                                #selectedProductInput
+                                interface="action-sheet"
+                                formControlName="product"
+                                *ngIf="isCreated"
+                                [compareWith]="compareWithFn"
+                                (ionChange)="configRingOrNecklace(selectedProductInput.value)"
                             >
                                 <ion-select-option
                                         *ngFor="let product of products$ | async"
@@ -267,13 +269,10 @@
                         <ion-item>
                             <ion-label>Ring Size US</ion-label>
                             <ion-input
+                                    *ngIf="!isDetailed"
                                     type="number"
-                                    placeholder=""
                                     formControlName="orderItemRingSizeUS"
                                     slot="end"
-                                    *ngIf="!isDetailed"
-                                    [min]="2"
-                                    [max]="13"
                             ></ion-input>
 
                             <ion-label *ngIf="isDetailed">{{ orderItem.orderItemRingSizeUS }}</ion-label>
@@ -285,11 +284,10 @@
                         <ion-item>
                             <ion-label>Length Inch</ion-label>
                             <ion-input
+                                    *ngIf="!isDetailed"
                                     type="number"
-                                    placeholder=""
                                     formControlName="orderItemLengthInch"
                                     slot="end"
-                                    *ngIf="!isDetailed"
                             ></ion-input>
 
                             <ion-label *ngIf="isDetailed">{{ orderItem.orderItemLengthInch }}</ion-label>
@@ -321,7 +319,7 @@
                         </ion-item>
                     </ion-item-group>
 
-                    <!--        Words and Fonts            -->
+                    <!--        Images          -->
                     <ion-button
                             (click)="addImageUrlFormControl()"
                             size="small"
@@ -348,10 +346,10 @@
                             <ion-item *ngIf="!isDetailed">
                                 <ion-label>Choose Image {{ i + 1 }}</ion-label>
                                 <ion-input
-                                        #imageInput
-                                        type="file"
-                                        slot="end"
-                                        (change)="previewLocalImg($event.target.files, i)"
+                                    #imageInput
+                                    type="file"
+                                    slot="end"
+                                    (change)="previewLocalImg($event.target.files, i)"
                                 ></ion-input>
                             </ion-item>
                         </ion-item-group>
@@ -360,6 +358,7 @@
                     <!--    Submit    -->
                     <ng-container>
                         <ion-button
+                                [disabled]="!validationForm.valid"
                                 [hidden]="isDetailed"
                                 class="ion-margin-top"
                                 (click)="submitHandler(submitButton)"

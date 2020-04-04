@@ -199,7 +199,7 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
      * Return css Font Class given Oder Item's font
      */
     getFontClass(orderItem: OrderItem) {
-        return this.fontService.getFontClass(orderItem.orderItemFont);
+        // return this.fontService.getFontClass(orderItem.orderItemFont);
     }
 
     /**

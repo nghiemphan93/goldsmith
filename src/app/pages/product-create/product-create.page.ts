@@ -12,6 +12,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Customer} from '../../models/customer';
 import {IonButton} from '@ionic/angular';
 import {ToastService} from '../../services/toast.service';
+import {ProductTypeService} from '../../services/product-type.service';
+import {ProductType} from '../../models/product-type';
 
 @Component({
     selector: 'app-product-create',
@@ -26,13 +28,15 @@ export class ProductCreatePage implements OnInit, OnDestroy {
     isCreated: boolean;
     isUpdated: boolean;
     isDetailed: boolean;
+    productTypes = this.productTypeService.getProductTypes();
 
     constructor(private productService: ProductService,
                 private formBuilder: FormBuilder,
                 private imageUploadService: ImageUploadService,
                 private router: Router,
                 private activatedRoute: ActivatedRoute,
-                private toastService: ToastService
+                private toastService: ToastService,
+                private productTypeService: ProductTypeService
     ) {
     }
 
@@ -98,7 +102,7 @@ export class ProductCreatePage implements OnInit, OnDestroy {
     prepareFormValidationCreate() {
         this.validationForm = this.formBuilder.group({
             productName: new FormControl('', Validators.required),
-            productType: new FormControl('Dây', Validators.required),
+            productType: new FormControl(ProductType.DAY, Validators.required),
             cutOrEngraved: new FormControl('Cut', Validators.required),
         });
     }

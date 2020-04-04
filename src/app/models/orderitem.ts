@@ -13,12 +13,9 @@ export class OrderItem {
 
     orderItemStatus: Status;
     orderItemComment: string;
-    orderItemFont: string;
-    orderItemWord: string;
-    orderItemWords: string[] = [];
     orderItemFonts: string[] = [];
+    orderItemWords: string[] = [];
     orderItemCode: string;
-    orderItemImageUrl: string;
     orderItemImageUrls: string[] = [];
     orderItemQuantity: number;
     orderItemColor: Color;

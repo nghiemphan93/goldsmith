@@ -24,6 +24,7 @@ export class OrdersPage implements OnInit, OnDestroy {
     orders: Order[] = [];
     subscription = new Subscription();
     user$ = this.authService.getCurentUser$();
+    isAuth$ = this.authService.getIsAuth$();
 
 
     constructor(private orderService: OrderService,

@@ -241,7 +241,7 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
      * Return css Font Class given Oder Item's font
      */
     getFontClass(orderItem: OrderItem) {
-        return this.fontService.getFontClass(orderItem.orderItemFont);
+        // return this.fontService.getFontClass(orderItem.orderItemFont);
     }
 
     getColorClassCell({row, column, value}) {

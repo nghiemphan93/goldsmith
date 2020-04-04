@@ -11,104 +11,115 @@
 <ion-content
         *ngIf="isDesktop && (ordersDesktop$ | async)"
 >
-    <ion-item-group class="ion-margin">
-        <ion-button
-                routerLink="/orders/create"
-                *ngIf="!(user$ | async).customClaims?.DESIGNER"
+    <section class="container">
+        <ion-item-group class="ion-margin">
+            <ion-button
+                    routerLink="/orders/create"
+                    *ngIf="(isAuth$ | async) && !(user$ | async).customClaims?.DESIGNER"
+            >
+                <ion-icon name="add-circle-outline"></ion-icon>
+                New Order
+            </ion-button>
+
+            <ion-button routerLink="/search/orderItem" color="tertiary">
+                <ion-icon name="search-outline"></ion-icon>
+                Search Order Items
+            </ion-button>
+        </ion-item-group>
+
+        <ngx-datatable
+                *ngIf="ordersDesktop$"
+                [rows]="ordersDesktop$ | async"
+                [rowHeight]="'auto'"
+                [headerHeight]="50"
+                [ngClass]="tableStyle"
+                [columnMode]="'force'"
+                [footerHeight]="50"
+                class="ion-text-wrap"
+                style="overflow: hidden"
         >
-            <ion-icon name="add-circle-outline"></ion-icon>
-            New Order
-        </ion-button>
+            <!--    Order Code    -->
+            <ngx-datatable-column name="Order Code" prop="orderCode">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <ion-button
+                            size="small"
+                            color="dark"
+                            [routerLink]="['/orders', row.id, 'orderItems']"
+                    >
+                        {{ row.orderCode }}
+                    </ion-button>
+                </ng-template>
+            </ngx-datatable-column>
 
-        <ion-button routerLink="/search/orderItem" color="tertiary">
-            <ion-icon name="search-outline"></ion-icon>
-            Search Order Items
-        </ion-button>
-    </ion-item-group>
+            <!--    Order Created At    -->
+            <ngx-datatable-column name="Created On" prop="createdAt">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    {{ row.createdAt | date: 'dd/MM/yyyy' }}
+                </ng-template>
+            </ngx-datatable-column>
 
-    <ngx-datatable
-            *ngIf="ordersDesktop$"
-            [rows]="ordersDesktop$ | async"
-            [rowHeight]="'auto'"
-            [headerHeight]="50"
-            [ngClass]="tableStyle"
-            [columnMode]="'force'"
-            [footerHeight]="50"
-            class="ion-text-wrap"
-            style="overflow: hidden"
-    >
-        <!--    Order Code    -->
-        <ngx-datatable-column name="Order Code" prop="orderCode">
-        </ngx-datatable-column>
+            <!--    Order Deadline    -->
+            <ngx-datatable-column name="Deadline" prop="orderDeadline">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    {{ row.orderDeadline | date: 'dd/MM/yyyy' }}
+                </ng-template>
+            </ngx-datatable-column>
 
-        <!--    Order Created At    -->
-        <ngx-datatable-column name="Created On" prop="createdAt">
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                {{ row.createdAt | date: 'dd/MM/yyyy' }}
-            </ng-template>
-        </ngx-datatable-column>
+            <!--    Order Status    -->
+            <ngx-datatable-column name="Status" prop="orderStatus">
+            </ngx-datatable-column>
 
-        <!--    Order Deadline    -->
-        <ngx-datatable-column name="Deadline" prop="orderDeadline">
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                {{ row.orderDeadline | date: 'dd/MM/yyyy' }}
-            </ng-template>
-        </ngx-datatable-column>
+            <!--    Order Details    -->
+            <!--        <ngx-datatable-column-->
+            <!--                name="Details"-->
+            <!--                [sortable]="false"-->
+            <!--        >-->
+            <!--            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>-->
+            <!--                <ion-button-->
+            <!--                        size="small"-->
+            <!--                        color="dark"-->
+            <!--                        [routerLink]="['/orders', row.id, 'orderItems']"-->
+            <!--                >-->
+            <!--                    Details-->
+            <!--                </ion-button>-->
+            <!--            </ng-template>-->
+            <!--        </ngx-datatable-column>-->
 
-        <!--    Order Status    -->
-        <ngx-datatable-column name="Status" prop="orderStatus">
-        </ngx-datatable-column>
+            <!--    Order Edit    -->
+            <ngx-datatable-column
+                    name="Edit"
+                    [sortable]="false"
+                    *ngIf="(isAuth$ | async) && !(user$ | async).customClaims?.DESIGNER"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <ion-button
+                            size="small"
+                            color="warning"
+                            [routerLink]="['/orders', row.id, 'edit']"
+                    >
+                        Edit
+                    </ion-button>
+                </ng-template>
+            </ngx-datatable-column>
 
-        <!--    Order Details    -->
-        <ngx-datatable-column
-                name="Details"
-                [sortable]="false"
-        >
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <ion-button
-                        size="small"
-                        color="warning"
-                        [routerLink]="['/orders', row.id, 'orderItems']"
-                >
-                    Details
-                </ion-button>
-            </ng-template>
-        </ngx-datatable-column>
-
-        <!--    Order Edit    -->
-        <ngx-datatable-column
-                name="Edit"
-                [sortable]="false"
-                *ngIf="isDesktop"
-        >
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <ion-button
-                        size="small"
-                        color="warning"
-                        [routerLink]="['/orders', row.id, 'edit']"
-                >
-                    Edit
-                </ion-button>
-            </ng-template>
-        </ngx-datatable-column>
-
-        <!--    Order Delete    -->
-        <ngx-datatable-column
-                name="Delete"
-                [sortable]="false"
-                *ngIf="isDesktop"
-        >
-            <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <ion-button
-                        size="small"
-                        (click)="presentDeleteConfirm(row)"
-                        color="danger"
-                >
-                    Delete
-                </ion-button>
-            </ng-template>
-        </ngx-datatable-column>
-    </ngx-datatable>
+            <!--    Order Delete    -->
+            <ngx-datatable-column
+                    name="Delete"
+                    [sortable]="false"
+                    *ngIf="(isAuth$ | async) && !(user$ | async).customClaims?.DESIGNER"
+            >
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                    <ion-button
+                            size="small"
+                            (click)="presentDeleteConfirm(row)"
+                            color="danger"
+                    >
+                        Delete
+                    </ion-button>
+                </ng-template>
+            </ngx-datatable-column>
+        </ngx-datatable>
+    </section>
 </ion-content>
 
 
