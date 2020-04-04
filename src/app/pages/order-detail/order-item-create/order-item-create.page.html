@@ -206,6 +206,7 @@
 
                     <!--        Words and Fonts            -->
                     <ion-button
+                            *ngIf="!isDetailed"
                             (click)="addWordAndFontFormControl()"
                             size="small"
                     >
@@ -215,7 +216,7 @@
 
                     <section
                             formArrayName="orderItemWords"
-                            *ngFor="let _ of orderItemWords.controls; index as i"
+                            *ngFor="let _ of orderItemWords?.controls; index as i"
                             class="ion-margin-bottom"
                     >
                         <!--    Word   -->
@@ -223,20 +224,30 @@
                             <ion-item>
                                 <ion-label>Word {{ i + 1 }}</ion-label>
                                 <ion-input
-                                        type="text"
-                                        [ngClass]="getFontClassFormArray(validationForm.value.orderItemFonts[i])"
-                                        slot="end"
                                         *ngIf="!isDetailed"
+                                        type="text"
+                                        [ngClass]="getFontClassFormArray(validationForm?.value?.orderItemFonts[i])"
+                                        slot="end"
                                         placeholder="word"
                                         [formControl]="orderItemWords.controls[i]"
                                 ></ion-input>
+
+                                <ion-input
+                                        type="text"
+                                        *ngIf="isDetailed"
+                                        [ngClass]="getFontClassFormArray(validationForm?.value?.orderItemFonts[i])"
+                                        slot="end"
+                                        [readonly]="isDetailed"
+                                >
+                                    {{ orderItem.orderItemWords[i] }}
+                                </ion-input>
                             </ion-item>
 
                             <ion-item>
                                 <ion-label>Font {{ i + 1 }}</ion-label>
                                 <ion-select
-                                        interface="action-sheet"
                                         *ngIf="!isDetailed"
+                                        interface="action-sheet"
                                         [formControl]="orderItemFonts.controls[i]"
                                 >
                                     <ion-select-option
@@ -244,6 +255,8 @@
                                             [value]="font"
                                     >{{ font }}</ion-select-option>
                                 </ion-select>
+
+                                <ion-label *ngIf="isDetailed">{{ orderItem.orderItemFonts[i] }}</ion-label>
                             </ion-item>
                         </ion-item-group>
                     </section>
@@ -321,6 +334,7 @@
 
                     <!--        Images          -->
                     <ion-button
+                            *ngIf="!isDetailed"
                             (click)="addImageUrlFormControl()"
                             size="small"
                     >

@@ -44,15 +44,13 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     colors: (string | Color)[];
     fontNames: string[];
     ringSizeUStoVNMapper: Map<number, number>;
-    isCreated: boolean;
-    isUpdated: boolean;
-    isDetailed: boolean;
+    isCreated: boolean = false;
+    isUpdated: boolean = false;
+    isDetailed: boolean = false;
     orderItemWords: FormArray;
     orderItemFonts: FormArray;
     orderItemImageUrls: FormArray;
     imgFilesLists: FileList[] = [];
-    isRingSubject = new BehaviorSubject<boolean>(false);
-    isRing$: Observable<boolean> = this.isRingSubject.asObservable();
 
     constructor(private orderService: OrderService,
                 private orderItemService: OrderItemService,
@@ -91,7 +89,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
         this.statuses = this.statusService.getStatuses();
         this.colors = this.colorService.getColors();
         this.fontNames = this.fontService.getFontNames();
-        this.ringSizeUStoVNMapper = this.configRingSizeUStoVN();
+        this.ringSizeUStoVNMapper = this.mapRingSizeUStoVN();
         this.orderId = this.activatedRoute.snapshot.params.orderId;
         this.order$ = this.orderService.getOrder(this.orderId);
         this.customers$ = this.customerCacheService.getCustomersCache$();
@@ -174,13 +172,13 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
         this.orderItemImageUrls = this.validationForm.get('orderItemImageUrls') as FormArray;
     }
 
-    addWordAndFontFormControl() {
-        this.orderItemFonts.push(new FormControl(this.fontNames[4], Validators.required));
-        this.orderItemWords.push(new FormControl(''));
+    addWordAndFontFormControl(wordValue: string = '', fontValue: string = this.fontNames[4]) {
+        this.orderItemFonts.push(new FormControl(fontValue, Validators.required));
+        this.orderItemWords.push(new FormControl(wordValue));
     }
 
-    addImageUrlFormControl() {
-        this.orderItemImageUrls.push(new FormControl(''));
+    addImageUrlFormControl(imageUrlValue: string = '') {
+        this.orderItemImageUrls.push(new FormControl(imageUrlValue));
     }
 
     previewLocalImg(files: FileList, imageIndex: number) {
@@ -222,17 +220,49 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             product: new FormControl(this.orderItem.product, Validators.required),
             orderItemComment: new FormControl(this.orderItem.orderItemComment),
             orderItemQuantity: new FormControl(this.orderItem.orderItemQuantity, Validators.required),
-            orderItemRingSizeUS: new FormControl(this.orderItem.orderItemRingSizeUS),
+            orderItemRingSizeUS: new FormControl(this.orderItem.orderItemRingSizeUS, [Validators.min(2), Validators.max(13)]),
             orderItemLengthInch: new FormControl(this.orderItem.orderItemLengthInch),
             orderItemColor: new FormControl(this.orderItem.orderItemColor, Validators.required),
+            orderItemFonts: new FormArray([]),
+            orderItemWords: new FormArray([]),
+            orderItemImageUrls: new FormArray([])
         });
+
+        this.orderItemFonts = this.validationForm.get('orderItemFonts') as FormArray;
+        this.orderItemWords = this.validationForm.get('orderItemWords') as FormArray;
+        this.orderItemImageUrls = this.validationForm.get('orderItemImageUrls') as FormArray;
+        this.configRingOrNecklace(this.validationForm.value.product);
+
+        const words: string[] = this.orderItem.orderItemWords;
+        const fonts: string[] = this.orderItem.orderItemFonts;
+        if (words.length === 0) {
+            this.addWordAndFontFormControl();
+        } else {
+            for (let i = 0; i < words.length; i++) {
+                if (words[i].trim() !== '') {
+                    this.addWordAndFontFormControl(words[i], fonts[i]);
+                }
+            }
+        }
+
+        const imageUrls: string[] = this.orderItem.orderItemImageUrls;
+        if (imageUrls.length === 0) {
+            this.addImageUrlFormControl();
+        } else {
+            imageUrls.forEach(imageUrl => {
+                this.addImageUrlFormControl(imageUrl);
+                this.imgFilesLists.push(undefined);
+            });
+        }
+
+        console.log(this.orderItem);
+        console.log(this.imgFilesLists);
     }
 
     configRingOrNecklace(product: Product) {
+        const ringSizeUSInput = this.validationForm.get('orderItemRingSizeUS');
+        const lengthInchInput = this.validationForm.get('orderItemLengthInch');
         if (product !== undefined) {
-            const ringSizeUSInput = this.validationForm.get('orderItemRingSizeUS');
-            const lengthInchInput = this.validationForm.get('orderItemLengthInch');
-
             switch (product.productType?.toUpperCase()) {
                 case ProductType.NHAN:
                     this.enableRingDisableNecklace(ringSizeUSInput, lengthInchInput);
@@ -245,6 +275,8 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
                     this.disableNecklaceAndRing(ringSizeUSInput, lengthInchInput);
                     break;
             }
+        } else {
+            this.disableNecklaceAndRing(ringSizeUSInput, lengthInchInput);
         }
     }
 
@@ -275,7 +307,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     /**
      * Prepare Ring Size Converter from US to VN
      */
-    configRingSizeUStoVN() {
+    mapRingSizeUStoVN() {
         const ringSizeUStoVN = new Map();
         ringSizeUStoVN.set(2, 1);
         ringSizeUStoVN.set(2.5, 2);
@@ -324,17 +356,45 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
         }
         this.orderItem.orderItemColor = this.validationForm.value.orderItemColor;
 
-        for (const filesList of this.imgFilesLists) {
-            const imgUrl = await this.imageUploadService.uploadOrderItemImage(filesList);
-            this.orderItem.orderItemImageUrls.push(imgUrl);
+        console.log(this.imgFilesLists);
+
+        const oldImageUrls: string[] = this.validationForm.value.orderItemImageUrls;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < this.imgFilesLists.length; i++) {
+            switch (this.isCreated) {
+                case true:
+                    const imgUrl = await this.imageUploadService.uploadOrderItemImage(this.imgFilesLists[i]);
+                    this.orderItem.orderItemImageUrls.push(imgUrl);
+                    break;
+                case false:
+                    if (this.imgFilesLists[i] !== undefined) {
+                        const newImgUrl = await this.imageUploadService.uploadOrderItemImage(this.imgFilesLists[i]);
+                        if (i < this.orderItem.orderItemImageUrls.length) {
+                            await this.imageUploadService.deleteImageFromUrl(oldImageUrls[i]);
+                            this.orderItem.orderItemImageUrls[i] = newImgUrl;
+                        } else {
+                            this.orderItem.orderItemImageUrls.push(newImgUrl);
+                        }
+                    }
+                    break;
+            }
         }
 
         const words: string[] = this.validationForm.value.orderItemWords;
         const fonts: string[] = this.validationForm.value.orderItemFonts;
         for (let i = 0; i < words.length; i++) {
-            if (words[i].trim() !== '') {
+            if (i < this.orderItem.orderItemWords.length) {
+                this.orderItem.orderItemWords[i] = words[i];
+                this.orderItem.orderItemFonts[i] = fonts[i];
+            } else {
                 this.orderItem.orderItemWords.push(words[i]);
                 this.orderItem.orderItemFonts.push(fonts[i]);
+            }
+        }
+        for (let i = 0; i < words.length; i++) {
+            if (this.orderItem.orderItemWords[i] === '') {
+                this.orderItem.orderItemWords.splice(i, 1);
+                this.orderItem.orderItemFonts.splice(i, 1);
             }
         }
     }
@@ -352,14 +412,16 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
                 const result = await this.orderItemService.createOrderItem(this.orderId, this.orderItem);
                 this.orderItem.id = result.id;
                 await this.toastService.presentToastSuccess(`Successfully created Order Item ${this.orderItem.orderItemCode}`);
+                this.prepareFormValidationCreate();
             } else {
+                console.log(this.orderItem);
                 await this.orderItemService.updateOrderItem(this.orderId, this.orderItem);
                 await this.toastService.presentToastSuccess(`Successfully updated Order Item ${this.orderItem.orderItemCode}`);
+                this.prepareFormValidationUpdateOrDetail();
             }
 
-            this.prepareFormValidationCreate();
             await this.loadingService.dismissLoading();
-            await this.router.navigate(['orders', this.orderId, 'orderItems']);
+            await this.router.navigate(['orders', this.orderId, 'orderItems', this.orderItem.id]);
             submitButton.disabled = false;
             window.dispatchEvent(new Event('resize'));
         } catch (e) {

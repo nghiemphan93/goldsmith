@@ -103,7 +103,7 @@ export class OrderItemService {
             .doc<Order>(orderId)
             .collection<OrderItem>('orderItems')
             .doc<OrderItem>(toUpdateOrderItem.id)
-            .update(toUpdateOrderItem);
+            .update({...toUpdateOrderItem});
     }
 
     /**
