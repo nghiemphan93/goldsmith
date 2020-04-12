@@ -56,7 +56,7 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
     toSearchText = '';
 
     customActionSheetOptions: any = {
-        header: 'Colors',
+        header: 'Status',
     };
 
     constructor(private orderService: OrderService,

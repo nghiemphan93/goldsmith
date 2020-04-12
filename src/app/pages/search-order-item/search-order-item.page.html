@@ -69,7 +69,10 @@
     </ion-grid>
 
 
-    <section *ngIf="isDesktop">
+    <section
+            *ngIf="isDesktop"
+            class="container"
+    >
         <ngx-datatable
             #table
             [rows]="orderItemsPaginated"

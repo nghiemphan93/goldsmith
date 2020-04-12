@@ -19,6 +19,7 @@ import {StatusService} from '../../../services/status.service';
 import {DatatableComponent} from '@swimlane/ngx-datatable';
 import {AuthService} from '../../../services/auth.service';
 import {Status} from '../../../models/status.enum';
+import * as XLSX from 'xlsx';
 
 
 @Component({
@@ -71,6 +72,8 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
                 await this.toastService.presentToastError('No data or Network error. Please add more data or refresh the page');
             }
         }, 4000);
+
+
     }
 
     ngAfterViewInit(): void {
@@ -79,6 +82,45 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
     ionViewDidEnter() {
         if (this.isDesktop) {
             this.orderItemsDesktop$ = this.orderItemCacheService.getOrderItemsCache$ByOrder(this.orderId);
+
+            this.orderItemsDesktop$.subscribe(orderItems => {
+                const tableData = orderItems.map(orderItem => {
+                    const data = [];
+                    data.push(orderItem.orderItemStatus);
+                    data.push(orderItem.orderItemComment);
+                    data.push(orderItem.orderItemCode);
+                    let words = '';
+                    orderItem.orderItemWords.forEach(word => words = words + word + ' \n');
+                    data.push(words);
+                    let fonts = '';
+                    orderItem.orderItemFonts.forEach(font => fonts = fonts + font + ' \n');
+                    data.push(fonts);
+                    data.push(orderItem.orderItemQuantity);
+                    if (orderItem.orderItemRingSizeUS !== undefined) {
+                        const product = `${orderItem.product.productName} \n${orderItem.orderItemColor} \nRing Size: ${orderItem.orderItemRingSizeUS}`;
+                        data.push(product);
+                    } else {
+                        const product = `${orderItem.product.productName} \n${orderItem.orderItemColor} \nSize: ${orderItem.orderItemLengthInch} inches`;
+                        data.push(product);
+                    }
+                    data.push(orderItem.customer);
+                    return data;
+                });
+                console.log(tableData);
+                if (tableData.length > 0) {
+                    const header = ['Status', 'Comment', 'Order Item Code', 'Words', 'Fonts', 'Quantity', 'Product', 'Customer'];
+                    tableData.splice(0, 0, header);
+                    /* generate worksheet */
+                    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(tableData);
+
+                    /* generate workbook and add the worksheet */
+                    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+                    /* save to file */
+                    // XLSX.writeFile(wb, 'SheetJS.xlsx');
+                }
+            });
         } else {
             this.orderItemsMobile$.push(this.orderItemService.getLimitedOrderItemsAfterStart(this.orderId));
         }
