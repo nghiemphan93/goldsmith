@@ -196,7 +196,7 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
         }
     }
 
-    async updateOrderItem(event: Event, attributeName: string, rowIndex: number, toUpdateOrderItem: OrderItem) {
+    async updateOrderItem(event: Event | any, attributeName: string, rowIndex: number, toUpdateOrderItem: OrderItem) {
         this.editingOrderItem[rowIndex + '-' + attributeName] = false;
         if (toUpdateOrderItem[attributeName] !== event.target.value) {
             toUpdateOrderItem[attributeName] = event.target.value;
