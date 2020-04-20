@@ -6,5 +6,7 @@ export class Product {
     productType: string;
     cutOrEngraved: ProducingTechnic;
     imageUrl?: string;
+
+    productPrice?: number;
     createdAt: Date;
 }

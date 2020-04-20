@@ -5,6 +5,7 @@ import {Router} from '@angular/router';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {ToastService} from '../../services/toast.service';
 import {IonButton} from '@ionic/angular';
+import {LoadingService} from '../../services/loading.service';
 
 @Component({
     selector: 'app-signin',
@@ -18,7 +19,8 @@ export class SigninPage implements OnInit {
     constructor(private formBuilder: FormBuilder,
                 private authService: AuthService,
                 private router: Router,
-                private toastService: ToastService
+                private toastService: ToastService,
+                private loadingService: LoadingService
     ) {
     }
 
@@ -43,6 +45,7 @@ export class SigninPage implements OnInit {
      */
     async signInHandler(submitButton: IonButton) {
         submitButton.disabled = true;
+        await this.loadingService.presentLoading();
         const email = this.validationForm.value.email;
         const password = this.validationForm.value.password;
 
@@ -50,10 +53,13 @@ export class SigninPage implements OnInit {
             const userCredential = await this.authService.signIn(email, password);
             this.validationForm.reset();
             await this.router.navigate(['orders']);
+            await this.loadingService.dismissLoading();
             await this.toastService.presentToastSuccess('Sign in successfully');
+            submitButton.disabled = false;
         } catch (e) {
             console.log(e);
             this.error = e.message;
+            await this.loadingService.dismissLoading();
             await this.toastService.presentToastError(e.message);
             submitButton.disabled = false;
         }

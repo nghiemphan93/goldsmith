@@ -130,3 +130,9 @@
   height: 150px;
   width: auto;
 }
+
+.flex-space-evenly {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}

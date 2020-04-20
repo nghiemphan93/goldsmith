@@ -16,7 +16,7 @@ import {OrderItemCacheService} from './services/order-item-cache.service';
 })
 export class AppComponent implements OnDestroy {
     isAuth$ = this.authService.getIsAuth$();
-    user$ = this.authService.getCurentUser$();
+    user$ = this.authService.getCurrentUser$();
 
     public appPages = [
         {

@@ -400,8 +400,8 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
      * Handler Submit button
      */
     async submitHandler(submitButton: IonButton) {
-        await this.loadingService.presentLoading();
         submitButton.disabled = true;
+        await this.loadingService.presentLoading();
         await this.transferDataFromFormToObject();
         try {
             if (this.isCreated) {

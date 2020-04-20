@@ -27,7 +27,7 @@ export class ProductsPage implements OnInit, OnDestroy {
     isMobile: boolean;
     skeletons = [1, 2];
     @ViewChild('table') table: DatatableComponent;
-    user$ = this.authService.getCurentUser$();
+    user$ = this.authService.getCurrentUser$();
     isAuth$ = this.authService.getIsAuth$();
 
     constructor(private productService: ProductService,

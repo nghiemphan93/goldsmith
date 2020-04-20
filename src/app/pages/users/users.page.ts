@@ -35,7 +35,7 @@ export class UsersPage implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.preparePlatform();
-        this.currentUser$ = this.authService.getCurentUser$();
+        this.currentUser$ = this.authService.getCurrentUser$();
         this.users$ = this.userService.getUsers();
     }
 

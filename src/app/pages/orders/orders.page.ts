@@ -23,7 +23,7 @@ export class OrdersPage implements OnInit, OnDestroy {
     skeletons = [1, 2];
     orders: Order[] = [];
     subscription = new Subscription();
-    user$ = this.authService.getCurentUser$();
+    user$ = this.authService.getCurrentUser$();
     isAuth$ = this.authService.getIsAuth$();
 
 

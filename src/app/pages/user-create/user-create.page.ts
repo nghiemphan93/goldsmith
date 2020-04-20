@@ -58,7 +58,7 @@ export class UserCreatePage implements OnInit, OnDestroy {
      * Create, Edit or Detail of a Customer
      */
     async preparePageContent() {
-        this.currentUser$ = this.authService.getCurentUser$();
+        this.currentUser$ = this.authService.getCurrentUser$();
         this.claims = this.claimService.getClaims();
         const userId = this.activatedRoute.snapshot.params.userId;
         const url = this.router.url.split('/');

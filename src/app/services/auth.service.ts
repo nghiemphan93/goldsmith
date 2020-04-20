@@ -37,6 +37,7 @@ export class AuthService {
                 this.userSubject.next(this.user);
                 this.isAuthSubject.next(true);
                 console.log('user logged in: ' + this.user.email);
+                console.log(this.user);
             } else {
                 this.user = null;
                 this.userSubject.next(this.user);
@@ -52,7 +53,7 @@ export class AuthService {
             .toPromise();
     }
 
-    getCurentUser$(): Observable<any> {
+    getCurrentUser$(): Observable<any> {
         return this.user$;
     }
 
