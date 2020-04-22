@@ -9,6 +9,7 @@ import {User} from 'firebase';
 import {UserService} from '../../services/user.service';
 import {ClaimService} from '../../services/claim.service';
 import {AlertService} from '../../services/alert.service';
+import {UserCacheService} from '../../services/user-cache.service';
 
 @Component({
     selector: 'app-users',
@@ -29,14 +30,15 @@ export class UsersPage implements OnInit, OnDestroy {
                 private alertController: AlertController,
                 private userService: UserService,
                 public claimService: ClaimService,
-                public alertService: AlertService
+                public alertService: AlertService,
+                private userCacheService: UserCacheService
     ) {
     }
 
     ngOnInit() {
         this.preparePlatform();
         this.currentUser$ = this.authService.getCurrentUser$();
-        this.users$ = this.userService.getUsers();
+        this.users$ = this.userCacheService.getUsersCache$();
     }
 
     ngOnDestroy() {

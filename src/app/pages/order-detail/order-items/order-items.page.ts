@@ -20,6 +20,7 @@ import {DatatableComponent} from '@swimlane/ngx-datatable';
 import {AuthService} from '../../../services/auth.service';
 import {Status} from '../../../models/status.enum';
 import * as XLSX from 'xlsx';
+import {ProductType} from '../../../models/product-type';
 
 
 @Component({
@@ -32,7 +33,7 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
     orderItemsDesktop$: Observable<OrderItem[]>;
     orderItemsMobile$: Observable<OrderItem[]>[] = [];
     orderItems: OrderItem[] = [];
-    tableStyle = 'material';
+    tableStyle = 'material striped';
     isDesktop: boolean;
     isMobile: boolean;
     orderId: string;
@@ -42,6 +43,7 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
     editingOrderItem = {};
     customActionSheetOptions: any = {
         header: 'Status',
+        cssClass: 'test'
     };
     statuses = this.statusService.getStatuses();
     @ViewChild('table') table: DatatableComponent;
@@ -83,44 +85,44 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
         if (this.isDesktop) {
             this.orderItemsDesktop$ = this.orderItemCacheService.getOrderItemsCache$ByOrder(this.orderId);
 
-            this.orderItemsDesktop$.subscribe(orderItems => {
-                const tableData = orderItems.map(orderItem => {
-                    const data = [];
-                    data.push(orderItem.orderItemStatus);
-                    data.push(orderItem.orderItemComment);
-                    data.push(orderItem.orderItemCode);
-                    let words = '';
-                    orderItem.orderItemWords.forEach(word => words = words + word + ' \n');
-                    data.push(words);
-                    let fonts = '';
-                    orderItem.orderItemFonts.forEach(font => fonts = fonts + font + ' \n');
-                    data.push(fonts);
-                    data.push(orderItem.orderItemQuantity);
-                    if (orderItem.orderItemRingSizeUS !== undefined) {
-                        const product = `${orderItem.product.productName} \n${orderItem.orderItemColor} \nRing Size: ${orderItem.orderItemRingSizeUS}`;
-                        data.push(product);
-                    } else {
-                        const product = `${orderItem.product.productName} \n${orderItem.orderItemColor} \nSize: ${orderItem.orderItemLengthInch} inches`;
-                        data.push(product);
-                    }
-                    data.push(orderItem.customer);
-                    return data;
-                });
-                console.log(tableData);
-                if (tableData.length > 0) {
-                    const header = ['Status', 'Comment', 'Order Item Code', 'Words', 'Fonts', 'Quantity', 'Product', 'Customer'];
-                    tableData.splice(0, 0, header);
-                    /* generate worksheet */
-                    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(tableData);
-
-                    /* generate workbook and add the worksheet */
-                    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
-                    /* save to file */
-                    // XLSX.writeFile(wb, 'SheetJS.xlsx');
-                }
-            });
+            // this.orderItemsDesktop$.subscribe(orderItems => {
+            //     const tableData = orderItems.map(orderItem => {
+            //         const data = [];
+            //         data.push(orderItem.orderItemStatus);
+            //         data.push(orderItem.orderItemComment);
+            //         data.push(orderItem.orderItemCode);
+            //         let words = '';
+            //         orderItem.orderItemWords.forEach(word => words = words + word + ' \n');
+            //         data.push(words);
+            //         let fonts = '';
+            //         orderItem.orderItemFonts.forEach(font => fonts = fonts + font + ' \n');
+            //         data.push(fonts);
+            //         data.push(orderItem.orderItemQuantity);
+            //         if (orderItem.orderItemRingSizeUS !== undefined) {
+            //             const product = `${orderItem.product.productName} \n${orderItem.orderItemColor} \nRing Size: ${orderItem.orderItemRingSizeUS}`;
+            //             data.push(product);
+            //         } else {
+            //             const product = `${orderItem.product.productName} \n${orderItem.orderItemColor} \nSize: ${orderItem.orderItemLengthInch} inches`;
+            //             data.push(product);
+            //         }
+            //         data.push(orderItem.customer);
+            //         return data;
+            //     });
+            //     console.log(tableData);
+            //     if (tableData.length > 0) {
+            //         const header = ['Status', 'Comment', 'Order Item Code', 'Words', 'Fonts', 'Quantity', 'Product', 'Customer'];
+            //         tableData.splice(0, 0, header);
+            //         /* generate worksheet */
+            //         const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(tableData);
+            //
+            //         /* generate workbook and add the worksheet */
+            //         const wb: XLSX.WorkBook = XLSX.utils.book_new();
+            //         XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+            //
+            //         /* save to file */
+            //         XLSX.writeFile(wb, 'SheetJS.xlsx');
+            //     }
+            // });
         } else {
             this.orderItemsMobile$.push(this.orderItemService.getLimitedOrderItemsAfterStart(this.orderId));
         }
@@ -260,10 +262,13 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     getRowClass(row: OrderItem) {
-        const statusName = row.orderItemStatus;
-        const statusClass = {};
-        statusClass[statusName] = true;
-        return statusClass;
+        let statusName: string | Status = row.orderItemStatus;
+        if (statusName === Status.RESERVED) {
+            statusName = statusName.toString().replace(/\s/g, '_');
+            const statusClass = {};
+            statusClass[statusName] = true;
+            return statusClass;
+        }
     }
 
     getFontClassCellSpan(row: OrderItem, fontIndex: number): any {
@@ -279,5 +284,23 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
         const colorClass = {};
         colorClass[className] = true;
         return colorClass;
+    }
+
+    getStatusClass({row, column, value}) {
+        let statusName: string | Status = row.orderItemStatus;
+        if (statusName !== Status.RESERVED) {
+            statusName = statusName.toString().replace(/\s/g, '_');
+            const statusClass = {};
+            statusClass[statusName] = true;
+            return statusClass;
+        }
+    }
+
+    isRing(productType: string) {
+        return productType.toUpperCase() === ProductType.NHAN;
+    }
+
+    isNecklace(productType: string) {
+        return productType.toUpperCase() === ProductType.DAY || productType.toUpperCase() === ProductType.VONG;
     }
 }

@@ -24,6 +24,8 @@ export class OrderItem {
     orderItemLengthInch: number;
     orderItemLengthCm: number;
 
+    orderItemPrice?: number;
+
 
     createdAt: Date;
 }

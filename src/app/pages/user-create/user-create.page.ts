@@ -13,6 +13,7 @@ import {Claim} from '../../models/claim.enum';
 import {UserService} from '../../services/user.service';
 import {IonButton} from '@ionic/angular';
 import {ToastService} from '../../services/toast.service';
+import {LoadingService} from '../../services/loading.service';
 
 @Component({
     selector: 'app-user-create',
@@ -39,6 +40,7 @@ export class UserCreatePage implements OnInit, OnDestroy {
                 public claimService: ClaimService,
                 private userService: UserService,
                 private toastService: ToastService,
+                private loadingService: LoadingService
     ) {
     }
 
@@ -127,8 +129,9 @@ export class UserCreatePage implements OnInit, OnDestroy {
     /**
      * Handler Submit button
      */
-    async submitHandler() {
-        console.log(this.submitButton.nativeElement);
+    async submitHandler(submitButton: IonButton) {
+        submitButton.disabled = true;
+        await this.loadingService.presentLoading();
         this.user.displayName = this.validationForm.value.displayName;
         this.user.email = this.validationForm.value.email;
         this.user.password = this.validationForm.value.password;
@@ -144,12 +147,16 @@ export class UserCreatePage implements OnInit, OnDestroy {
             }
 
             this.validationForm.reset();
+            await this.loadingService.dismissLoading();
             await this.router.navigate(['users']);
+            submitButton.disabled = false;
             window.dispatchEvent(new Event('resize'));
         } catch (e) {
             console.log(e);
             this.error = e.message;
+            await this.loadingService.dismissLoading();
             await this.toastService.presentToastError(e.message);
+            submitButton.disabled = false;
             window.dispatchEvent(new Event('resize'));
         }
     }

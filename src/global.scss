@@ -81,9 +81,11 @@
 
 
 .datatable-body-cell {
-  padding: 0px !important;
+  padding: 0 !important;
   padding-left: 5px !important;
   padding-top: 5px !important;
+  margin-bottom: 5px !important;
+
 
   .datatable-body-cell-label {
     overflow: hidden;
@@ -93,7 +95,7 @@
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 1rem auto;
 }
 
@@ -126,6 +128,11 @@
   text-align: center;
 }
 
+.cell-text-center {
+  display: block;
+  text-align: center;
+}
+
 .img-size-medium {
   height: 150px;
   width: auto;
@@ -135,4 +142,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
+}
+
+.test {
+  background: red !important;
 }

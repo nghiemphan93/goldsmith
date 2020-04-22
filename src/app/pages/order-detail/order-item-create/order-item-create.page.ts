@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChildren} from '@angular/core';
+import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChildren} from '@angular/core';
 import {Order} from '../../../models/order';
 import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {OrderService} from '../../../services/order.service';
@@ -23,6 +23,7 @@ import {IonButton, IonInput} from '@ionic/angular';
 import {ProductType} from '../../../models/product-type';
 import {LoadingService} from '../../../services/loading.service';
 import * as _ from 'lodash';
+import {Page} from '../../../models/page';
 
 
 @Component({
@@ -66,7 +67,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
                 private customerCacheService: CustomerCacheService,
                 private productCacheService: ProductCacheService,
                 private toastService: ToastService,
-                private loadingService: LoadingService
+                private loadingService: LoadingService,
     ) {
     }
 
@@ -75,7 +76,9 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
         await this.preparePageContent();
     }
 
+    @HostListener('unloaded')
     ngOnDestroy(): void {
+        console.log('bye bye order item create ...');
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
@@ -156,12 +159,12 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             order: new FormControl(this.order, Validators.required),
             orderItemCode: new FormControl('', Validators.required),
             orderItemStatus: new FormControl(Status.PENDING), // PENDING
-            customer: new FormControl('', Validators.required),
+            customer: new FormControl(''),
             product: new FormControl('', Validators.required),
             orderItemComment: new FormControl(''),
             orderItemQuantity: new FormControl(1, Validators.required),
-            orderItemRingSizeUS: new FormControl({value: '', disabled: true}, [Validators.min(2), Validators.max(13)]),
-            orderItemLengthInch: new FormControl({value: '', disabled: true}),
+            orderItemRingSizeUS: new FormControl({value: '', disabled: true}, [Validators.min(2), Validators.max(13), Validators.required]),
+            orderItemLengthInch: new FormControl({value: '', disabled: true}, Validators.required),
             orderItemColor: new FormControl(Color.SILVER, Validators.required), // Color.SILVER
             orderItemFonts: new FormArray([new FormControl(this.fontNames[4], Validators.required)]), // Font Arial
             orderItemWords: new FormArray([new FormControl('')]),
@@ -218,7 +221,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
             order: new FormControl(this.orderItem.order, Validators.required),
             orderItemCode: new FormControl(this.orderItem.orderItemCode, Validators.required),
             orderItemStatus: new FormControl(this.orderItem.orderItemStatus),
-            customer: new FormControl(this.orderItem.customer, Validators.required),
+            customer: new FormControl(this.orderItem.customer),
             product: new FormControl(this.orderItem.product, Validators.required),
             orderItemComment: new FormControl(this.orderItem.orderItemComment),
             orderItemQuantity: new FormControl(this.orderItem.orderItemQuantity, Validators.required),
@@ -280,16 +283,28 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
     }
 
 
-    private disableNecklaceAndRing(ringSizeUSInput: AbstractControl, lengthInchInput: AbstractControl) {
-        ringSizeUSInput.reset();
-        ringSizeUSInput.disable();
+    private disableNecklaceAndRing(ringSizeUSInput?: AbstractControl, lengthInchInput?: AbstractControl) {
+        if (ringSizeUSInput && lengthInchInput) {
+            ringSizeUSInput.reset();
+            ringSizeUSInput.disable();
 
-        lengthInchInput.reset();
-        lengthInchInput.disable();
+            lengthInchInput.reset();
+            lengthInchInput.disable();
+        } else {
+            const ringSizeUSInput2 = this.validationForm.get('orderItemRingSizeUS');
+            const lengthInchInput2 = this.validationForm.get('orderItemLengthInch');
+            ringSizeUSInput2.reset();
+            ringSizeUSInput2.disable();
+
+            lengthInchInput2.reset();
+            lengthInchInput2.disable();
+        }
+
     }
 
     private enableNecklaceDisableRing(lengthInchInput: AbstractControl, ringSizeUSInput: AbstractControl) {
         lengthInchInput.enable();
+        lengthInchInput.setValidators(Validators.required);
 
         ringSizeUSInput.reset();
         ringSizeUSInput.disable();
@@ -297,7 +312,7 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
 
     private enableRingDisableNecklace(ringSizeUSInput: AbstractControl, lengthInchInput: AbstractControl) {
         ringSizeUSInput.enable();
-        ringSizeUSInput.setValidators([Validators.min(2), Validators.max(13)]);
+        ringSizeUSInput.setValidators([Validators.min(2), Validators.max(13), Validators.required]);
 
         lengthInchInput.reset();
         lengthInchInput.disable();
@@ -409,17 +424,15 @@ export class OrderItemCreatePage implements OnInit, OnDestroy {
                 const result = await this.orderItemService.createOrderItem(this.orderId, this.orderItem);
                 this.orderItem.id = result.id;
                 await this.toastService.presentToastSuccess(`Successfully created Order Item ${this.orderItem.orderItemCode}`);
-                this.prepareFormValidationCreate();
             } else {
                 console.log(this.orderItem);
                 await this.orderItemService.updateOrderItem(this.orderId, this.orderItem);
                 await this.toastService.presentToastSuccess(`Successfully updated Order Item ${this.orderItem.orderItemCode}`);
-                this.prepareFormValidationUpdateOrDetail();
             }
 
             await this.loadingService.dismissLoading();
-            await this.router.navigate(['orders', this.orderId, 'orderItems', this.orderItem.id]);
             submitButton.disabled = false;
+            await this.router.navigate(['orders', this.orderId, 'orderItems']);
             window.dispatchEvent(new Event('resize'));
         } catch (e) {
             console.log(e);

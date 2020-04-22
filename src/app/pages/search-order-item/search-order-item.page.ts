@@ -19,6 +19,8 @@ import {AlertService} from '../../services/alert.service';
 import {StatusService} from '../../services/status.service';
 import {OrderCacheService} from '../../services/order-cache.service';
 import {DatatableComponent} from '@swimlane/ngx-datatable';
+import {Status} from '../../models/status.enum';
+import {ProductType} from '../../models/product-type';
 
 @Component({
     selector: 'app-search-order-item',
@@ -26,7 +28,7 @@ import {DatatableComponent} from '@swimlane/ngx-datatable';
     styleUrls: ['./search-order-item.page.scss'],
 })
 export class SearchOrderItemPage implements OnInit, OnDestroy {
-    tableStyle = 'material';
+    tableStyle = 'material striped';
     validationForm: FormGroup;
     ordersDesktop$: Observable<Order[]>;
     ordersMobile$: Observable<Order[]>[] = [];
@@ -276,10 +278,13 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
     }
 
     getRowClass(row: OrderItem) {
-        const statusName = row.orderItemStatus;
-        const statusClass = {};
-        statusClass[statusName] = true;
-        return statusClass;
+        let statusName: string | Status = row.orderItemStatus;
+        if (statusName === Status.RESERVED) {
+            statusName = statusName.toString().replace(/\s/g, '_');
+            const statusClass = {};
+            statusClass[statusName] = true;
+            return statusClass;
+        }
     }
 
     getFontClassCellSpan(row: OrderItem, fontIndex: number): any {
@@ -295,5 +300,23 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
         const colorClass = {};
         colorClass[className] = true;
         return colorClass;
+    }
+
+    getStatusClass({row, column, value}) {
+        let statusName: string | Status = row.orderItemStatus;
+        if (statusName !== Status.RESERVED) {
+            statusName = statusName.toString().replace(/\s/g, '_');
+            const statusClass = {};
+            statusClass[statusName] = true;
+            return statusClass;
+        }
+    }
+
+    isRing(productType: string) {
+        return productType.toUpperCase() === ProductType.NHAN;
+    }
+
+    isNecklace(productType: string) {
+        return productType.toUpperCase() === ProductType.DAY || productType.toUpperCase() === ProductType.VONG;
     }
 }

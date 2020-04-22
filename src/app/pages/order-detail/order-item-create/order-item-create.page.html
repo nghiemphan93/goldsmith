@@ -153,12 +153,12 @@
                             <ion-label>Product</ion-label>
                             <!--            Create                -->
                             <ion-select
-                                #selectedProductInput
+                                #selectedProductInputCreate
                                 interface="action-sheet"
                                 formControlName="product"
                                 *ngIf="isCreated"
                                 [compareWith]="compareWithFn"
-                                (ionChange)="configRingOrNecklace(selectedProductInput.value)"
+                                (ionChange)="configRingOrNecklace(selectedProductInputCreate.value)"
                             >
                                 <ion-select-option
                                         *ngFor="let product of products$ | async"
@@ -170,10 +170,12 @@
 
                             <!--            Update                -->
                             <ion-select
-                                    interface="action-sheet"
-                                    formControlName="product"
-                                    *ngIf="isUpdated"
-                                    [compareWith]="compareWithFn"
+                                #selectedProductInputUpdate
+                                interface="action-sheet"
+                                formControlName="product"
+                                *ngIf="isUpdated"
+                                [compareWith]="compareWithFn"
+                                (ionChange)="configRingOrNecklace(selectedProductInputUpdate.value)"
                             >
                                 <ion-select-option
                                         *ngFor="let product of products$ | async"
@@ -297,7 +299,7 @@
                             <ion-label>Length Inch</ion-label>
                             <ion-input
                                     *ngIf="!isDetailed"
-                                    type="number"
+                                    type="text"
                                     formControlName="orderItemLengthInch"
                                     slot="end"
                             ></ion-input>

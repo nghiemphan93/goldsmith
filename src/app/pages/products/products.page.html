@@ -12,7 +12,7 @@
     <ion-item-group class="ion-margin">
         <ion-button
                 routerLink="/products/create"
-                *ngIf="(isAuth$ | async) &&!(user$ | async).customClaims.DESIGNER"
+                *ngIf="(isAuth$ | async) && !(user$ | async)?.customClaims?.DESIGNER"
         >
             <ion-icon name="add-circle-outline" class="ion-margin-end"></ion-icon>
             <p>Create New Product</p>

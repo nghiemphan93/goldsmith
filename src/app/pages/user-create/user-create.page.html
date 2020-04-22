@@ -38,7 +38,7 @@
                 <form
                         [formGroup]="validationForm"
                         *ngIf="user"
-                        (keydown.enter)="validationForm.valid ? submitHandler() : null"
+                        (keydown.enter)="validationForm.valid ? submitHandler(submitButton) : null"
                 >
                     <ion-item-divider>
                         <ion-label *ngIf="isDetailed">Please fill in information for the user</ion-label>
@@ -106,20 +106,16 @@
                             <ion-label>Role</ion-label>
                             <ion-label>
                                 <span>{{ claimService.claimBooleanToEnum(user) }}</span>
-                                <!--                                <span *ngIf="user.customClaims.DEV">DEV</span>-->
-                                <!--                                <span *ngIf="user.customClaims.ADMIN">ADMIN</span>-->
-                                <!--                                <span *ngIf="user.customClaims.MODERATOR">MODERATOR</span>-->
-                                <!--                                <span *ngIf="user.customClaims.DESIGNER">DESIGNER</span>-->
                             </ion-label>
                         </ion-item>
                     </ion-item-group>
 
                     <!--  Submit Button  -->
                     <ion-button
-                            *ngIf="!isDetailed"
+                            [hidden]="isDetailed"
                             [disabled]="!validationForm.valid"
                             class="ion-margin-top"
-                            (click)="submitHandler()"
+                            (click)="submitHandler(submitButton)"
                             type="submit"
                             expand="block"
                             #submitButton

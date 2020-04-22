@@ -78,7 +78,7 @@ export class OrderCreatePage implements OnInit, OnDestroy {
     prepareFormValidationCreate() {
         this.validationForm = this.formBuilder.group({
             orderCode: new FormControl('', Validators.required),
-            orderStatus: new FormControl(this.statuses[0], Validators.required),
+            orderStatus: new FormControl(Status.PENDING, Validators.required),
             orderDeadline: new FormControl('', Validators.required)
         });
     }

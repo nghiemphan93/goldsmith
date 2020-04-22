@@ -36,7 +36,10 @@ export class AuthService {
                 this.user.customClaims = idTokenResult.claims;
                 this.userSubject.next(this.user);
                 this.isAuthSubject.next(true);
+                // const result = await this.makeDev(user.email);
+                // console.log(result);
                 console.log('user logged in: ' + this.user.email);
+                // console.log(user);
             } else {
                 this.user = null;
                 this.userSubject.next(this.user);

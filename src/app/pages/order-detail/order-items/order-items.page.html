@@ -54,40 +54,40 @@
             style="overflow: hidden"
             [rowClass]="getRowClass"
         >
-            <!-- Status -->
+            <!--    Status    -->
             <ngx-datatable-column
                     name="Status"
                     prop="orderItemStatus"
+                    [cellClass]="getStatusClass"
             >
                 <ng-template
                         let-row="row"
                         let-value="value"
                         let-rowIndex="rowIndex"
                         ngx-datatable-cell-template
-
                 >
                     <span
                             *ngIf="!editingOrderItem[rowIndex + '-orderItemStatus']"
                             title="Double Click to edit"
                             (dblclick)="editingOrderItem[rowIndex + '-orderItemStatus'] = true"
+                            class="cell-text-center"
                     >
-                        {{ row.orderItemStatus }}
+                        {{ row?.orderItemStatus }}
                     </span>
 
                     <ion-select
+                            *ngIf="editingOrderItem[rowIndex + '-orderItemStatus']"
                             class="ion-no-margin ion-no-padding"
                             interface="action-sheet"
-                            *ngIf="editingOrderItem[rowIndex + '-orderItemStatus']"
                             (mouseenter)="startEditingInputSelect(orderItemStatus)"
-                            [value]="row.orderItemStatus"
-                            #orderItemStatus
+                            [value]="row?.orderItemStatus"
                             (ionChange)="updateOrderItem($event, 'orderItemStatus', rowIndex, row)"
                             (ionCancel)="editingOrderItem[rowIndex + '-orderItemStatus'] = false"
+                            #orderItemStatus
                     >
                         <ion-select-option
                                 *ngFor="let status of statuses"
                                 [value]="status"
-                                #selectOption
                         >
                             {{ status }}
                         </ion-select-option>
@@ -100,7 +100,6 @@
                     name="Comment"
                     prop="orderItemComment"
                     [cellClass]="getCommentClassCell"
-                    *ngIf="isDesktop"
             >
                 <ng-template let-row="row" let-value="value" let-rowIndex="rowIndex" ngx-datatable-cell-template
                              class="ion-no-padding"
@@ -195,10 +194,9 @@
             <ngx-datatable-column
                     name="Quantity"
                     prop="orderItemQuantity"
-                    [cellClass]="getQuantityClassCell"
-            >
+                    [cellClass]="getQuantityClassCell">
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                    <span>{{ row.orderItemQuantity }}</span>
+                    <span class="cell-text-center">{{ row.orderItemQuantity }}</span>
                 </ng-template>
             </ngx-datatable-column>
 
@@ -208,30 +206,28 @@
                     prop="product.productName"
                     [cellClass]="getColorClassCell">
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                <span *ngIf="row.product?.productType !== 'Nhẫn'">
-                  <strong>{{ row.product?.productName }} </strong><br>
-                    {{ row.orderItemColor }} <br>
-                  <span *ngIf="row.orderItemLengthInch">Size: {{ row.orderItemLengthInch }} inches</span>
-                </span>
+                    <strong>{{ row?.product?.productName }} </strong><br>
+                    {{ row?.orderItemColor }} <br>
+                    <ng-container *ngIf="isNecklace(row?.product?.productType)">
+                        <strong *ngIf="row?.orderItemLengthInch">Dài: {{ row.orderItemLengthInch }} inches</strong>
+                    </ng-container>
 
-                    <span *ngIf="row.product?.productType === 'Nhẫn'">
-                  <strong>{{ row.product.productName }}</strong><br>
-                        {{ row.orderItemColor }} <br>
-                Ring Size: {{ row.orderItemRingSizeUS }} US
-                </span>
+                    <ng-container *ngIf="isRing(row?.product?.productType)">
+                        <strong>Size Nhẫn: {{ row?.orderItemRingSizeUS }} US</strong>
+                    </ng-container>
                 </ng-template>
             </ngx-datatable-column>
 
             <!--    Customer    -->
-            <ngx-datatable-column
-                    name="Customer"
-                    prop="customer"
-                    *ngIf="(isAuth$ | async) &&!(user$ | async).customClaims.DESIGNER"
-            >
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                    <span>{{ row.customer }}</span>
-                </ng-template>
-            </ngx-datatable-column>
+            <!--            <ngx-datatable-column-->
+            <!--                    name="Customer"-->
+            <!--                    prop="customer"-->
+            <!--                    *ngIf="(isAuth$ | async) &&!(user$ | async).customClaims.DESIGNER"-->
+            <!--            >-->
+            <!--                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>-->
+            <!--                    <span>{{ row.customer }}</span>-->
+            <!--                </ng-template>-->
+            <!--            </ngx-datatable-column>-->
 
             <!--    Delete    -->
             <ngx-datatable-column

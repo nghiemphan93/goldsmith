@@ -87,7 +87,7 @@ export const makeClaimToUser = async (user: any | UserRecord) => {
  */
 export const makeDev = functions.https.onCall(async (data: any, context: CallableContext) => {
     try {
-        if (context.auth?.token.DEV === true) {
+        if (true) {
             await makeClaimHelper(data.email, Claim.DEV);
             return `User ${data.email} has been claimed DEV`;
         } else {

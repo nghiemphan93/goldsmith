@@ -1,7 +1,7 @@
 export enum Status {
-    RESERVED = 'RESERVED',
-    PENDING = 'PENDING',
-    DESIGNED = 'DESIGNED',
-    LABELED = 'LABELED',
-    FINISHED = 'FINISHED'
+    RESERVED = 'ĐANG CHỜ',
+    PENDING = 'BẮT ĐẦU',
+    DESIGNED = 'ĐÃ LÀM MẪU',
+    CHECKED = 'ĐÃ MẮC DÂY',
+    FINISHED = 'XONG'
 }
