@@ -25,6 +25,11 @@
     font-size: 1.5rem !important;
 }
 
+.AutumnChant {
+    font-family: AutumnChant;
+    font-size: 1.5rem !important;
+}
+
 .BookmanOldStyle {
     font-family: Bookman Old Style;
     font-size: 2rem !important;
@@ -87,6 +92,11 @@
 
 .Desyrel {
     font-family: Desyrel;
+    font-size: 2rem !important;
+}
+
+.Cursif {
+    font-family: Cursif;
     font-size: 2rem !important;
 }
 

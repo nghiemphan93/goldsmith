@@ -30,6 +30,7 @@
                                     formControlName="orders"
                                     [compareWith]="compareWithFn"
                                     (ionChange)="onSelectOrder()"
+                                    #ordersIonSelect
                             >
                                 <ion-select-option
                                         *ngFor="let order of orders$ | async"
@@ -135,27 +136,27 @@
                 <ng-template let-row="row" let-value="value" let-rowIndex="rowIndex" ngx-datatable-cell-template
                              class="ion-no-padding"
                 >
-                    <!--                    <span>-->
-                    <!--                        {{ row.orderItemComment }}-->
+                                        <span>
+                                            {{ row.orderItemComment }}
+                                        </span>
+
+                    <!--                    <span-->
+                    <!--                            *ngIf="!editingOrderItem[rowIndex + '-orderItemComment']"-->
+                    <!--                            title="Double Click to edit"-->
+                    <!--                            (dblclick)="editingOrderItem[rowIndex + '-orderItemComment'] = true"-->
+                    <!--                    >-->
+                    <!--                             {{ row.orderItemComment }}-->
                     <!--                    </span>-->
 
-                    <span
-                            *ngIf="!editingOrderItem[rowIndex + '-orderItemComment']"
-                            title="Double Click to edit"
-                            (dblclick)="editingOrderItem[rowIndex + '-orderItemComment'] = true"
-                    >
-                             {{ row.orderItemComment }}
-                    </span>
-
-                    <input
-                            *ngIf="editingOrderItem[rowIndex + '-orderItemComment']"
-                            type="text"
-                            (blur)="updateOrderItem($event,'orderItemComment',rowIndex,row)"
-                            [value]="value"
-                            (mouseenter)="startEditingInputText(orderItemCommentInput)"
-                            (keyup.enter)="updateOrderItem($event,'orderItemComment',rowIndex,row)"
-                            #orderItemCommentInput
-                    >
+                    <!--                    <input-->
+                    <!--                            *ngIf="editingOrderItem[rowIndex + '-orderItemComment']"-->
+                    <!--                            type="text"-->
+                    <!--                            (blur)="updateOrderItem($event,'orderItemComment',rowIndex,row)"-->
+                    <!--                            [value]="value"-->
+                    <!--                            (mouseenter)="startEditingInputText(orderItemCommentInput)"-->
+                    <!--                            (keyup.enter)="updateOrderItem($event,'orderItemComment',rowIndex,row)"-->
+                    <!--                            #orderItemCommentInput-->
+                    <!--                    >-->
                 </ng-template>
             </ngx-datatable-column>
 
@@ -256,13 +257,17 @@
                     [cellClass]="getColorClassCell">
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                     <strong>{{ row?.product?.productName }} </strong><br>
-                    {{ row?.orderItemColor }} <br>
+                    {{ row?.orderItemColor }} <br><br>
                     <ng-container *ngIf="isNecklace(row?.product?.productType)">
-                        <strong *ngIf="row?.orderItemLengthInch">Dài: {{ row.orderItemLengthInch }} inches</strong>
+                        <strong *ngIf="row?.orderItemLengthInch">Length: {{ row.orderItemLengthInch }} inches</strong>
+                        <br>
+                        <strong *ngIf="row?.orderItemLengthCm">Dài: {{ row.orderItemLengthCm }} cm</strong>
                     </ng-container>
 
                     <ng-container *ngIf="isRing(row?.product?.productType)">
-                        <strong>Size Nhẫn: {{ row?.orderItemRingSizeUS }} US</strong>
+                        <strong>Size Ring: {{ row?.orderItemRingSizeUS }} US</strong>
+                        <br>
+                        <strong>Size Nhẫn: {{ row?.orderItemRingSizeVN }} VN</strong>
                     </ng-container>
                 </ng-template>
             </ngx-datatable-column>

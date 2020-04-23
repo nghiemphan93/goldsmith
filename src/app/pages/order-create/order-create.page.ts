@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {Customer} from '../../models/customer';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {CustomerService} from '../../services/customer.service';
@@ -36,11 +36,13 @@ export class OrderCreatePage implements OnInit, OnDestroy {
         this.preparePageContent();
     }
 
+    @HostListener('unloaded')
     ngOnDestroy(): void {
         console.log('bye bye OrderCreatePage...');
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
+        window.dispatchEvent(new Event('resize'));
     }
 
     /**

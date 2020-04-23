@@ -53,6 +53,7 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
     allOrderItemsCache$: Observable<OrderItem[]>;
 
     @ViewChild('searchInput') searchInput: IonInput;
+    @ViewChild('ordersIonSelect') ordersIonSelect: IonSelect;
     @ViewChild('orderItemCommentInput') orderItemCommentInput: ElementRef;
     @ViewChild('table') table: DatatableComponent;
     toSearchText = '';
@@ -73,23 +74,18 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
                 private toastService: ToastService,
                 public alertService: AlertService,
                 private statusService: StatusService,
-                private orderCacheService: OrderCacheService
+                private orderCacheService: OrderCacheService,
     ) {
+    }
+
+    async ionViewDidEnter() {
+        await this.ordersIonSelect.open();
     }
 
     ngOnInit() {
         this.setup();
         this.orders$ = this.orderCacheService.getOrdersCache$();
         this.prepareFormValidation();
-
-        // const list = [2, 3, 1, 6, 6, 8, 3, 4543, 13, 5, 6];
-        // const toFiltered = [2, 6, 5];
-        // console.log(list);
-        // console.log(list.filter(numb => {
-        //     if (toFiltered.includes(numb)) {
-        //         return numb;
-        //     }
-        // }));
     }
 
     ngOnDestroy(): void {
@@ -120,16 +116,16 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
         });
     }
 
-    onSelectOrder() {
+    async onSelectOrder() {
         this.selectedOrders = this.validationForm.value.orders;
         this.orderItemCacheService.setSelectedOrders(this.selectedOrders);
-
 
         this.orderItemCacheService.getAllOrderItemsCache$().subscribe(async moreOrderItems => {
             this.addMoreOrderItems(moreOrderItems);
             const selectedOrderIds = this.selectedOrders.map(selectedOrder => selectedOrder.id);
             this.orderItems = this.orderItems.filter(oldOrderItem => {
                 if (selectedOrderIds.includes(oldOrderItem.order.id)) {
+                    // this.searchInput.setFocus();
                     return oldOrderItem;
                 }
             });
@@ -210,13 +206,17 @@ export class SearchOrderItemPage implements OnInit, OnDestroy {
         }
     }
 
-    async updateOrderItem(event: Event | any, attributeName: string, rowIndex: number, toUpdateOrderItem: OrderItem) {
+    async updateOrderItem(event: any, attributeName: string, rowIndex: number, toUpdateOrderItem: OrderItem) {
+
         this.editingOrderItem[rowIndex + '-' + attributeName] = false;
         if (toUpdateOrderItem[attributeName] !== event.target.value) {
             toUpdateOrderItem[attributeName] = event.target.value;
             try {
                 const updateResult = await this.orderItemService.updateOrderItem(toUpdateOrderItem.order.id, toUpdateOrderItem);
                 await this.toastService.presentToastSuccess(`Successfully updated Order Item ${toUpdateOrderItem.orderItemCode} from Order ${toUpdateOrderItem.order.orderCode}`);
+                if (this.orderItemsPaginated.length <= 5) {
+                    await this.searchInput.setFocus();
+                }
             } catch (e) {
                 console.log(e);
                 await this.toastService.presentToastError(e.message);

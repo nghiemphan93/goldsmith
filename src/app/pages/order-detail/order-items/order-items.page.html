@@ -16,13 +16,22 @@
         *ngIf="isDesktop"
 >
     <section class="container">
-        <ion-button
-                [routerLink]="['/orders', orderId, 'orderItems', 'create']"
-                *ngIf="(isAuth$ | async) && !(user$ | async).customClaims.DESIGNER"
-        >
-            <ion-icon name="add-circle-outline"></ion-icon>
-            New Order Item
-        </ion-button>
+        <ion-item-group>
+            <ion-button
+                    [routerLink]="['/orders']"
+                    color="dark"
+            >
+                <ion-icon name="arrow-back-outline"></ion-icon>
+                Quay về các đơn hàng
+            </ion-button>
+            <ion-button
+                    [routerLink]="['/orders', orderId, 'orderItems', 'create']"
+                    *ngIf="(isAuth$ | async) && !(user$ | async).customClaims.DESIGNER"
+            >
+                <ion-icon name="add-circle-outline"></ion-icon>
+                Sản phẩm mới
+            </ion-button>
+        </ion-item-group>
 
         <ion-grid fixed>
             <ion-row>
@@ -203,17 +212,21 @@
             <!--    Product    -->
             <ngx-datatable-column
                     name="Product"
-                    prop="product.productName"
+                    prop="orderItemColor"
                     [cellClass]="getColorClassCell">
                 <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
                     <strong>{{ row?.product?.productName }} </strong><br>
-                    {{ row?.orderItemColor }} <br>
+                    {{ row?.orderItemColor }} <br><br>
                     <ng-container *ngIf="isNecklace(row?.product?.productType)">
-                        <strong *ngIf="row?.orderItemLengthInch">Dài: {{ row.orderItemLengthInch }} inches</strong>
+                        <strong *ngIf="row?.orderItemLengthInch">Length: {{ row.orderItemLengthInch }} inches</strong>
+                        <br>
+                        <strong *ngIf="row?.orderItemLengthCm">Dài: {{ row.orderItemLengthCm }} cm</strong>
                     </ng-container>
 
                     <ng-container *ngIf="isRing(row?.product?.productType)">
-                        <strong>Size Nhẫn: {{ row?.orderItemRingSizeUS }} US</strong>
+                        <strong>Size Ring: {{ row?.orderItemRingSizeUS }} US</strong>
+                        <br>
+                        <strong>Size Nhẫn: {{ row?.orderItemRingSizeVN }} VN</strong>
                     </ng-container>
                 </ng-template>
             </ngx-datatable-column>
