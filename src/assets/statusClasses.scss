@@ -1,6 +1,25 @@
 .RESERVED {
-  background: #fffd00;
+  background: #fffd00 !important;
 }
+
+.PENDING {
+}
+
+.DESIGNED {
+  background: var(--ion-color-primary) !important;
+  color: var(--ion-color-primary-contrast) !important;
+}
+
+.CHECKED {
+  background: var(--ion-color-secondary) !important;
+  color: var(--ion-color-secondary-contrast) !important;
+}
+
+.FINISHED {
+  background: var(--ion-color-success) !important;
+  color: var(--ion-color-success-contrast) !important;
+}
+
 
 .ĐANG_CHỜ {
   background: #fffd00 !important;

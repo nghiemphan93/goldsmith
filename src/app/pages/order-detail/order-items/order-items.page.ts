@@ -69,7 +69,7 @@ export class OrderItemsPage implements OnInit, OnDestroy, AfterViewInit {
     ngOnInit() {
         this.setup();
         setTimeout(async () => {
-            if (this.table.rowCount === 0) {
+            if (this.isDesktop && this.table.rowCount === 0) {
                 this.table.rowCount = -1;
                 await this.toastService.presentToastError('No data or Network error. Please add more data or refresh the page');
             }
